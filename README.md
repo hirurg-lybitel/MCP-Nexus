@@ -26,8 +26,8 @@ This multi-channel approach makes MCP Nexus a complete reference implementation 
 
 ### Prerequisites
 
-- **Node.js** 18 or higher
-- **pnpm** 8 or higher
+- **Node.js** 25 or higher
+- **pnpm** 10 or higher
 
 ### Installation
 
@@ -42,7 +42,7 @@ Create a `.env` file in the root directory to configure the application:
 
 ```bash
 # Server Configuration
-PORT=4004              # Next.js server port (default: 4004)
+PORT=4000              # Next.js server port (default: 4000)
 HOSTNAME=localhost     # Server hostname (default: localhost)
 NODE_ENV=development   # Environment mode
 
@@ -59,7 +59,7 @@ Start the development environment (runs both Next.js app and MCP server):
 pnpm dev
 ```
 
-The application will be available at `http://localhost:3000`, and the MCP server will be running in parallel.
+The application will be available at `http://localhost:{port}`, and the MCP server will be running in parallel.
 
 ### Running Specific Components
 
@@ -89,16 +89,9 @@ This will remove:
 
 ## 📦 Project Structure
 
-```
-local-mcp/
-├── apps/
-│   └── web/          # Next.js application with integrated MCP server
-└── ...
-```
-
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 16
+- **Framework**: Next.js 25
 - **Language**: TypeScript
 - **Monorepo**: Turbo
 - **Package Manager**: pnpm
