@@ -17,11 +17,11 @@
     "del-cli": "^7.0.0",
     "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
-    "turbo": "^1.12.0",
+    "turbo": "^2.7.5",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@10.28.1",
   "engines": {
-    "node": ">=18"
+    "node": ">=25"
   }
 }
