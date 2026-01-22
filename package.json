@@ -9,7 +9,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "type-check": "turbo run type-check",
-    "clean": "del-cli node_modules && del-cli node_modules .turbo && del-cli \"apps/*/node_modules\" \"apps/*/.next\" \"apps/*/.turbo\" \"apps/*/dist\" \"apps/*/build\" \"apps/*/.tsbuildinfo\""
+    "clean": "del-cli node_modules && del-cli node_modules .turbo && del-cli \"apps/*/.next\" \"apps/*/.turbo\" \"apps/*/dist\" \"apps/*/build\" \"apps/*/.tsbuildinfo\" \"apps/*/node_modules\""
   },
   "devDependencies": {
     "@turbo/gen": "^1.12.0",
