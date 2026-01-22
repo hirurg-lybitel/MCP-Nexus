@@ -173,7 +173,7 @@ export default function McpTools() {
             value={serverUrl}
             onChange={(e) => setServerUrl(e.target.value)}
             disabled={isConnected}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white disabled:opacity-50"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white disabled:opacity-50"
             placeholder="http://localhost:4005/mcp"
           />
         </div>

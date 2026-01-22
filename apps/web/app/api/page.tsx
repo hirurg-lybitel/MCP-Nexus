@@ -29,7 +29,7 @@ export default function ApiPage() {
           </h2>
           <div className="space-y-3 text-sm">
             <div>
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-sm">
                 GET /api/users
               </code>
               <span className="ml-2 text-gray-600 dark:text-gray-400">
@@ -37,7 +37,7 @@ export default function ApiPage() {
               </span>
             </div>
             <div>
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-sm">
                 POST /api/users
               </code>
               <span className="ml-2 text-gray-600 dark:text-gray-400">
@@ -45,7 +45,7 @@ export default function ApiPage() {
               </span>
             </div>
             <div>
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-sm">
                 DELETE /api/users/[id]
               </code>
               <span className="ml-2 text-gray-600 dark:text-gray-400">
@@ -53,7 +53,7 @@ export default function ApiPage() {
               </span>
             </div>
             <div>
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-sm">
                 GET /api/posts
               </code>
               <span className="ml-2 text-gray-600 dark:text-gray-400">
@@ -61,7 +61,7 @@ export default function ApiPage() {
               </span>
             </div>
             <div>
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-sm">
                 POST /api/posts
               </code>
               <span className="ml-2 text-gray-600 dark:text-gray-400">
@@ -69,7 +69,7 @@ export default function ApiPage() {
               </span>
             </div>
             <div>
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-sm">
                 DELETE /api/posts/[id]
               </code>
               <span className="ml-2 text-gray-600 dark:text-gray-400">
