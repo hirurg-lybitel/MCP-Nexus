@@ -1,0 +1,27 @@
+{
+  "name": "turbo-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "dev:s": "turbo build --filter web... && turbo dev --filter web...",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "type-check": "turbo run type-check",
+    "clean": "del-cli node_modules && del-cli node_modules .turbo && del-cli \"apps/*/node_modules\" \"apps/*/.next\" \"apps/*/.turbo\" \"apps/*/dist\" \"apps/*/build\" \"apps/*/.tsbuildinfo\""
+  },
+  "devDependencies": {
+    "@turbo/gen": "^1.12.0",
+    "cross-env": "^10.1.0",
+    "del-cli": "^7.0.0",
+    "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
+    "turbo": "^1.12.0",
+    "typescript": "^5.3.3"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=18"
+  }
+}
