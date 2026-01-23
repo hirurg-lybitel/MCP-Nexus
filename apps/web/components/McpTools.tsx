@@ -1,170 +1,168 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useRef } from 'react'
-import { McpClientAdapter } from '@/lib/mcp/client'
-import Button from './Button'
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { McpClientAdapter } from '@/lib/mcp/client';
+import Button from './Button';
 
 export default function McpTools() {
-  const [client, setClient] = useState<McpClientAdapter | null>(null)
-  const [isConnected, setIsConnected] = useState(false)
-  const [isConnecting, setIsConnecting] = useState(false)
-  const [tools, setTools] = useState<Array<{
-    name: string
-    description?: string
-  }>>([])
-  const [error, setError] = useState<string | null>(null)
-  const [serverUrl, setServerUrl] = useState('http://localhost:4005/mcp')
-  const isMountedRef = useRef(true)
+  const [client, setClient] = useState<McpClientAdapter | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [tools, setTools] = useState<
+    Array<{
+      name: string;
+      description?: string;
+    }>
+  >([]);
+  const [error, setError] = useState<string | null>(null);
+  const [serverUrl, setServerUrl] = useState('http://localhost:4005/mcp');
+  const isMountedRef = useRef(true);
 
-  // Track component mount status
-  useEffect(() => {
-    isMountedRef.current = true
-    return () => {
-      isMountedRef.current = false
+  const autoConnect = useCallback(async () => {
+    if (client || isConnecting) {
+      return;
     }
-  }, [])
+    setIsConnecting(true);
 
-  // Auto-connect on mount
-  useEffect(() => {
-    return;
-    const autoConnect = async () => {
-      if (!client && !isConnecting) {
-        setIsConnecting(true)
-        setError(null)
+    try {
+      const newClient = new McpClientAdapter(serverUrl);
+      await newClient.connect();
 
-        try {
-          const newClient = new McpClientAdapter(serverUrl)
-          await newClient.connect()
-          
-          // Check if component is still mounted before updating state
-          if (!isMountedRef.current) {
-            await newClient.disconnect().catch(() => {})
-            return
-          }
-          
-          setClient(newClient)
-          setIsConnected(true)
+      setClient(newClient);
+      setIsConnected(true);
 
-          // Fetch tools immediately after connection
-          const result = await newClient.listTools()
+      const result = await newClient.listTools();
 
-          // Check again before updating state
-          if (!isMountedRef.current) {
-            return
-          }
+      // Check again before updating state
+      if (!isMountedRef.current) {
+        return;
+      }
 
-          console.log('Tools:', result.tools)
-          setTools(result.tools.map(tool => ({
-            name: tool.name,
-            description: tool.description
-          })))
-          setError(null)
-        } catch (err) {
-          // Ignore errors if component is unmounted
-          if (!isMountedRef.current) {
-            return
-          }
-          
-          setError(err instanceof Error ? err.message : 'Failed to connect')
-          setIsConnected(false)
-        } finally {
-          if (isMountedRef.current) {
-            setIsConnecting(false)
-          }
-        }
+      console.log('Tools:', result.tools);
+      setTools(
+        result.tools.map((tool) => ({
+          name: tool.name,
+          description: tool.description,
+        }))
+      );
+    } catch (err) {
+      // Ignore errors if component is unmounted
+      if (!isMountedRef.current) {
+        return;
+      }
+
+      console.error('Error connecting to server:', err);
+      setIsConnected(false);
+    } finally {
+      if (isMountedRef.current) {
+        setIsConnecting(false);
       }
     }
+  }, [client, isConnecting, serverUrl]);
 
-    autoConnect()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Run only on mount
+  const isMounted = useRef(false);
+  useEffect(() => {
+    if (!isMounted.current) {
+      autoConnect();
+
+      isMounted.current = true;
+    }
+  }, [autoConnect]);
 
   useEffect(() => {
     // Cleanup on unmount
     return () => {
+      console.log('Disconnecting on unmount 1');
       if (client) {
+        console.log('Disconnecting on unmount 2');
         // Silently disconnect - ignore errors during unmount
-        client.disconnect().catch(() => {
+        client.disconnect().catch((e) => {
           // Ignore errors during cleanup
-        })
+          console.log('Failed to disconnect on unmount', e);
+        });
       }
-    }
-  }, [client])
+    };
+  }, [client]);
 
   const handleConnect = async () => {
-    setIsConnecting(true)
-    setError(null)
+    setIsConnecting(true);
+    setError(null);
 
     try {
-      const newClient = new McpClientAdapter(serverUrl)
-      await newClient.connect()
-      setClient(newClient)
-      setIsConnected(true)
+      const newClient = new McpClientAdapter(serverUrl);
+      await newClient.connect();
+      setClient(newClient);
+      setIsConnected(true);
 
       // Fetch tools immediately after connection
-      await fetchTools(newClient)
+      await fetchTools(newClient);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to connect')
-      setIsConnected(false)
+      setError(err instanceof Error ? err.message : 'Failed to connect');
+      setIsConnected(false);
     } finally {
-      setIsConnecting(false)
+      setIsConnecting(false);
     }
-  }
+  };
 
   const handleDisconnect = async () => {
     try {
       if (client) {
-        await client.disconnect()
+        await client.disconnect();
       }
-      setClient(null)
-      setIsConnected(false)
-      setTools([])
-      setError(null)
+      setClient(null);
+      setIsConnected(false);
+      setTools([]);
+      setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to disconnect')
+      setError(err instanceof Error ? err.message : 'Failed to disconnect');
     }
-  }
+  };
 
   const fetchTools = async (mcpClient?: McpClientAdapter) => {
-    const clientToUse = mcpClient || client
+    const clientToUse = mcpClient || client;
     if (!clientToUse) {
       if (isMountedRef.current) {
-        setError('Not connected to server')
+        setError('Not connected to server');
       }
-      return
+      return;
     }
 
     try {
-      const result = await clientToUse.listTools()
-      
+      const result = await clientToUse.listTools();
+
       // Check if component is still mounted before updating state
       if (!isMountedRef.current) {
-        return
+        return;
       }
-      
-      setTools(result.tools.map(tool => ({
-        name: tool.name,
-        description: tool.description
-      })))
-      setError(null)
+
+      setTools(
+        result.tools.map((tool) => ({
+          name: tool.name,
+          description: tool.description,
+        }))
+      );
+      setError(null);
     } catch (err) {
       // Ignore "Connection closed" errors if component is unmounting
-      const errorMessage = err instanceof Error ? err.message : String(err)
+      const errorMessage = err instanceof Error ? err.message : String(err);
       if (errorMessage.includes('Connection closed') && !isMountedRef.current) {
-        return
+        return;
       }
-      
+
       if (isMountedRef.current) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch tools')
+        setError(err instanceof Error ? err.message : 'Failed to fetch tools');
       }
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2 items-end">
         <div className="flex-1">
-          <label htmlFor="server-url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label
+            htmlFor="server-url"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
             MCP Server URL
           </label>
           <input
@@ -248,5 +246,5 @@ export default function McpTools() {
         </p>
       )}
     </div>
-  )
+  );
 }
