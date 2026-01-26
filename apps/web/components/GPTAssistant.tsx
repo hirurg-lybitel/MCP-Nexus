@@ -48,28 +48,16 @@ export default function GPTAssistant() {
     mcpToolNamesRef.current = new Set(toOpenAiTools.map(t => t.function.name));
   }, [isConnected, tools]);
 
-  //   useEffect(() => {
-  //     const loadTools = async () => {
-  //       try {
-  //         const response = await fetch("/api/mcp", {
-  //           method: "POST",
-  //           headers: { "Content-Type": "application/json" },
-  //           body: JSON.stringify({ action: "list_tools" }),
-  //         });
-  //         const data = await response.json();
-  //         setTools(data.tools || []);
-  //       } catch (err) {
-  //         console.error("Error loading tools:", err);
-  //         setError("Failed to load tools");
-  //       }
-  //     };
-
-  //     loadTools();
-  //   }, []);
-
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (!mcpError) { 
+      return;
+    }
+    setError(mcpError);
+  }, [mcpError]);
 
   async function processTool(
     toolName: string,
@@ -176,9 +164,14 @@ export default function GPTAssistant() {
 
       let data = await response.json();
 
+      if (!data.choices?.[0]) {
+        throw new Error("Invalid API response: no choices returned");
+      }
+
+
       while (
         data.choices[0].finish_reason === "tool_calls" &&
-        data.choices[0].message.tool_calls
+        data.choices[0].message?.tool_calls
       ) {
         const toolCalls = data.choices[0].message.tool_calls;
 

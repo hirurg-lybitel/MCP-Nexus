@@ -77,7 +77,6 @@ export const useMcpAdapter = () => {
       client.disconnect().catch((e) => {
         // Ignore errors during cleanup
         console.log('Failed to disconnect on unmount', e);
-        setError(e instanceof Error ? e.message : 'Failed to disconnect');
       });
     };
   }, [client]);

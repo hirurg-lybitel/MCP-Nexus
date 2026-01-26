@@ -4,8 +4,8 @@ import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
-    variant?: 'primary' | 'secondary' | 'danger'
-    size?: 'sm' | 'md'
+    variant?: 'primary' | 'secondary' | 'danger';
+    size?: 'sm' | 'md' | 'lg';
 }
 
 export default function Button({

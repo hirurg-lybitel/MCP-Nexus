@@ -1,7 +1,7 @@
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions";
 
-export const PORT = process.env.PORT;
-export const MCP_PORT = process.env.NEXT_PUBLIC_MCP_PORT;
+export const PORT = process.env.PORT ?? '4004';
+export const MCP_PORT = process.env.NEXT_PUBLIC_MCP_PORT ?? '4005';
 export const MCP_URL = `http://localhost:${MCP_PORT}/mcp`;
 export const OPENAI_SECURITY_KEY = process.env.NEXT_PUBLIC_OPENAI_SECURITY_KEY;
 export const GPT_PROXY_URL = "https://chatgpt-proxy.gdmn.app/openai";

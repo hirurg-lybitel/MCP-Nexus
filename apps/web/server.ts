@@ -2,13 +2,13 @@ import { createServer } from 'http';
 import { parse } from 'url';
 import next from 'next';
 import dotenv from "dotenv";
+dotenv.config();
+
 import { startMcpServer } from './lib/mcp/server';
 import { MCP_PORT, PORT } from './constants';
 
-dotenv.config();
-
-const port = parseInt(PORT || '4004', 10);
-const mcpPort = parseInt(MCP_PORT || '4005', 10);
+const port = parseInt(PORT, 10);
+const mcpPort = parseInt(MCP_PORT, 10);
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = process.env.HOSTNAME || 'localhost';
 

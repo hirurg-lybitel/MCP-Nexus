@@ -42,7 +42,7 @@ export default function AboutPage() {
                   Go to Chat
                 </Button>
               </Link>
-              <Link href="/home">
+              <Link href="/">
                 <Button variant="secondary">
                   Home
                 </Button>
