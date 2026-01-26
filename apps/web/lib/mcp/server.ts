@@ -39,26 +39,26 @@ export function startMcpServer(port = 4005) {
   server.registerPrompt(
     'greeting-template',
     {
-        title: 'Greeting Template',
-        description: 'A simple greeting prompt template',
-        argsSchema: {
-            name: z.string().describe('Name to include in greeting')
-        }
+      title: 'Greeting Template',
+      description: 'A simple greeting prompt template',
+      argsSchema: {
+        name: z.string().describe('Name to include in greeting')
+      }
     },
     async ({ name }): Promise<GetPromptResult> => {
-        return {
-            messages: [
-                {
-                    role: 'user',
-                    content: {
-                        type: 'text',
-                        text: `Please greet ${name} in a friendly manner and add a sign BigTeam in the end of the message.`
-                    }
-                }
-            ]
-        };
+      return {
+        messages: [
+          {
+            role: 'user',
+            content: {
+              type: 'text',
+              text: `Please greet ${name} in a friendly manner and add a sign BigTeam in the end of the message.`
+            }
+          }
+        ]
+      };
     }
-);
+  );
 
   const app = createMcpExpressApp();
 
@@ -88,9 +88,9 @@ export function startMcpServer(port = 4005) {
   const mcpPostHandler = async (req: Request, res: Response) => {
     const sessionId = req.headers['mcp-session-id'] as string | undefined;
     if (sessionId) {
-        console.log(`Received MCP request for session: ${sessionId}`);
+      console.log(`Received MCP request for session: ${sessionId}`);
     } else {
-        console.log('Request body:', req.body);
+      console.log('Request body:', req.body);
     }
 
     try {
@@ -105,12 +105,12 @@ export function startMcpServer(port = 4005) {
           res.status(400).json({
             jsonrpc: '2.0',
             error: {
-                code: -32_000,
-                message: 'Bad Request: No valid session ID provided'
+              code: -32_000,
+              message: 'Bad Request: No valid session ID provided'
             },
             id: null
-        });
-        return;
+          });
+          return;
         }
 
         const eventStore = new InMemoryEventStore();
@@ -130,8 +130,8 @@ export function startMcpServer(port = 4005) {
           console.log('Transport closed');
           const sid = transport.sessionId;
           if (sid && transports[sid]) {
-              console.log(`Transport closed for session ${sid}, removing from transports map`);
-              delete transports[sid];
+            console.log(`Transport closed for session ${sid}, removing from transports map`);
+            delete transports[sid];
           }
         };
 
@@ -150,41 +150,41 @@ export function startMcpServer(port = 4005) {
   const mcpGetHandler = async (req: Request, res: Response) => {
     const sessionId = req.headers['mcp-session-id'] as string | undefined;
     if (!sessionId || !transports[sessionId]) {
-        res.status(400).send('Invalid or missing session ID');
-        return;
+      res.status(400).send('Invalid or missing session ID');
+      return;
     }
 
     // Check for Last-Event-ID header for resumability
     const lastEventId = req.headers['last-event-id'] as string | undefined;
     if (lastEventId) {
-        console.log(`Client reconnecting with Last-Event-ID: ${lastEventId}`);
+      console.log(`Client reconnecting with Last-Event-ID: ${lastEventId}`);
     } else {
-        console.log(`Establishing new SSE stream for session ${sessionId}`);
+      console.log(`Establishing new SSE stream for session ${sessionId}`);
     }
 
     const transport = transports[sessionId];
     await transport.handleRequest(req, res);
-};
+  };
 
-const mcpDeleteHandler = async (req: Request, res: Response) => {
-  const sessionId = req.headers['mcp-session-id'] as string | undefined;
-  if (!sessionId || !transports[sessionId]) {
+  const mcpDeleteHandler = async (req: Request, res: Response) => {
+    const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    if (!sessionId || !transports[sessionId]) {
       res.status(400).send('Invalid or missing session ID');
       return;
-  }
+    }
 
-  console.log(`Received session termination request for session ${sessionId}`);
+    console.log(`Received session termination request for session ${sessionId}`);
 
-  try {
+    try {
       const transport = transports[sessionId];
       await transport.handleRequest(req, res);
-  } catch (error) {
+    } catch (error) {
       console.error('Error handling session termination:', error);
       if (!res.headersSent) {
-          res.status(500).send('Error processing session termination');
+        res.status(500).send('Error processing session termination');
       }
-  }
-};
+    }
+  };
 
   // Handle OPTIONS for all routes
   app.options('/mcp', (req: Request, res: Response) => {
@@ -197,9 +197,8 @@ const mcpDeleteHandler = async (req: Request, res: Response) => {
 
   app.listen(port, error => {
     if (error) {
-        console.error('Failed to start server:', error);
-        // eslint-disable-next-line unicorn/no-process-exit
-        process.exit(1);
+      console.error('Failed to start server:', error);
+      process.exit(1);
     }
     console.log(`MCP Streamable HTTP Server listening on port ${port}`);
   });

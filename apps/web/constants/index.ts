@@ -1,0 +1,1 @@
+export const GPT_PROXY_URL = "https://chatgpt-proxy.gdmn.app/openai";

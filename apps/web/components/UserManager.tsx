@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { getUsers, createUser, deleteUser, type User } from '@/lib/api'
-import Card from './Card'
-import Button from './Button'
+import Card from './basic/Card'
+import Button from './basic/Button'
 
 export default function UserManager() {
   const [users, setUsers] = useState<User[]>([])

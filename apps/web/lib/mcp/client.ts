@@ -2,6 +2,8 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { ListToolsResult } from '@modelcontextprotocol/sdk/types.js';
 
+export type { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
+
 /**
  * MCP Client Adapter for browser
  * 
@@ -64,6 +66,8 @@ export class McpClientAdapter {
 
       // Create transport
       this.transport = new StreamableHTTPClientTransport(new URL(this.serverUrl));
+
+      console.log('transport', this.transport );
 
       // Connect the client
       await this.client.connect(this.transport);

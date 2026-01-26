@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import Button from './Button'
-import Card from './Card'
+import Button from './basic/Button'
+import Card from './basic/Card'
 
 interface Todo {
   id: number

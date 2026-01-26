@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
-import './globals.css'
-import Navigation from '@/components/Navigation'
+import type { Metadata } from 'next';
+import './globals.css';
+import Navigation from '@/components/Navigation';
 
 export const metadata: Metadata = {
-  title: 'Turbo Monorepo App',
-  description: 'Next.js 16 app in Turbo monorepo',
-}
+  title: 'MCP Nexus',
+  description: 'MCP in Turbo monorepo',
+};
 
 export default function RootLayout({
   children,
@@ -19,5 +19,5 @@ export default function RootLayout({
         {children}
       </body>
     </html>
-  )
+  );
 }

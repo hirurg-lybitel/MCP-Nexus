@@ -1,5 +1,5 @@
-import UserManager from '@/components/UserManager'
-import PostManager from '@/components/PostManager'
+import UserManager from '@/components/UserManager';
+import PostManager from '@/components/PostManager';
 
 export default function ApiPage() {
   return (
@@ -80,5 +80,5 @@ export default function ApiPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

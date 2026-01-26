@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { getPosts, createPost, deletePost, type Post } from '@/lib/api'
-import Card from './Card'
-import Button from './Button'
+import Card from './basic/Card'
+import Button from './basic/Button'
 
 export default function PostManager() {
   const [posts, setPosts] = useState<Post[]>([])

@@ -1,5 +1,5 @@
-export { default as Button } from './Button'
-export { default as Card } from './Card'
+export { default as Button } from './basic/Button'
+export { default as Card } from './basic/Card'
 export { default as Counter } from './Counter'
 export { default as Navigation } from './Navigation'
 export { default as TodoList } from './TodoList'

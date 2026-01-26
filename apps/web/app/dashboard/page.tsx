@@ -1,7 +1,7 @@
-import Counter from '@/components/Counter'
-import TodoList from '@/components/TodoList'
-import Card from '@/components/Card'
-import McpTools from '@/components/McpTools'
+import Counter from '@/components/Counter';
+import TodoList from '@/components/TodoList';
+import Card from '@/components/basic/Card';
+import McpTools from '@/components/McpTools';
 
 export default function DashboardPage() {
   return (
@@ -57,5 +57,5 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
