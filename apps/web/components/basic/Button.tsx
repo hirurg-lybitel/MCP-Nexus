@@ -18,8 +18,8 @@ export default function Button({
   const baseStyles = 'font-medium rounded-lg transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-950';
   
   const variants = {
-    primary: 'bg-blue-600 text-gray-300 hover:bg-blue-500 focus:ring-white shadow-lg shadow-white/5',
-    secondary: 'bg-blue-600/5 text-gray-300 border border-white/10 hover:bg-blue-600/10 hover:text-white focus:ring-gray-500',
+    primary: 'bg-blue-600 text-gray-200 hover:bg-blue-500 focus:ring-white shadow-lg shadow-white/5',
+    secondary: 'bg-blue-600/5 text-gray-200 border border-white/10 hover:bg-blue-600/10 hover:text-white focus:ring-gray-500',
     danger: 'bg-red-500/20 text-red-400 border border-red-500/50 hover:bg-red-600 hover:text-white focus:ring-red-500',
   };
   

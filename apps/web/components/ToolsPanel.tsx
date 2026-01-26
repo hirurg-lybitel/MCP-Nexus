@@ -1,13 +1,17 @@
-import { McpTool } from "@/lib/mcp/client";
-import { Zap, ChevronDown } from "lucide-react";
+import { Zap, ChevronDown, DatabaseZap } from "lucide-react";
 import { useState } from "react";
+import ToolViewer from "./ToolViewer";
+import { Tool } from "@/types";
 
 interface ToolsPanelProps {
-  tools: McpTool[];
+  tools: Tool[];
 }
 
 export default function ToolsPanel({ tools }: ToolsPanelProps) {
   const [isOpen, setIsOpen] = useState(true);
+  const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
+
+  const handleCloseTool = () => setSelectedTool(null);
 
   return (
     <div
@@ -41,15 +45,16 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
             className="group"
             title={isOpen ? "" : tool.description}
           >
-            <div
-              className={`p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors cursor-default ${
+            <button
+              onClick={() => setSelectedTool(tool)}
+              className={`w-full p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-left ${
                 !isOpen ? "flex items-center justify-center" : ""
               }`}
             >
               {isOpen ? (
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-yellow-500 shrink-0" />
+                    {tool.name.startsWith('mcp') ? <DatabaseZap className="w-4 h-4 text-yellow-500 shrink-0" /> : <Zap className="w-4 h-4 text-yellow-500 shrink-0" />}
                     <h3 className="text-xs font-semibold text-white truncate">
                       {tool.name}
                     </h3>
@@ -59,9 +64,9 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
                   </p>
                 </div>
               ) : (
-                <Zap className="w-4 h-4 text-yellow-500" />
+                tool.name.startsWith('mcp') ? <DatabaseZap className="w-4 h-4 text-yellow-500" /> :<Zap className="w-4 h-4 text-yellow-500" />
               )}
-            </div>
+            </button>
           </div>
         ))}
 
@@ -78,6 +83,10 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
             {tools.length} tool{tools.length !== 1 ? "s" : ""} available
           </p>
         </div>
+      )}
+
+      {selectedTool && (
+        <ToolViewer tool={selectedTool} onClose={handleCloseTool} />
       )}
     </div>
   );

@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { McpClientAdapter, McpTool } from "../client";
+'use client';
 
-const serverUrl = 'http://localhost:4005';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { McpClientAdapter, McpTool } from '../client';
+import { MCP_URL } from '@/constants';
 
 export const useMcpAdapter = () => {
   const [client, setClient] = useState<McpClientAdapter | null>(null);
@@ -18,7 +19,7 @@ export const useMcpAdapter = () => {
     setIsConnecting(true);
 
     try {
-      const newClient = new McpClientAdapter(serverUrl);
+      const newClient = new McpClientAdapter(MCP_URL);
       await newClient.connect();
 
       setClient(newClient);
@@ -37,7 +38,7 @@ export const useMcpAdapter = () => {
           name: tool.name,
           description: tool.description,
           inputSchema: tool.inputSchema,
-          outputSchema: tool.outputSchema
+          outputSchema: tool.outputSchema,
         }))
       );
     } catch (err) {
@@ -81,10 +82,21 @@ export const useMcpAdapter = () => {
     };
   }, [client]);
 
+  const callTool = useCallback(async (name: string, args: Record<string, unknown>) => {
+    if (!client) {
+      console.error('Not connected to mcp server.');      
+      setError('Not connected to mcp server.');
+      return;
+    }
+
+    return await client.callTool(name, args);
+  }, [client]);
+
   return {
     isConnected,
     isConnecting,
     error,
-    tools
+    tools,
+    callTool
   };
 };

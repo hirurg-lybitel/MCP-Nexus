@@ -38,7 +38,7 @@ pnpm install
 
 ### Environment Variables
 
-Create a `.env` file in the root directory to configure the application:
+Create a `.env` file in the apps/web directory to configure the application:
 
 ```bash
 # Server Configuration

@@ -11,7 +11,8 @@ const eslintConfig = defineConfig([
     rules: {
       'react/no-unescaped-entities': 'off',
       'indent': ["error", 2],
-      'semi': ["error", "always"]
+      'semi': ["error", "always"],
+      '@typescript-eslint/no-explicit-any': 'off'
     }
   },
   globalIgnores([

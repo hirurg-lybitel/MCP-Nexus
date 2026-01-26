@@ -16,7 +16,7 @@ export class McpClientAdapter {
   private readonly serverUrl: string;
   private isDisconnecting: boolean = false;
 
-  constructor(serverUrl: string = 'http://localhost:4005/mcp') {
+  constructor(serverUrl: string) {
     this.serverUrl = serverUrl;
   }
 

@@ -103,12 +103,6 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/constants:
-    dependencies:
-      zod:
-        specifier: ^4.3.5
-        version: 4.3.5
-
 packages:
 
   '@alloc/quick-lru@5.2.0':

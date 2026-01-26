@@ -9,8 +9,7 @@ import { GetPromptResult, isInitializeRequest } from "@modelcontextprotocol/sdk/
 
 const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
 
-export function startMcpServer(port = 4005) {
-  // Создаём MCP сервер
+export function startMcpServer(port: number) {
   const server = new McpServer({
     name: "mock-mcp-server",
     version: "1.0.0",
@@ -18,11 +17,11 @@ export function startMcpServer(port = 4005) {
     capabilities: { logging: {}, tasks: { requests: { tools: { call: {} } } } },
   });
 
-  // Регистрируем минимальный mock tool
+  // Register a simple tool
   server.registerTool(
     'mcp_get_forecast',
     {
-      description: 'Get forecast by city',
+      description: 'Get current weather for a location. Use this to check weather conditions for any city.',
       inputSchema: {
         city: z.string().describe('City'),
       },
