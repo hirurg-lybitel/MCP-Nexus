@@ -59,6 +59,39 @@ export default function GPTAssistant() {
     setError(mcpError);
   }, [mcpError]);
 
+  function extractMcpText(response: unknown): string | null {
+    if (!response || typeof response !== "object") {
+      return null;
+    }
+
+    const record = response as Record<string, unknown>;
+    const content = record.content;
+    if (!Array.isArray(content)) {
+      return null;
+    }
+
+    const parts = content
+      .map((item) => {
+        if (!item || typeof item !== "object") {
+          return null;
+        }
+        const itemRecord = item as Record<string, unknown>;
+        if (itemRecord.type === "text") {
+          return typeof itemRecord.text === "string" ? itemRecord.text : null;
+        }
+        if (itemRecord.type === "resource") {
+          const resource = itemRecord.resource as Record<string, unknown> | undefined;
+          if (resource && typeof resource.text === "string") {
+            return resource.text;
+          }
+        }
+        return null;
+      })
+      .filter((part): part is string => typeof part === "string" && part.length > 0);
+
+    return parts.length > 0 ? parts.join("\n") : null;
+  }
+
   async function processTool(
     toolName: string,
     toolInput: Record<string, unknown>
@@ -80,14 +113,24 @@ export default function GPTAssistant() {
         throw new Error("Empty response");
       }
 
-      const resRecord = response as Record<string, unknown>;
       console.log('processTool response', response);
 
+      if (typeof response === "string") {
+        return response;
+      }
+
+      const resRecord = response as Record<string, unknown>;
       if (resRecord.isError) {
-        throw new Error(Array.isArray(resRecord.content) ? resRecord.content[0].text : 'unknown');
+        const errorText = extractMcpText(response);
+        throw new Error(errorText ?? 'unknown');
       }
       
-      return JSON.stringify(resRecord);  
+      const extractedText = extractMcpText(response);
+      if (extractedText) {
+        return extractedText;
+      }
+
+      return JSON.stringify(response);
     }
     catch (err: any) {
       return JSON.stringify({ error: `Tool execution failed. ${err.message ?? 'unknown'}` });
