@@ -20,9 +20,8 @@ export default function GPTAssistant() {
   const [toolsList, setToolsList] = useState<Tool[]>([]);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
   const [mcpTools, setMcpTools] = useState<ChatCompletionTool[]>([]);
-  const mcpToolNamesRef = useRef<Set<string>>(new Set());
+
 
   const { tools, isConnected, callTool, error: mcpError } = useMcpAdapter();
 
@@ -45,7 +44,6 @@ export default function GPTAssistant() {
       ...GptFunctions.map(t => ({ name: t.function.name, description: t.function.description ?? '', inputSchema: t.function.parameters ?? {} })), 
       ...toOpenAiTools.map(t => ({ name: t.function.name, description: t.function.description ?? '', inputSchema: t.function.parameters ?? {} }))
     ]);
-    mcpToolNamesRef.current = new Set(toOpenAiTools.map(t => t.function.name));
   }, [isConnected, tools]);
 
   useEffect(() => {

@@ -78,6 +78,8 @@ export const useMcpAdapter = () => {
         // Ignore errors during cleanup
         console.log('Failed to disconnect on unmount', e);
       });
+
+      isMounted.current = false;
     };
   }, [client]);
 

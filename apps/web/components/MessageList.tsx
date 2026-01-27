@@ -1,14 +1,7 @@
 import { useRef, useEffect } from "react";
 import { Loader } from "lucide-react";
 import MessageItem from "./MessageItem";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-  toolName?: string;
-}
+import { Message } from "@/types";
 
 interface MessageListProps {
   messages: Message[];

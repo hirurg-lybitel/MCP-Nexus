@@ -1,13 +1,7 @@
+import { Message } from "@/types";
 import { Zap } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-  toolName?: string;
-}
 
 interface MessageItemProps {
   message: Message;
