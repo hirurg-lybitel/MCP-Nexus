@@ -209,28 +209,22 @@ export default function GPTAssistant() {
       ) {
         const toolCalls = data.choices[0].message.tool_calls;
 
-        // conversationMessages.push({
-        //   role: "assistant",
-        //   content: data.choices[0].message.content || "Calling tools...",
-        // });
+        conversationMessages.push({
+          role: "assistant",
+          content: data.choices[0].message.content || "Calling tools...",
+          tool_calls: toolCalls.map((toolCall) => ({
+            type: "function",
+            id: toolCall.id,
+            function: {
+              name: toolCall.function.name,
+              arguments: toolCall.function.arguments,
+            },
+          })),
+        });
 
         for (const toolCall of toolCalls) {
           try {
             console.log('toolCall', toolCall);
-
-            conversationMessages.push({
-              role: "assistant",
-              content: data.choices[0].message.content || "Calling tools...",
-              tool_calls: [{
-                type: 'function',
-                id: toolCall.id,
-                function: {
-                  name: toolCall.function.name,
-                  arguments: toolCall.function.arguments
-                }
-                
-              }]
-            });
 
             const result = await processTool(
               toolCall.function.name,
