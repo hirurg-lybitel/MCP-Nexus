@@ -11,6 +11,29 @@ export const useMcpAdapter = () => {
   const [tools, setTools] = useState<Array<McpTool>>([]);
   const [error, setError] = useState<string | null>(null);
   const isMounted = useRef(false);
+  const clientRef = useRef<McpClientAdapter | null>(null);
+
+  useEffect(() => {
+    clientRef.current = client;
+  }, [client]);
+
+  useEffect(() => {
+    isMounted.current = true;
+
+    return () => {
+      isMounted.current = false;
+
+      const currentClient = clientRef.current;
+      if (!currentClient) {
+        return;
+      }
+
+      // Silently disconnect - ignore errors during unmount
+      currentClient.disconnect().catch((e) => {
+        console.log('Failed to disconnect on unmount', e);
+      });
+    };
+  }, []);
 
   const autoConnect = useCallback(async () => {
     if (client || isConnecting) {
@@ -22,6 +45,14 @@ export const useMcpAdapter = () => {
       const newClient = new McpClientAdapter(MCP_URL);
       await newClient.connect();
 
+      if (!isMounted.current) {
+        await newClient.disconnect().catch((e) => {
+          console.log('Failed to disconnect after unmount', e);
+        });
+        return;
+      }
+
+      clientRef.current = newClient;
       setClient(newClient);
       setIsConnected(true);
 
@@ -58,30 +89,8 @@ export const useMcpAdapter = () => {
   }, [client, isConnecting]);
 
   useEffect(() => {
-    if (!isMounted.current) {
-      autoConnect();
-
-      isMounted.current = true;
-    }
+    autoConnect();
   }, [autoConnect]);
-
-  useEffect(() => {
-    // Cleanup on unmount
-    return () => {
-      console.log('Disconnecting on unmount 1');
-      if (!client) {
-        return;
-      }
-      console.log('Disconnecting on unmount 2');
-      // Silently disconnect - ignore errors during unmount
-      client.disconnect().catch((e) => {
-        // Ignore errors during cleanup
-        console.log('Failed to disconnect on unmount', e);
-      });
-
-      isMounted.current = false;
-    };
-  }, [client]);
 
   const callTool = useCallback(async (name: string, args: Record<string, unknown>) => {
     if (!client) {
