@@ -29,7 +29,56 @@ export function startMcpServer(port: number) {
     async ({ city }) => {
       console.log('[DEBUG] MCP get_forecast', city);
       return {
-        content: [{ type: 'text', text: JSON.stringify({ message: `Forecast for ${city} is 200 degrees` }) }],
+        content: [{ type: 'text', text: JSON.stringify({ message: `Forecast for ${city} is sleet and a gentle breeze. It's cloudy.` }) }],
+      };
+    }
+  );
+
+  server.registerTool(
+    'mcp_get_current_temperature',
+    {
+      description: 'Get current temperature for a location. Use this to check temperature conditions for any city.',
+      inputSchema: {
+        city: z.string().describe('City'),
+        unit: z.enum(['celsius', 'fahrenheit']).default('celsius').optional().describe('Temperature unit'),
+      },
+      outputSchema: {
+        temperature: z.number().describe('Temperature in degrees'),
+        unit: z.enum(['celsius', 'fahrenheit']).describe('Temperature unit'),
+      },
+    },
+    async ({ city, unit }) => {
+      // some api for getting current temperature in city
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ temperature: 20, unit }) }],
+        structuredContent: {
+          temperature: 20,
+          unit
+        }
+      };
+    }
+  );
+
+  server.registerTool(
+    'mcp_get_rain_probability',
+    {
+      description: 'et the probability of rain for a specific location.',
+      inputSchema: {
+        city: z.string().describe('City'),
+        date: z.string().describe('Date in UTC format'),
+      },
+      outputSchema: {
+        probability: z.number().describe('Rain probability in percentage'),
+      },
+    },
+    async ({ city, date }) => {
+      console.log('[DEBUG] MCP get_rain_probability', city, date);
+      // some api for getting current temperature in city
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ probability: 20 }) }],
+        structuredContent: {
+          probability: 20
+        }
       };
     }
   );

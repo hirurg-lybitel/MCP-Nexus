@@ -8,7 +8,7 @@ import ToolsPanel from "./ToolsPanel";
 import { useMcpAdapter } from "@/lib/mcp/hook/useMcpAdapter";
 import { GPT_MODEL_GENERAL, GPT_PROXY_URL, OPENAI_SECURITY_KEY } from "@/constants";
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.js";
-import { ChatCompletionFunctionTool, ChatCompletionTool } from "openai/resources";
+import { ChatCompletionFunctionTool, ChatCompletionMessageParam, ChatCompletionTool } from "openai/resources";
 import { GptFunctionName, GptFunctions } from "@/lib/openai/functions";
 import { Message, Tool } from "@/types";
 import { getHoroscope } from "@/lib/openai/actions";
@@ -17,7 +17,9 @@ export default function GPTAssistant() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [toolsList, setToolsList] = useState<Tool[]>([]);
+  const [toolsList, setToolsList] = useState<Tool[]>([
+    ...GptFunctions.map(t => ({ name: t.function.name, description: t.function.description ?? '', inputSchema: t.function.parameters ?? {} }))
+  ]);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [mcpTools, setMcpTools] = useState<ChatCompletionTool[]>([]);
@@ -61,22 +63,8 @@ export default function GPTAssistant() {
     toolName: string,
     toolInput: Record<string, unknown>
   ): Promise<string> {
-    // try {
-    //   const response = await fetch("/api/mcp", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({
-    //       action: "call_tool",
-    //       toolName,
-    //       toolInput,
-    //     }),
-    //   });
-    //   const data = await response.json();
-    //   return data.result || JSON.stringify(data);
-    // } catch (err) {
-    //   return JSON.stringify({ error: "Tool execution failed" });
-    // }
     console.log('processTool', { toolName, toolInput });
+    
     switch (toolName) {
     case GptFunctionName.Horoscope:
       return await getHoroscope({ 
@@ -86,15 +74,23 @@ export default function GPTAssistant() {
       });
     } 
 
-    console.log('processTool 2');
-    
     try {
-      const response: any = await callTool(toolName, toolInput);
+      const response = await callTool(toolName, toolInput);
+      if (!response) {
+        throw new Error("Empty response");
+      }
+
+      const resRecord = response as Record<string, unknown>;
       console.log('processTool response', response);
-      return response || JSON.stringify({ error: "Tool execution failed" });  
+
+      if (resRecord.isError) {
+        throw new Error(Array.isArray(resRecord.content) ? resRecord.content[0].text : 'unknown');
+      }
+      
+      return JSON.stringify(resRecord);  
     }
-    catch (err) {
-      return JSON.stringify({ error: "Tool execution failed" });
+    catch (err: any) {
+      return JSON.stringify({ error: `Tool execution failed. ${err.message ?? 'unknown'}` });
     }
   }
 
@@ -118,10 +114,7 @@ export default function GPTAssistant() {
         throw new Error("OpenAI API key is not configured");
       }
 
-      const conversationMessages: Array<{
-        role: "user" | "assistant";
-        content: string;
-      }> = messages.map((msg) => ({
+      const conversationMessages: Array<ChatCompletionMessageParam> = messages.map((msg) => ({
         role: msg.role,
         content: msg.content,
       }));
@@ -173,15 +166,29 @@ export default function GPTAssistant() {
       ) {
         const toolCalls = data.choices[0].message.tool_calls;
 
-        conversationMessages.push({
-          role: "assistant",
-          content:
-            data.choices[0].message.content || "Calling tools...",
-        });
+        // conversationMessages.push({
+        //   role: "assistant",
+        //   content: data.choices[0].message.content || "Calling tools...",
+        // });
 
-        const toolResults = [];
         for (const toolCall of toolCalls) {
           try {
+            console.log('toolCall', toolCall);
+
+            conversationMessages.push({
+              role: "assistant",
+              content: data.choices[0].message.content || "Calling tools...",
+              tool_calls: [{
+                type: 'function',
+                id: toolCall.id,
+                function: {
+                  name: toolCall.function.name,
+                  arguments: toolCall.function.arguments
+                }
+                
+              }]
+            });
+
             const result = await processTool(
               toolCall.function.name,
               JSON.parse(toolCall.function.arguments)
@@ -196,22 +203,19 @@ export default function GPTAssistant() {
             };
             setMessages((prev) => [...prev, assistantToolMessage]);
 
-            toolResults.push({
+            conversationMessages.push({
+              role: "tool",
               tool_call_id: toolCall.id,
-              result,
+              content: result,
             });
-          } catch (err) {
-            toolResults.push({
+          } catch (err: any) {
+            conversationMessages.push({
+              role: "tool",
               tool_call_id: toolCall.id,
-              result: JSON.stringify({ error: "Tool execution failed" }),
+              content: JSON.stringify({ error: "Tool execution failed: " + `${err.message || 'Unknown error'}` }),
             });
           }
         }
-
-        conversationMessages.push({
-          role: "user",
-          content: JSON.stringify(toolResults),
-        });
 
         const chatGPTRequest: ChatCompletionCreateParamsBase = {
           ...GPT_MODEL_GENERAL,
@@ -236,6 +240,9 @@ export default function GPTAssistant() {
         }
 
         data = await response.json();
+        if (!data?.choices?.[0]?.message) {
+          throw new Error("Invalid API response structure: missing choices or message");
+        }
       }
 
       const assistantMessage: Message = {

@@ -67,8 +67,6 @@ export class McpClientAdapter {
       // Create transport
       this.transport = new StreamableHTTPClientTransport(new URL(this.serverUrl));
 
-      console.log('transport', this.transport );
-
       // Connect the client
       await this.client.connect(this.transport);
       console.log('Connected to MCP server');
