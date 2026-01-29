@@ -157,10 +157,12 @@ export default function GPTAssistant() {
         throw new Error("OpenAI API key is not configured");
       }
 
-      const conversationMessages: Array<ChatCompletionMessageParam> = messages.map((msg) => ({
-        role: msg.role,
-        content: msg.content,
-      }));
+      const conversationMessages: Array<ChatCompletionMessageParam> = messages
+        .filter((msg) => !msg.isUiMessage)
+        .map((msg) => ({
+          role: msg.role,
+          content: msg.content,
+        }));
 
       conversationMessages.push({
         role: "user",
@@ -237,6 +239,7 @@ export default function GPTAssistant() {
               content: `Using tool: ${toolCall.function.name}`,
               timestamp: new Date(),
               toolName: toolCall.function.name,
+              isUiMessage: true,
             };
             setMessages((prev) => [...prev, assistantToolMessage]);
 
