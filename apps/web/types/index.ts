@@ -4,7 +4,6 @@ export interface Message {
   content: string;
   timestamp: Date;
   toolName?: string;
-  isUiMessage?: boolean;
 }
 
 export interface Tool {
