@@ -1,0 +1,31 @@
+services:
+  web:
+    container_name: web
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+      args:
+        - NEXT_PUBLIC_OPENAI_SECURITY_KEY=${NEXT_PUBLIC_OPENAI_SECURITY_KEY}
+    restart: always
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      - TZ=Europe/Minsk
+    networks:
+      - proxy_network
+  # api:
+  #   container_name: api
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/api/Dockerfile
+  #   restart: always
+  #   ports:
+  #     - 3001:3001
+  #   networks:
+  #     - app_network
+
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+networks:
+  proxy_network:
+    external: true

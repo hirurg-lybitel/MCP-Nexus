@@ -9,11 +9,12 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "type-check": "turbo run type-check",
-    "clean": "del-cli node_modules && del-cli node_modules .turbo && del-cli \"apps/*/.next\" \"apps/*/.turbo\" \"apps/*/dist\" \"apps/*/build\" \"apps/*/.tsbuildinfo\" \"apps/*/node_modules\""
+    "clean": "del-cli node_modules && del-cli node_modules .turbo && del-cli \"apps/*/.next\" \"apps/*/.turbo\" \"apps/*/dist\" \"apps/*/build\" \"apps/*/.tsbuildinfo\" \"apps/*/node_modules\"",
+    "docker:s:up": "docker compose -f docker-compose.yaml --env-file apps/web/.env up -d",
+    "docker:s:down": "docker compose -f docker-compose.yaml --env-file apps/web/.env down"
   },
   "devDependencies": {
     "@turbo/gen": "^1.12.0",
-    "cross-env": "^10.1.0",
     "del-cli": "^7.0.0",
     "minimatch": "^10.1.1",
     "prettier": "^3.8.0",

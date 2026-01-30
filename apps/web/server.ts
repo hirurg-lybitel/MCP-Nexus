@@ -7,6 +7,11 @@ dotenv.config();
 import { startMcpServer } from './lib/mcp/server';
 import { MCP_PORT, PORT } from './constants';
 
+console.log('NODE_ENV', process.env.NODE_ENV);
+console.log('PORT', PORT);
+console.log('HOSTNAME', process.env.HOSTNAME);
+console.log('NEXT_PUBLIC_MCP_PORT', process.env.NEXT_PUBLIC_MCP_PORT);
+
 const port = parseInt(PORT, 10);
 const mcpPort = parseInt(MCP_PORT, 10);
 const dev = process.env.NODE_ENV !== 'production';
