@@ -13,13 +13,22 @@ export function startMcpServer(port: number) {
   const server = new McpServer({
     name: "mock-mcp-server",
     version: "1.0.0",
+    description: "A mock MCP server for testing purposes.",
+    title: "Mock MCP Server",
   }, {
-    capabilities: { logging: {}, tasks: { requests: { tools: { call: {} } } } },
+    capabilities: { 
+      tools: {},
+      logging: {}, 
+      tasks: { requests: { tools: { call: {} } } },
+      prompts: {
+        listChanged: true
+      }
+    },
   });
 
   // Register a simple tool
   server.registerTool(
-    'mcp_get_forecast',
+    'get_forecast',
     {
       description: 'Get current weather for a location. Use this to check weather conditions for any city.',
       inputSchema: {
@@ -35,7 +44,7 @@ export function startMcpServer(port: number) {
   );
 
   server.registerTool(
-    'mcp_get_current_temperature',
+    'get_current_temperature',
     {
       description: 'Get current temperature for a location. Use this to check temperature conditions for any city.',
       inputSchema: {
@@ -60,7 +69,7 @@ export function startMcpServer(port: number) {
   );
 
   server.registerTool(
-    'mcp_get_rain_probability',
+    'get_rain_probability',
     {
       description: 'et the probability of rain for a specific location.',
       inputSchema: {
@@ -83,7 +92,27 @@ export function startMcpServer(port: number) {
     }
   );
 
-  // Register a simple prompt with title
+  server.registerPrompt(
+    'get_basic_prompt',
+    {
+      description: 'Example of a basic complex prompt',
+      title: 'Basic Prompt',
+    },
+    async () => {
+      return {
+        messages: [
+          {
+            role: 'user',
+            content: {
+              type: 'text',
+              text: 'Show me the full forecast with temperature, chance of precipitation, cloud cover, etc. in London'
+            }
+          }
+        ]
+      };
+    }
+  );
+
   server.registerPrompt(
     'greeting-template',
     {
@@ -93,17 +122,38 @@ export function startMcpServer(port: number) {
         name: z.string().describe('Name to include in greeting')
       }
     },
-    async ({ name }): Promise<GetPromptResult> => {
+    async (args): Promise<GetPromptResult> => {
+      console.log('[DEBUG] MCP prompt greeting-template', args);
       return {
         messages: [
           {
             role: 'user',
             content: {
               type: 'text',
-              text: `Please greet ${name} in a friendly manner and add a sign BigTeam in the end of the message.`
+              text: `Please greet ${args.name} in a friendly manner and add a sign BigTeam in the end of the message.`
             }
           }
         ]
+      };
+    }
+  );
+
+  server.registerPrompt(
+    'get_forecast',
+    {
+      title: 'Get current weather for a location',
+      description: 'Get current weather for a location. Use this to check weather conditions for any city.',
+      argsSchema: {
+        city: z.string().describe('City')
+      }
+    },
+    async ({ city }) => {
+      console.log('[DEBUG] MCP prompt get_forecast', city);
+      return {
+        messages: [{
+          role: 'user',
+          content: { type: 'text', text: "text of forecast prompt" },
+        }]
       };
     }
   );
@@ -135,10 +185,9 @@ export function startMcpServer(port: number) {
 
   const mcpPostHandler = async (req: Request, res: Response) => {
     const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    console.log('Request body:', req.body);
     if (sessionId) {
       console.log(`Received MCP request for session: ${sessionId}`);
-    } else {
-      console.log('Request body:', req.body);
     }
 
     try {
@@ -148,7 +197,6 @@ export function startMcpServer(port: number) {
       } else {
 
         const initializeRequest = isInitializeRequest(req.body);
-        console.log('Initialize request:', initializeRequest);
         if (!initializeRequest) {
           res.status(400).json({
             jsonrpc: '2.0',
@@ -162,7 +210,6 @@ export function startMcpServer(port: number) {
         }
 
         const eventStore = new InMemoryEventStore();
-
         
         transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: () => crypto.randomUUID(),

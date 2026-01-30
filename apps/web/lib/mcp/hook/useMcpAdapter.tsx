@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { McpClientAdapter, McpTool } from '../client';
+import { McpClientAdapter, McpPrompt, McpTool } from '../client';
 import { MCP_URL } from '@/constants';
 
 export const useMcpAdapter = () => {
@@ -9,6 +9,7 @@ export const useMcpAdapter = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [tools, setTools] = useState<Array<McpTool>>([]);
+  const [prompts, setPrompts] = useState<Array<McpPrompt>>([]);
   const [error, setError] = useState<string | null>(null);
   const isMounted = useRef(false);
 
@@ -25,20 +26,30 @@ export const useMcpAdapter = () => {
       setClient(newClient);
       setIsConnected(true);
 
-      const result = await newClient.listTools();
+      const toolsResult = await newClient.listTools();
+      const promptsResult = await newClient.listPrompts();
 
       // Check again before updating state
       if (!isMounted.current) {
         return;
       }
 
-      console.log('Tools:', result.tools);
+      console.log('Tools:', toolsResult.tools);
+      console.log('Prompts:', promptsResult.prompts);
+
       setTools(
-        result.tools.map((tool) => ({
+        toolsResult.tools.map((tool) => ({
           name: tool.name,
           description: tool.description,
           inputSchema: tool.inputSchema,
           outputSchema: tool.outputSchema,
+        }))
+      );
+
+      setPrompts(
+        promptsResult.prompts.map((prompt) => ({
+          name: prompt.name,
+          description: prompt.description,
         }))
       );
     } catch (err) {
@@ -85,7 +96,7 @@ export const useMcpAdapter = () => {
 
   const callTool = useCallback(async (name: string, args: Record<string, unknown>) => {
     if (!client) {
-      console.error('Not connected to mcp server.');      
+      console.error('Not connected to mcp server.');
       setError('Not connected to mcp server.');
       return;
     }
@@ -93,11 +104,24 @@ export const useMcpAdapter = () => {
     return await client.callTool(name, args);
   }, [client]);
 
+  const getPrompt = useCallback(
+    async (name: string, args?: Record<string, unknown>) => {
+      if (!client) {
+        setError('Not connected to mcp server.');
+        throw new Error('Not connected to mcp server.');
+      }
+      return await client.getPrompt(name, args);
+    },
+    [client]
+  );
+
   return {
     isConnected,
     isConnecting,
     error,
     tools,
-    callTool
+    prompts,
+    callTool,
+    getPrompt,
   };
 };

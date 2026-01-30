@@ -22,3 +22,5 @@ export const GPT_MODEL_GENERAL: GPT_MODEL = {
   temperature: 0.1,
   max_tokens: MAX_TOKENS,
 };
+
+export const TODO_MESSAGE_ID = 'todo_message';

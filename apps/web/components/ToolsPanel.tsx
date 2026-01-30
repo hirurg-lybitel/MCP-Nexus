@@ -1,7 +1,8 @@
 import { Zap, ChevronDown, DatabaseZap } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import ToolViewer from "./ToolViewer";
 import { Tool } from "@/types";
+import { GptFunctions } from "@/lib/openai/functions";
 
 interface ToolsPanelProps {
   tools: Tool[];
@@ -12,6 +13,8 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
 
   const handleCloseTool = () => setSelectedTool(null);
+
+  const isOpenAiTool = useCallback((id: string) => GptFunctions.some(f => f.function.name === id), []);
 
   return (
     <div
@@ -53,8 +56,8 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
             >
               {isOpen ? (
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    {tool.name.startsWith('mcp') ? <DatabaseZap className="w-4 h-4 text-yellow-500 shrink-0" /> : <Zap className="w-4 h-4 text-yellow-500 shrink-0" />}
+                  <div className="flex items-center gap-2" title={isOpenAiTool(tool.name) ? 'openai tool' : 'mcp tool'}>
+                    {isOpenAiTool(tool.name) ? <Zap className="w-4 h-4 text-yellow-500 shrink-0" /> : <DatabaseZap className="w-4 h-4 text-yellow-500 shrink-0" />}
                     <h3 className="text-xs font-semibold text-white truncate">
                       {tool.name}
                     </h3>
@@ -64,7 +67,7 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
                   </p>
                 </div>
               ) : (
-                tool.name.startsWith('mcp') ? <DatabaseZap className="w-4 h-4 text-yellow-500" /> :<Zap className="w-4 h-4 text-yellow-500" />
+                isOpenAiTool(tool.name) ? <Zap className="w-4 h-4 text-yellow-500" /> : <DatabaseZap className="w-4 h-4 text-yellow-500" />
               )}
             </button>
           </div>

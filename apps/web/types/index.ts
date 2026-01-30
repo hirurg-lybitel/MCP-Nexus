@@ -12,3 +12,9 @@ export interface Tool {
   description: string;
   inputSchema: Record<string, unknown>;
 }
+
+export type ExecutionStep = {
+  id: string;
+  label: string;
+  status: 'pending' | 'running' | 'completed' | 'error';
+};

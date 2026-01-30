@@ -3,21 +3,24 @@ import Button from "./basic/Button";
 
 interface InputAreaProps {
   input: string;
-  setInput: (value: string) => void;
   loading: boolean;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onSendMessage: () => void;
   onClearMessage: () => void;
 }
 
 export default function InputArea({
   input,
-  setInput,
   loading,
+  onChange,
+  onKeyDown,
   onSendMessage,
   onClearMessage
 }: InputAreaProps) {
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    onKeyDown?.(e);
+    if (!e.defaultPrevented && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSendMessage();
     }
@@ -28,12 +31,12 @@ export default function InputArea({
       <div className="flex gap-3 items-end relative">
         <textarea
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onChange={onChange}
+          onKeyDown={handleKeyDown}
           placeholder="Type your message... (Shift+Enter for new line)"
           disabled={loading}
           rows={4}
-          className="flex-1 bg-gray-800 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed resize-none placeholder-gray-500 border border-gray-700"
+          className="flex-1 bg-gray-800 text-white px-4 py-3 pr-16 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed resize-none placeholder-gray-500 border border-gray-700"
         />
 
         <div className="absolute flex flex-col gap-3 right-4 bottom-4">

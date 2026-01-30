@@ -31,13 +31,13 @@ export default function MessageList({ messages, loading }: MessageListProps) {
         </div>
       )}
 
-      {messages.map((message) => (
-        <MessageItem key={message.id} message={message} />
+      {messages.map((message, idx) => (
+        <MessageItem key={`${message.id}_${idx}`} message={message} />
       ))}
 
       {loading && (
         <div className="flex gap-3 items-start">
-          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
             <Loader className="w-4 h-4 animate-spin" />
           </div>
           <div className="bg-gray-800 rounded-lg px-4 py-3 max-w-md">
