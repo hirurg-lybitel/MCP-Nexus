@@ -2,6 +2,7 @@ import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completion
 import dotenv from "dotenv";
 dotenv.config();
 
+export const HOST = process.env.HOSTNAME || 'localhost';
 export const PORT = process.env.PORT ?? '4004';
 export const MCP_PORT = process.env.NEXT_PUBLIC_MCP_PORT ?? '4005';
 // export const MCP_URL = `http://localhost:${MCP_PORT}/mcp`;
