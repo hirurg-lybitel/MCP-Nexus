@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/mcp/:path*', 
-        destination: 'http://localhost:6005/mcp/:path*',
+        destination: 'http://localhost:5005/mcp/:path*',
       },
     ];
   },
