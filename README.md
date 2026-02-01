@@ -33,7 +33,7 @@ This multi-channel approach makes MCP Nexus a complete reference implementation 
 
 ```bash
 # Install dependencies
-pnpm install
+pnpm i
 ```
 
 ### Environment Variables
@@ -42,11 +42,11 @@ Create a `.env` file in the apps/web directory to configure the application:
 
 ```bash
 # Server Configuration
-PORT=4000              # Next.js server port (default: 4000)
-HOSTNAME=localhost     # Server hostname (default: localhost)
-NODE_ENV=development   # Environment mode
-
-# MCP Server runs on port 4005 by default
+NODE_ENV=development                    # Environment mode
+HOSTNAME=localhost                      # Server hostname (default: localhost)
+PORT=4004                               # Next.js server port (default: 4004)
+NEXT_PUBLIC_MCP_PORT=4005               # MCP server port (default: 4005)
+NEXT_PUBLIC_OPENAI_SECURITY_KEY=123     # OpenAI security key (replace with your own key)
 ```
 
 The `.env` file is already included in `.gitignore` and won't be committed to the repository. Make sure to create your own `.env` file based on your needs.
@@ -59,7 +59,21 @@ Start the development environment (runs both Next.js app and MCP server):
 pnpm dev
 ```
 
-The application will be available at `http://localhost:{port}`, and the MCP server will be running in parallel.
+The application will be available at `http://{host}:{port}`, and the MCP server will be running in parallel.
+But there's a proxy trick to redirect all requests to `http://{host}:{port}/api/mcp` to local MCP server through `next.config.ts`:
+
+```typescript
+// next.config.ts
+async rewrites() {
+  return [
+    {
+      source: '/api/mcp/:path*', 
+      destination: `http://localhost:${mcp_port}/mcp/:path*`,
+    },
+  ];
+}
+```
+
 
 ### Running Specific Components
 
