@@ -8,7 +8,6 @@ import { useMcpAdapter } from '@/lib/mcp/hook/useMcpAdapter';
 import {
   GPT_MODEL_GENERAL,
   GPT_PROXY_URL,
-  OPENAI_SECURITY_KEY,
   TODO_MESSAGE_ID,
 } from '@/constants';
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions.js';
@@ -20,6 +19,9 @@ import {
 import { GptFunctionName, GptFunctions } from '@/lib/openai/functions';
 import { ExecutionStep, Message, Tool } from '@/types';
 import { getHoroscope } from '@/lib/openai/actions';
+import { useTokenStore } from '@/stores/useTokenStore';
+import Link from 'next/link';
+import { TriangleAlert } from 'lucide-react';
 
 const SYSTEM_PROMPT = 
   'You are a helpful AI assistant in the GPT Assistant app with MCP (Model Context Protocol) tools integration. ' +
@@ -48,6 +50,8 @@ export default function GPTAssistant() {
   const [commandFilter, setCommandFilter] = useState('');
   const [selectedPromptIndex, setSelectedPromptIndex] = useState(0);
   const stepsRef = useRef<ExecutionStep[]>([]);
+
+  const { token } = useTokenStore();
 
   const {
     tools,
@@ -285,7 +289,7 @@ export default function GPTAssistant() {
     setError(null);
 
     try {
-      if (!OPENAI_SECURITY_KEY) {
+      if (!token) {
         throw new Error('OpenAI API key is not configured');
       }
 
@@ -314,7 +318,7 @@ export default function GPTAssistant() {
         method: 'POST',
         body: JSON.stringify({
           ...chatGPTRequest,
-          security_key: OPENAI_SECURITY_KEY,
+          security_key: token,
         }),
         signal: abortController.signal,
       });
@@ -461,7 +465,7 @@ export default function GPTAssistant() {
           method: 'POST',
           body: JSON.stringify({
             ...chatGPTRequest,
-            security_key: OPENAI_SECURITY_KEY,
+            security_key: token,
           }),
           signal: abortController.signal,
         });
@@ -526,6 +530,19 @@ export default function GPTAssistant() {
               {error}
             </div>
           )}
+
+          {!token && (
+            <div className="bg-blue-900/30 border border-blue-500/50 mt-3 p-4 rounded-lg">
+              <p className="flex items-center gap-1 text-sm text-blue-200">
+                <TriangleAlert className="text-yellow-500 h-4 w-4" />
+                To use the chat, you need to set <b>your personal access token</b>.
+              </p>
+              <p className="text-sm text-blue-200">
+                Go to the <Link href="/about" className="font-bold underline">About Us</Link>, 
+                where you will find the input field in the 'OpenAI Configuration' area."
+              </p>
+            </div>
+          )}          
         </header>
 
         <MessageList
@@ -565,6 +582,7 @@ export default function GPTAssistant() {
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
             loading={loading}
+            disabled={!token}
             onSendMessage={handleSendMessage}
             onClearMessage={handleClearMessage}
           />

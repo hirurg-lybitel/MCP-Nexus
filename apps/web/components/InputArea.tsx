@@ -2,6 +2,7 @@ import { Send, X } from "lucide-react";
 import Button from "./basic/Button";
 
 interface InputAreaProps {
+  disabled?: boolean;
   input: string;
   loading: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -13,6 +14,7 @@ interface InputAreaProps {
 export default function InputArea({
   input,
   loading,
+  disabled = false,
   onChange,
   onKeyDown,
   onSendMessage,
@@ -33,15 +35,15 @@ export default function InputArea({
           value={input}
           onChange={onChange}
           onKeyDown={handleKeyDown}
-          placeholder="Type your message... (Shift+Enter for new line)"
-          disabled={loading}
+          placeholder="Type your message or / for commands... (Shift+Enter for new line)"
+          disabled={disabled || loading}
           rows={4}
           className="flex-1 bg-gray-800 text-white px-4 py-3 pr-16 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed resize-none placeholder-gray-500 border border-gray-700"
         />
 
         <div className="absolute flex flex-col gap-3 right-4 bottom-4">
           <Button
-            disabled={loading || !input.trim()}
+            disabled={disabled || loading || !input.trim()}
             onClick={onClearMessage}
             variant="secondary"
             className="bg-transparent! shadow-none p-2.5! border-0! disabled:opacity-0 disabled:pointer-events-none"
@@ -50,7 +52,7 @@ export default function InputArea({
           </Button>
 
           <Button
-            disabled={loading || !input.trim()}
+            disabled={disabled || loading || !input.trim()}
             onClick={onSendMessage}
             className="p-2.5! disabled:opacity-0 disabled:pointer-events-none"
           >

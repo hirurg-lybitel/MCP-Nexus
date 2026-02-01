@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { McpClientAdapter, McpPrompt, McpTool } from '../client';
-import { MCP_URL } from '@/constants';
 
 export const useMcpAdapter = () => {
   const [client, setClient] = useState<McpClientAdapter | null>(null);
@@ -20,7 +19,7 @@ export const useMcpAdapter = () => {
     setIsConnecting(true);
 
     try {
-      const newClient = new McpClientAdapter(MCP_URL);
+      const newClient = new McpClientAdapter(window.location.origin + '/api/mcp');
       await newClient.connect();
 
       setClient(newClient);

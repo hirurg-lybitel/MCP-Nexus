@@ -17,7 +17,7 @@ const mcpPort = parseInt(MCP_PORT, 10);
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = process.env.HOSTNAME || 'localhost';
 
-const app = next({ dev, hostname, port });
+const app = next({ dev, hostname, port, customServer: true  });
 const handle = app.getRequestHandler();
 
 startMcpServer(mcpPort);

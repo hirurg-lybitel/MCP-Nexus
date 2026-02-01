@@ -113,50 +113,50 @@ export function startMcpServer(port: number) {
     }
   );
 
-  server.registerPrompt(
-    'greeting-template',
-    {
-      title: 'Greeting Template',
-      description: 'A simple greeting prompt template',
-      argsSchema: {
-        name: z.string().describe('Name to include in greeting')
-      }
-    },
-    async (args): Promise<GetPromptResult> => {
-      console.log('[DEBUG] MCP prompt greeting-template', args);
-      return {
-        messages: [
-          {
-            role: 'user',
-            content: {
-              type: 'text',
-              text: `Please greet ${args.name} in a friendly manner and add a sign BigTeam in the end of the message.`
-            }
-          }
-        ]
-      };
-    }
-  );
+  // server.registerPrompt(
+  //   'greeting-template',
+  //   {
+  //     title: 'Greeting Template',
+  //     description: 'A simple greeting prompt template',
+  //     argsSchema: {
+  //       name: z.string().describe('Name to include in greeting')
+  //     }
+  //   },
+  //   async (args): Promise<GetPromptResult> => {
+  //     console.log('[DEBUG] MCP prompt greeting-template', args);
+  //     return {
+  //       messages: [
+  //         {
+  //           role: 'user',
+  //           content: {
+  //             type: 'text',
+  //             text: `Please greet ${args.name} in a friendly manner and add a sign BigTeam in the end of the message.`
+  //           }
+  //         }
+  //       ]
+  //     };
+  //   }
+  // );
 
-  server.registerPrompt(
-    'get_forecast',
-    {
-      title: 'Get current weather for a location',
-      description: 'Get current weather for a location. Use this to check weather conditions for any city.',
-      argsSchema: {
-        city: z.string().describe('City')
-      }
-    },
-    async ({ city }) => {
-      console.log('[DEBUG] MCP prompt get_forecast', city);
-      return {
-        messages: [{
-          role: 'user',
-          content: { type: 'text', text: "text of forecast prompt" },
-        }]
-      };
-    }
-  );
+  // server.registerPrompt(
+  //   'get_forecast',
+  //   {
+  //     title: 'Get current weather for a location',
+  //     description: 'Get current weather for a location. Use this to check weather conditions for any city.',
+  //     argsSchema: {
+  //       city: z.string().describe('City')
+  //     }
+  //   },
+  //   async ({ city }) => {
+  //     console.log('[DEBUG] MCP prompt get_forecast', city);
+  //     return {
+  //       messages: [{
+  //         role: 'user',
+  //         content: { type: 'text', text: "text of forecast prompt" },
+  //       }]
+  //     };
+  //   }
+  // );
 
   const app = createMcpExpressApp();
 
