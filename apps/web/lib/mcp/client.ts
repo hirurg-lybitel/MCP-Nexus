@@ -1,6 +1,15 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import type { ListToolsResult } from '@modelcontextprotocol/sdk/types.js';
+import type {
+  ListToolsResult,
+  ListPromptsResult,
+  GetPromptResult,
+} from '@modelcontextprotocol/sdk/types.js';
+
+export type { 
+  Tool as McpTool, 
+  Prompt as McpPrompt 
+} from '@modelcontextprotocol/sdk/types.js';
 
 /**
  * MCP Client Adapter for browser
@@ -14,7 +23,7 @@ export class McpClientAdapter {
   private readonly serverUrl: string;
   private isDisconnecting: boolean = false;
 
-  constructor(serverUrl: string = 'http://localhost:4005/mcp') {
+  constructor(serverUrl: string) {
     this.serverUrl = serverUrl;
   }
 
@@ -154,6 +163,62 @@ export class McpClientAdapter {
       }
       
       console.error('Error listing tools:', error);
+      throw error;
+    }
+  }
+
+  async listPrompts(): Promise<ListPromptsResult> {
+    if (!this.client) {
+      throw new Error('Not connected to server.');
+    }
+
+    try {
+      const result = await this.client.listPrompts();
+      return result;
+    } catch (error) {
+      // Don't log errors if we're disconnecting (connection closed is expected)
+      if (this.isDisconnecting) {
+        throw error;
+      }
+      
+      // Check if it's a connection closed error - don't log these as they're expected during cleanup
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('Connection closed') || 
+          errorMessage.includes('MCP error -32000')) {
+        throw error; // Re-throw but don't log
+      }
+      
+      console.error('Error listing prompts:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get prompt content by name (for slash-command insertion).
+   */
+  async getPrompt(
+    name: string,
+    args?: Record<string, unknown>
+  ): Promise<GetPromptResult> {
+    if (!this.client) {
+      throw new Error('Not connected to server.');
+    }
+
+    try {
+      const result = await (
+        this.client as {
+          getPrompt: (params: {
+            name: string;
+            arguments?: Record<string, unknown>;
+          }) => Promise<GetPromptResult>;
+        }
+      ).getPrompt({
+        name,
+        arguments: args,
+      });
+      return result;
+    } catch (error) {
+      console.error(`Error getting prompt ${name}:`, error);
       throw error;
     }
   }

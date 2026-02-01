@@ -9,20 +9,28 @@ import { GetPromptResult, isInitializeRequest } from "@modelcontextprotocol/sdk/
 
 const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
 
-export function startMcpServer(port = 4005) {
-  // Создаём MCP сервер
+export function startMcpServer(port: number) {
   const server = new McpServer({
     name: "mock-mcp-server",
     version: "1.0.0",
+    description: "A mock MCP server for testing purposes.",
+    title: "Mock MCP Server",
   }, {
-    capabilities: { logging: {}, tasks: { requests: { tools: { call: {} } } } },
+    capabilities: { 
+      tools: {},
+      logging: {}, 
+      tasks: { requests: { tools: { call: {} } } },
+      prompts: {
+        listChanged: true
+      }
+    },
   });
 
-  // Регистрируем минимальный mock tool
+  // Register a simple tool
   server.registerTool(
-    'mcp_get_forecast',
+    'get_forecast',
     {
-      description: 'Get forecast by city',
+      description: 'Get current weather for a location. Use this to check weather conditions for any city.',
       inputSchema: {
         city: z.string().describe('City'),
       },
@@ -30,35 +38,125 @@ export function startMcpServer(port = 4005) {
     async ({ city }) => {
       console.log('[DEBUG] MCP get_forecast', city);
       return {
-        content: [{ type: 'text', text: JSON.stringify({ message: `Forecast for ${city} is 200 degrees` }) }],
+        content: [{ type: 'text', text: JSON.stringify({ message: `Forecast for ${city} is sleet and a gentle breeze. It's cloudy.` }) }],
       };
     }
   );
 
-  // Register a simple prompt with title
-  server.registerPrompt(
-    'greeting-template',
+  server.registerTool(
+    'get_current_temperature',
     {
-        title: 'Greeting Template',
-        description: 'A simple greeting prompt template',
-        argsSchema: {
-            name: z.string().describe('Name to include in greeting')
-        }
+      description: 'Get current temperature for a location. Use this to check temperature conditions for any city.',
+      inputSchema: {
+        city: z.string().describe('City'),
+        unit: z.enum(['celsius', 'fahrenheit']).default('celsius').optional().describe('Temperature unit'),
+      },
+      outputSchema: {
+        temperature: z.number().describe('Temperature in degrees'),
+        unit: z.enum(['celsius', 'fahrenheit']).describe('Temperature unit'),
+      },
     },
-    async ({ name }): Promise<GetPromptResult> => {
-        return {
-            messages: [
-                {
-                    role: 'user',
-                    content: {
-                        type: 'text',
-                        text: `Please greet ${name} in a friendly manner and add a sign BigTeam in the end of the message.`
-                    }
-                }
-            ]
-        };
+    async ({ city, unit }) => {
+      // some api for getting current temperature in city
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ temperature: 20, unit }) }],
+        structuredContent: {
+          temperature: 20,
+          unit
+        }
+      };
     }
-);
+  );
+
+  server.registerTool(
+    'get_rain_probability',
+    {
+      description: 'et the probability of rain for a specific location.',
+      inputSchema: {
+        city: z.string().describe('City'),
+        date: z.string().describe('Date in UTC format'),
+      },
+      outputSchema: {
+        probability: z.number().describe('Rain probability in percentage'),
+      },
+    },
+    async ({ city, date }) => {
+      console.log('[DEBUG] MCP get_rain_probability', city, date);
+      // some api for getting current temperature in city
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ probability: 20 }) }],
+        structuredContent: {
+          probability: 20
+        }
+      };
+    }
+  );
+
+  server.registerPrompt(
+    'get_basic_prompt',
+    {
+      description: 'Example of a basic complex prompt',
+      title: 'Basic Prompt',
+    },
+    async () => {
+      return {
+        messages: [
+          {
+            role: 'user',
+            content: {
+              type: 'text',
+              text: 'Show me the full forecast with temperature, chance of precipitation, cloud cover, etc. in London'
+            }
+          }
+        ]
+      };
+    }
+  );
+
+  // server.registerPrompt(
+  //   'greeting-template',
+  //   {
+  //     title: 'Greeting Template',
+  //     description: 'A simple greeting prompt template',
+  //     argsSchema: {
+  //       name: z.string().describe('Name to include in greeting')
+  //     }
+  //   },
+  //   async (args): Promise<GetPromptResult> => {
+  //     console.log('[DEBUG] MCP prompt greeting-template', args);
+  //     return {
+  //       messages: [
+  //         {
+  //           role: 'user',
+  //           content: {
+  //             type: 'text',
+  //             text: `Please greet ${args.name} in a friendly manner and add a sign BigTeam in the end of the message.`
+  //           }
+  //         }
+  //       ]
+  //     };
+  //   }
+  // );
+
+  // server.registerPrompt(
+  //   'get_forecast',
+  //   {
+  //     title: 'Get current weather for a location',
+  //     description: 'Get current weather for a location. Use this to check weather conditions for any city.',
+  //     argsSchema: {
+  //       city: z.string().describe('City')
+  //     }
+  //   },
+  //   async ({ city }) => {
+  //     console.log('[DEBUG] MCP prompt get_forecast', city);
+  //     return {
+  //       messages: [{
+  //         role: 'user',
+  //         content: { type: 'text', text: "text of forecast prompt" },
+  //       }]
+  //     };
+  //   }
+  // );
 
   const app = createMcpExpressApp();
 
@@ -87,10 +185,9 @@ export function startMcpServer(port = 4005) {
 
   const mcpPostHandler = async (req: Request, res: Response) => {
     const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    console.log('Request body:', req.body);
     if (sessionId) {
-        console.log(`Received MCP request for session: ${sessionId}`);
-    } else {
-        console.log('Request body:', req.body);
+      console.log(`Received MCP request for session: ${sessionId}`);
     }
 
     try {
@@ -100,21 +197,19 @@ export function startMcpServer(port = 4005) {
       } else {
 
         const initializeRequest = isInitializeRequest(req.body);
-        console.log('Initialize request:', initializeRequest);
         if (!initializeRequest) {
           res.status(400).json({
             jsonrpc: '2.0',
             error: {
-                code: -32_000,
-                message: 'Bad Request: No valid session ID provided'
+              code: -32_000,
+              message: 'Bad Request: No valid session ID provided'
             },
             id: null
-        });
-        return;
+          });
+          return;
         }
 
         const eventStore = new InMemoryEventStore();
-
         
         transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: () => crypto.randomUUID(),
@@ -130,8 +225,8 @@ export function startMcpServer(port = 4005) {
           console.log('Transport closed');
           const sid = transport.sessionId;
           if (sid && transports[sid]) {
-              console.log(`Transport closed for session ${sid}, removing from transports map`);
-              delete transports[sid];
+            console.log(`Transport closed for session ${sid}, removing from transports map`);
+            delete transports[sid];
           }
         };
 
@@ -150,41 +245,41 @@ export function startMcpServer(port = 4005) {
   const mcpGetHandler = async (req: Request, res: Response) => {
     const sessionId = req.headers['mcp-session-id'] as string | undefined;
     if (!sessionId || !transports[sessionId]) {
-        res.status(400).send('Invalid or missing session ID');
-        return;
+      res.status(400).send('Invalid or missing session ID');
+      return;
     }
 
     // Check for Last-Event-ID header for resumability
     const lastEventId = req.headers['last-event-id'] as string | undefined;
     if (lastEventId) {
-        console.log(`Client reconnecting with Last-Event-ID: ${lastEventId}`);
+      console.log(`Client reconnecting with Last-Event-ID: ${lastEventId}`);
     } else {
-        console.log(`Establishing new SSE stream for session ${sessionId}`);
+      console.log(`Establishing new SSE stream for session ${sessionId}`);
     }
 
     const transport = transports[sessionId];
     await transport.handleRequest(req, res);
-};
+  };
 
-const mcpDeleteHandler = async (req: Request, res: Response) => {
-  const sessionId = req.headers['mcp-session-id'] as string | undefined;
-  if (!sessionId || !transports[sessionId]) {
+  const mcpDeleteHandler = async (req: Request, res: Response) => {
+    const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    if (!sessionId || !transports[sessionId]) {
       res.status(400).send('Invalid or missing session ID');
       return;
-  }
+    }
 
-  console.log(`Received session termination request for session ${sessionId}`);
+    console.log(`Received session termination request for session ${sessionId}`);
 
-  try {
+    try {
       const transport = transports[sessionId];
       await transport.handleRequest(req, res);
-  } catch (error) {
+    } catch (error) {
       console.error('Error handling session termination:', error);
       if (!res.headersSent) {
-          res.status(500).send('Error processing session termination');
+        res.status(500).send('Error processing session termination');
       }
-  }
-};
+    }
+  };
 
   // Handle OPTIONS for all routes
   app.options('/mcp', (req: Request, res: Response) => {
@@ -197,9 +292,8 @@ const mcpDeleteHandler = async (req: Request, res: Response) => {
 
   app.listen(port, error => {
     if (error) {
-        console.error('Failed to start server:', error);
-        // eslint-disable-next-line unicorn/no-process-exit
-        process.exit(1);
+      console.error('Failed to start server:', error);
+      process.exit(1);
     }
     console.log(`MCP Streamable HTTP Server listening on port ${port}`);
   });
