@@ -19,7 +19,7 @@ COPY apps/web ./apps/web
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 
 RUN pnpm install --frozen-lockfile --ignore-scripts \
-    && turbo run build --filter=web... \
+    && pnpm turbo run build --filter=web... \
     && pnpm --filter web deploy --prod --ignore-scripts --legacy ./out \
     && cp -rL /app/apps/web/.next /app/out/.next \
     && rm -rf /app/apps /app/packages /app/node_modules /app/.turbo \
