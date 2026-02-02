@@ -512,10 +512,10 @@ export default function GPTAssistant() {
   }
 
   return (
-    <div className="flex h-screen bg-linear-to-br from-gray-950 via-gray-900 to-gray-950">
+    <div className="flex h-full w-full">
       <ToolsPanel tools={toolsList} />
 
-      <div className="flex flex-col flex-1 ">
+      <div className="flex flex-col flex-1 h-full">
         <header className="bg-gray-900 border-b border-t border-gray-800 px-6 py-4 shadow-lg">
           <div className="flex items-center gap-3">
             <div>
@@ -545,10 +545,12 @@ export default function GPTAssistant() {
           )}          
         </header>
 
-        <MessageList
-          messages={messages}
-          loading={loading}
-        />
+        <div className="flex-1 overflow-y-auto">
+          <MessageList
+            messages={messages}
+            loading={loading}
+          />
+        </div>
 
         <div className="relative">
           {showCommandMenu && filteredPrompts.length > 0 && (

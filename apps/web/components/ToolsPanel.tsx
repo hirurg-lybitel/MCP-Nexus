@@ -20,7 +20,7 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
     <div
       className={`bg-gray-900 border-r border-t border-gray-800 transition-all duration-300 ${
         isOpen ? "w-72" : "w-16"
-      } overflow-hidden flex flex-col h-screen`}
+      } overflow-hidden flex flex-col h-full`}
     >
       <div className={`flex items-center ${isOpen ? "justify-between" : "justify-center"} p-4 border-b border-gray-800`}>
         {isOpen && (

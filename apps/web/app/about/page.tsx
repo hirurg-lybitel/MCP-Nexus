@@ -9,7 +9,7 @@ export default function AboutPage() {
   const { token, setToken, clearToken } = useTokenStore();
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-950 via-gray-900 to-gray-950 py-8 text-gray-100">
+    <div className="py-8 text-gray-100">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-bold text-white mb-8">
           About Us
@@ -43,15 +43,41 @@ export default function AboutPage() {
             </div>
           </Card>
 
-          <Card title="Our Mission">
+          <Card title="MCP-Nexus Project">
             <p className="mb-4 text-gray-300">
-              We are building modern web applications using the latest technologies
-              including Next.js 16, TypeScript, and Turbo monorepo architecture.
+              This is a demonstration Next.js application showcasing a complete 
+              <strong> Model Context Protocol (MCP) server</strong> implementation 
+              with universal access from multiple sources:
             </p>
-            <p className="text-gray-300">
-              Our goal is to create scalable, maintainable, and performant applications
-              that provide excellent user experiences.
+            <ul className="list-disc list-inside space-y-1.5 mb-4 text-gray-300">
+              <li>External clients (Cursor, Claude Desktop, etc.)</li>
+              <li>Client-side Next.js components</li>
+              <li>Server-side API routes and Server Components</li>
+            </ul>
+            <p className="mb-4 text-gray-300">
+              The project serves as a reference implementation for integrating 
+              advanced AI capabilities via MCP into modern full-stack Next.js applications.
             </p>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="https://github.com/hirurg-lybitel/MCP-Nexus"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button>
+                  View on GitHub →
+                </Button>
+              </a>
+              <a
+                href="https://github.com/hirurg-lybitel/MCP-Nexus#readme"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="secondary">
+                  Read README
+                </Button>
+              </a>
+            </div>
           </Card>
 
           <Card title="Technology Stack">

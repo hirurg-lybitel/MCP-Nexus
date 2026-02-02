@@ -22,6 +22,14 @@ The primary strength of this project is its ability to provide MCP server access
 
 This multi-channel approach makes MCP Nexus a complete reference implementation for building production-ready MCP servers that can be integrated anywhere in your stack.
 
+## 🚀 Live Demo
+
+Try the public deployment here:  
+👉 https://mcp-nexus-fgka.onrender.com/
+
+- `/api/health-check` → should return `OK`
+- `/api/mcp/...` endpoints are available for MCP clients
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -32,8 +40,7 @@ This multi-channel approach makes MCP Nexus a complete reference implementation 
 ### Installation
 
 ```bash
-# Install dependencies
-pnpm i
+pnpm install
 ```
 
 ### Environment Variables
