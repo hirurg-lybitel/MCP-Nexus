@@ -2,6 +2,14 @@
   "name": "turbo-monorepo",
   "version": "1.0.0",
   "private": true,
+  "description": "MCP-Nexus — a comprehensive demonstration of a full Model Context Protocol (MCP) server with universal access from various clients in a Next.js application",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hirurg-lybitel/MCP-Nexus.git"
+  },
+  "homepage": "https://github.com/hirurg-lybitel/MCP-Nexus#readme",
+  "author": "hirurg-lybitel",
+  "license": "MIT",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
