@@ -29,8 +29,8 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         <div className="flex flex-col min-h-screen bg-linear-to-b from-gray-950 via-gray-900 to-gray-950 text-gray-100">
-          <Navigation /> {/* Static nav, h-16 from your code */}
-          <main className="flex-1 pt-16">{children}</main> {/* Pages go here, flex-1 fills */}
+          <Navigation />
+          <main className="flex-1 pt-16">{children}</main>
         </div>
       </body>
     </html>
