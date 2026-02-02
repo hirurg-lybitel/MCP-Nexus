@@ -36,6 +36,7 @@ export function startMcpServer(port: number) {
     },
     async ({ city }) => {
       console.log('[DEBUG] MCP get_forecast', city);
+      await pause(2000);
       return {
         content: [{ type: 'text', text: JSON.stringify({ message: `Forecast for ${city} is sleet and a gentle breeze. It's cloudy.` }) }],
       };
@@ -57,6 +58,7 @@ export function startMcpServer(port: number) {
     },
     async ({ city, unit }) => {
       // some api for getting current temperature in city
+      await pause(2000);
       return {
         content: [{ type: 'text', text: JSON.stringify({ temperature: 20, unit }) }],
         structuredContent: {
@@ -81,6 +83,7 @@ export function startMcpServer(port: number) {
     },
     async ({ city, date }) => {
       console.log('[DEBUG] MCP get_rain_probability', city, date);
+      await pause(2000);
       // some api for getting current temperature in city
       return {
         content: [{ type: 'text', text: JSON.stringify({ probability: 20 }) }],
@@ -340,3 +343,5 @@ export function startMcpServer(port: number) {
     console.log(`MCP Streamable HTTP Server listening on port ${port}`);
   });
 }
+
+const pause = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
