@@ -106,7 +106,6 @@ This will remove:
 - Next.js build cache (`.next`)
 - TypeScript build info (`.tsbuildinfo`)
 - Build and dist directories
-```
 
 ## 🛠️ API Endpoints
 
@@ -121,8 +120,6 @@ Useful for:
 - health checks in Docker / Kubernetes
 - monitoring service availability
 - checking that the Next.js application launched correctly
-
-## 📦 Project Structure
 
 ## 🛠️ Tech Stack
 
