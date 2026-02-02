@@ -21,4 +21,7 @@
     "typescript",
     "typescriptreact"
   ],
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
 }

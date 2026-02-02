@@ -101,6 +101,20 @@ This will remove:
 - Build and dist directories
 ```
 
+## 🛠️ API Endpoints
+
+| Method | Path                        | Description                              | Response              |
+|--------|-----------------------------|------------------------------------------|-----------------------|
+| `GET`  | `/api/health-check`         | Checking application liveness            | `OK` (200)            |
+| `POST` | `/api/mcp/...`              | MCP Protocol endpoints (via rewrite)     | depends on request    |
+
+`/api/health-check` — a minimalistic route that always returns a status of 200 and the text "OK". 
+Useful for:
+
+- health checks in Docker / Kubernetes
+- monitoring service availability
+- checking that the Next.js application launched correctly
+
 ## 📦 Project Structure
 
 ## 🛠️ Tech Stack
