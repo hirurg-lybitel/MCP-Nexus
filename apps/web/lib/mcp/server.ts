@@ -112,6 +112,49 @@ export function startMcpServer(port: number) {
     }
   );
 
+
+  server.registerPrompt(
+    'get_rain_probability_prompt',
+    {
+      description: 'A prompt for getting the probability of rain',
+      title: 'Rain Probability Prompt',
+    },
+    async () => {
+      return {
+        messages: [
+          {
+            role: 'user',
+            content: {
+              type: 'text',
+              text: 'What is the probability of rain in London today?'
+            }
+          }
+        ]
+      };
+    }
+  );
+
+  server.registerPrompt(
+    'get_temperature_prompt',
+    {
+      description: 'A prompt for getting the temperature',
+      title: 'Temperature Prompt',
+    },
+    async () => {
+      return {
+        messages: [
+          {
+            role: 'user',
+            content: {
+              type: 'text',
+              text: 'What is the temperature in Minsk today?'
+            }
+          }
+        ]
+      };
+    }
+  );
+
   // server.registerPrompt(
   //   'greeting-template',
   //   {
