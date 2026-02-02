@@ -324,8 +324,28 @@ export default function GPTAssistant() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'OpenAI API error');
+        let errorMessage = 'OpenAI proxy error';
+
+        if (response.status === 403) {
+          errorMessage = 'Authentication failed – please verify your OpenAI token.';
+          throw new Error(errorMessage);
+        }
+
+        try {
+          const errorBody = await response.text();
+          errorMessage = errorBody.trim() || `HTTP ${response.status}`;
+
+          // try to parse JSON error if proxy sometimes returns JSON
+          try {
+            const jsonError = JSON.parse(errorBody);
+            errorMessage = jsonError.error?.message || jsonError.message || errorBody;
+          } catch {
+            // it's plain text → keep it as is
+          }
+        } catch {
+          // can't even read body
+        }
+        throw new Error(errorMessage);
       }
 
       let data = await response.json();
