@@ -2,19 +2,14 @@ import { createServer } from 'http';
 import { parse } from 'url';
 import next from 'next';
 import { startMcpServer } from './lib/mcp/server';
-import { HOST, MCP_PORT, PORT } from './constants';
+import { MCP_PORT, PORT, HOST } from './constants';
 import dotenv from "dotenv";
 dotenv.config();
-
-
-console.log('NODE_ENV', process.env.NODE_ENV);
-console.log('PORT', PORT);
-console.log('HOSTNAME', HOST);
-console.log('NEXT_PUBLIC_MCP_PORT', MCP_PORT);
 
 const port = parseInt(PORT, 10);
 const mcpPort = parseInt(MCP_PORT, 10);
 const dev = process.env.NODE_ENV !== 'production';
+const hostname = HOST || 'localhost';
 
 const app = next({ dev, hostname: HOST, port, customServer: true  });
 const handle = app.getRequestHandler();

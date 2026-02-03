@@ -46,7 +46,7 @@ export default function InputArea({
             disabled={disabled || loading || !input.trim()}
             onClick={onClearMessage}
             variant="secondary"
-            className="bg-transparent! shadow-none p-2.5! border-0! disabled:opacity-0 disabled:pointer-events-none"
+            className="bg-transparent! shadow-none p-2.5! border-0! disabled:opacity-0!"
           >
             <X className="w-5 h-5" />                
           </Button>
@@ -54,7 +54,7 @@ export default function InputArea({
           <Button
             disabled={disabled || loading || !input.trim()}
             onClick={onSendMessage}
-            className="p-2.5! disabled:opacity-0 disabled:pointer-events-none"
+            className="p-2.5! disabled:opacity-0!"
           >
             <Send className="w-5 h-5" />            
           </Button>

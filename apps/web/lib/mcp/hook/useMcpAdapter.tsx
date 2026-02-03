@@ -49,6 +49,7 @@ export const useMcpAdapter = () => {
         promptsResult.prompts.map((prompt) => ({
           name: prompt.name,
           description: prompt.description,
+          arguments: prompt.arguments,
         }))
       );
     } catch (err) {
