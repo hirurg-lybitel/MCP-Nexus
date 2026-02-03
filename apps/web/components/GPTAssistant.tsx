@@ -5,11 +5,7 @@ import MessageList from './MessageList';
 import InputArea from './InputArea';
 import ToolsPanel from './ToolsPanel';
 import { useMcpAdapter } from '@/lib/mcp/hook/useMcpAdapter';
-import {
-  GPT_MODEL_GENERAL,
-  GPT_PROXY_URL,
-  TODO_MESSAGE_ID,
-} from '@/constants';
+import { GPT_MODEL_GENERAL, GPT_PROXY_URL, TODO_MESSAGE_ID } from '@/constants';
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions.js';
 import {
   ChatCompletionFunctionTool,
@@ -21,9 +17,12 @@ import { ExecutionStep, Message, Tool } from '@/types';
 import { getHoroscope } from '@/lib/openai/actions';
 import { useTokenStore } from '@/stores/useTokenStore';
 import Link from 'next/link';
-import { TriangleAlert } from 'lucide-react';
+import { Trash, TriangleAlert } from 'lucide-react';
+import PromptArgsModal from './PromptArgsModal';
+import { McpPrompt, McpTool } from '@/lib/mcp/client';
+import Button from './basic/Button';
 
-const SYSTEM_PROMPT = 
+const SYSTEM_PROMPT =
   'You are a helpful AI assistant in the GPT Assistant app with MCP (Model Context Protocol) tools integration. ' +
   'Your role: answer questions clearly, help with tasks, and use available MCP and OpenAI tools when needed. ' +
   'Guidelines: be concise and relevant, explain tool results when useful, and stay helpful and professional. ' +
@@ -50,6 +49,9 @@ export default function GPTAssistant() {
   const [commandFilter, setCommandFilter] = useState('');
   const [selectedPromptIndex, setSelectedPromptIndex] = useState(0);
   const stepsRef = useRef<ExecutionStep[]>([]);
+
+  const [showArgsModal, setShowArgsModal] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState<McpPrompt | null>(null);
 
   const { token } = useTokenStore();
 
@@ -125,12 +127,19 @@ export default function GPTAssistant() {
     }
   };
 
-  function extractPromptText(messages: Array<{ role: string; content?: unknown }>): string {
+  function extractPromptText(
+    messages: Array<{ role: string; content?: unknown }>
+  ): string {
     if (!Array.isArray(messages)) return '';
     return messages
       .map((m) => {
         const content = m.content;
-        if (content && typeof content === 'object' && 'text' in content && typeof (content as { text: string }).text === 'string') {
+        if (
+          content &&
+          typeof content === 'object' &&
+          'text' in content &&
+          typeof (content as { text: string }).text === 'string'
+        ) {
           return (content as { text: string }).text;
         }
         return '';
@@ -139,7 +148,14 @@ export default function GPTAssistant() {
       .join('\n\n');
   }
 
-  async function handleSelectPrompt(prompt: { name: string; description?: string }) {
+  async function handleSelectPrompt(prompt: McpPrompt) {
+    if (prompt.arguments) {
+      setSelectedPrompt(prompt);
+      setShowArgsModal(true);
+      setShowCommandMenu(false);
+      return;
+    }
+
     try {
       // TODO: Prompt could has required arguments, which we must to send with getPrompt
       const result = await getPrompt(prompt.name);
@@ -152,6 +168,18 @@ export default function GPTAssistant() {
     }
   }
 
+  async function handleArgsSubmit(args: Record<string, unknown>) {
+    if (!selectedPrompt) return;
+
+    try {
+      const result = await getPrompt(selectedPrompt.name, args);
+      const text = extractPromptText(result.messages ?? []);
+      setInput((prev) => prev.replace(/\/\S*$/, '').trim() + text);
+    } catch {
+      setError('Failed to load parameterized prompt');
+    }
+  }
+
   function handleInputKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (!showCommandMenu || filteredPrompts.length === 0) return;
     if (e.key === 'Escape') {
@@ -161,7 +189,9 @@ export default function GPTAssistant() {
     }
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedPromptIndex((i) => Math.min(i + 1, filteredPrompts.length - 1));
+      setSelectedPromptIndex((i) =>
+        Math.min(i + 1, filteredPrompts.length - 1)
+      );
       return;
     }
     if (e.key === 'ArrowUp') {
@@ -221,14 +251,16 @@ export default function GPTAssistant() {
     switch (toolName) {
     case GptFunctionName.Planning: {
       if (!Array.isArray(toolInput.steps)) {
-        throw new Error('Invalid steps');        
+        throw new Error('Invalid steps');
       }
 
-      const newSteps: ExecutionStep[] = toolInput.steps.map(({ id, label }) => ({
-        id,
-        label,
-        status: 'pending'        
-      }));
+      const newSteps: ExecutionStep[] = toolInput.steps.map(
+        ({ id, label }) => ({
+          id,
+          label,
+          status: 'pending',
+        })
+      );
 
       stepsRef.current = newSteps;
 
@@ -380,24 +412,30 @@ export default function GPTAssistant() {
             // TODO вынести в функцию
             setMessages((prev) => {
               const newMessages = [...prev];
-              const currentTodoMessageIdx = newMessages.findLastIndex(m => m.id === TODO_MESSAGE_ID);
+              const currentTodoMessageIdx = newMessages.findLastIndex(
+                (m) => m.id === TODO_MESSAGE_ID
+              );
 
               if (currentTodoMessageIdx < 0) {
                 return prev;
               }
-              const steps: ExecutionStep[] = JSON.parse(newMessages[currentTodoMessageIdx].content).steps;
-              const stepIdx = stepsRef.current.findIndex(s => s.id === toolCall.function.name);
+              const steps: ExecutionStep[] = JSON.parse(
+                newMessages[currentTodoMessageIdx].content
+              ).steps;
+              const stepIdx = stepsRef.current.findIndex(
+                (s) => s.id === toolCall.function.name
+              );
 
-
-              if (stepIdx >= 0 ) {
+              if (stepIdx >= 0) {
                 steps[stepIdx].status = 'running';
-                newMessages[currentTodoMessageIdx].content = JSON.stringify({ steps });
+                newMessages[currentTodoMessageIdx].content = JSON.stringify({
+                  steps,
+                });
               }
-              
 
               return newMessages;
             });
-            
+
             const result = await processTool(
               toolCall.function.name,
               JSON.parse(toolCall.function.arguments)
@@ -415,7 +453,6 @@ export default function GPTAssistant() {
             // Create TODO list message
             let todoMessage: Message;
             if (toolCall.function.name === GptFunctionName.Planning) {
-
               // const newSteps = JSON.parse(result).steps;
               // setSteps(newSteps);
 
@@ -436,22 +473,28 @@ export default function GPTAssistant() {
               ...(todoMessage ? [todoMessage] : []),
             ]);
 
-
-
             // TODO: need check error
             setMessages((prev) => {
               const newMessages = [...prev];
-              const currentTodoMessageIdx = newMessages.findLastIndex(m => m.id === TODO_MESSAGE_ID);
+              const currentTodoMessageIdx = newMessages.findLastIndex(
+                (m) => m.id === TODO_MESSAGE_ID
+              );
 
               if (currentTodoMessageIdx < 0) {
                 return prev;
               }
-              const steps: ExecutionStep[] = JSON.parse(newMessages[currentTodoMessageIdx].content).steps;
-              const stepIdx = stepsRef.current.findIndex(s => s.id === toolCall.function.name);
+              const steps: ExecutionStep[] = JSON.parse(
+                newMessages[currentTodoMessageIdx].content
+              ).steps;
+              const stepIdx = stepsRef.current.findIndex(
+                (s) => s.id === toolCall.function.name
+              );
 
-              if (stepIdx >= 0 ) {
+              if (stepIdx >= 0) {
                 steps[stepIdx].status = 'completed';
-                newMessages[currentTodoMessageIdx].content = JSON.stringify({ steps });
+                newMessages[currentTodoMessageIdx].content = JSON.stringify({
+                  steps,
+                });
               }
 
               return newMessages;
@@ -531,20 +574,44 @@ export default function GPTAssistant() {
     setInput('');
   }
 
+  function handleClearHistory() {
+    setMessages([]);
+  }
+
   return (
     <div className="flex h-full w-full">
+      <PromptArgsModal
+        isOpen={showArgsModal}
+        onClose={() => setShowArgsModal(false)}
+        onSubmit={handleArgsSubmit}
+        arguments={selectedPrompt?.arguments || []}
+        promptName={selectedPrompt?.name || ''}
+      />
+
       <ToolsPanel tools={toolsList} />
 
       <div className="flex flex-col flex-1 h-full">
         <header className="bg-gray-900 border-b border-t border-gray-800 px-6 py-4 shadow-lg">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 justify-between">
             <div>
               <h1 className="text-2xl font-bold text-white">GPT Assistant</h1>
               <p className="text-sm text-gray-400">
                 Powered by OpenAI with MCP Tools Integration
               </p>
             </div>
+            {messages.length > 0 && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleClearHistory}
+                disabled={loading}
+                title="Clear History"
+              >
+                <Trash className="h-5 w-5 " />
+              </Button>
+            )}
           </div>
+
           {error && (
             <div className="mt-3 p-3 bg-red-900/30 border border-red-700 rounded text-red-300 text-sm">
               {error}
@@ -555,14 +622,22 @@ export default function GPTAssistant() {
             <div className="bg-blue-900/30 border border-blue-500/50 mt-3 p-4 rounded-lg">
               <p className="flex items-center gap-1 text-sm text-blue-200">
                 <TriangleAlert className="text-yellow-500 h-4 w-4" />
-                To use the chat, you need to set <b>your personal access token</b>.
+                To use the chat, you need to set{' '}
+                <b>your personal access token</b>.
               </p>
               <p className="text-sm text-blue-200">
-                Go to the <Link href="/about" className="font-bold underline">About Us</Link>, 
-                where you will find the input field in the 'OpenAI Configuration' area."
+                Go to the{' '}
+                <Link
+                  href="/about"
+                  className="font-bold underline"
+                >
+                  About Us
+                </Link>
+                , where you will find the input field in the 'OpenAI
+                Configuration' area."
               </p>
             </div>
-          )}          
+          )}
         </header>
 
         <div className="flex-1 overflow-y-auto">
@@ -576,7 +651,7 @@ export default function GPTAssistant() {
           {showCommandMenu && filteredPrompts.length > 0 && (
             <div
               aria-label="command-menu"
-              className="absolute bottom-full left-0 right-0 mb-2 mx-6 max-h-64 overflow-auto rounded-lg border border-gray-700 bg-gray-800 shadow-xl z-50 py-1"
+              className="absolute bottom-full left-0 right-0 mb-2 mx-6 max-h-96 overflow-auto rounded-lg border border-gray-700 bg-gray-800 shadow-xl z-50 py-1"
             >
               {filteredPrompts.map((prompt, index) => (
                 <button
@@ -589,7 +664,9 @@ export default function GPTAssistant() {
                   }`}
                   onClick={() => handleSelectPrompt(prompt)}
                 >
-                  <span className="font-medium text-white text-sm">{prompt.name}</span>
+                  <span className="font-medium text-white text-sm">
+                    {prompt.name}
+                  </span>
                   {prompt.description && (
                     <span className="text-xs text-gray-400">
                       {prompt.description}

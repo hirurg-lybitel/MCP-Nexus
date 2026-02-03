@@ -25,20 +25,19 @@ export function startMcpServer(port: number) {
     },
   });
 
-  // Register a simple tool
+  // Tools
   server.registerTool(
-    'get_forecast',
+    'get_humidity',
     {
-      description: 'Get current weather for a location. Use this to check weather conditions for any city.',
+      description: 'Get humidity for a location. Use this to check humidity conditions for any city.',
       inputSchema: {
         city: z.string().describe('City'),
       },
     },
     async ({ city }) => {
-      console.log('[DEBUG] MCP get_forecast', city);
       await pause(2000);
       return {
-        content: [{ type: 'text', text: JSON.stringify({ message: `Forecast for ${city} is sleet and a gentle breeze. It's cloudy.` }) }],
+        content: [{ type: 'text', text: JSON.stringify({ message: `Humidity for ${city} is 50%` }) }],
       };
     }
   );
@@ -82,7 +81,6 @@ export function startMcpServer(port: number) {
       },
     },
     async ({ city, date }) => {
-      console.log('[DEBUG] MCP get_rain_probability', city, date);
       await pause(2000);
       // some api for getting current temperature in city
       return {
@@ -94,6 +92,7 @@ export function startMcpServer(port: number) {
     }
   );
 
+  // Prompts
   server.registerPrompt(
     'get_basic_prompt',
     {
@@ -114,7 +113,6 @@ export function startMcpServer(port: number) {
       };
     }
   );
-
 
   server.registerPrompt(
     'get_rain_probability_prompt',
@@ -158,50 +156,55 @@ export function startMcpServer(port: number) {
     }
   );
 
-  // server.registerPrompt(
-  //   'greeting-template',
-  //   {
-  //     title: 'Greeting Template',
-  //     description: 'A simple greeting prompt template',
-  //     argsSchema: {
-  //       name: z.string().describe('Name to include in greeting')
-  //     }
-  //   },
-  //   async (args): Promise<GetPromptResult> => {
-  //     console.log('[DEBUG] MCP prompt greeting-template', args);
-  //     return {
-  //       messages: [
-  //         {
-  //           role: 'user',
-  //           content: {
-  //             type: 'text',
-  //             text: `Please greet ${args.name} in a friendly manner and add a sign BigTeam in the end of the message.`
-  //           }
-  //         }
-  //       ]
-  //     };
-  //   }
-  // );
+  server.registerPrompt(
+    'greeting-template',
+    {
+      title: 'Greeting Template',
+      description: 'A simple greeting prompt template',
+      argsSchema: {
+        name: z.string().describe('Name to include in greeting')
+      }
+    },
+    async (args): Promise<GetPromptResult> => {
+      console.log('[DEBUG] MCP prompt greeting-template', args);
+      return {
+        messages: [
+          {
+            role: 'user',
+            content: {
+              type: 'text',
+              text: `Please greet ${args.name} in a friendly manner and add a sign BigTeam in the end of the message.`
+            }
+          }
+        ]
+      };
+    }
+  );
 
-  // server.registerPrompt(
-  //   'get_forecast',
-  //   {
-  //     title: 'Get current weather for a location',
-  //     description: 'Get current weather for a location. Use this to check weather conditions for any city.',
-  //     argsSchema: {
-  //       city: z.string().describe('City')
-  //     }
-  //   },
-  //   async ({ city }) => {
-  //     console.log('[DEBUG] MCP prompt get_forecast', city);
-  //     return {
-  //       messages: [{
-  //         role: 'user',
-  //         content: { type: 'text', text: "text of forecast prompt" },
-  //       }]
-  //     };
-  //   }
-  // );
+  server.registerPrompt(
+    'birthday_congratulations',
+    {
+      title: 'Birthday Congratulations',
+      description: 'A prompt for congratulating a person on their birthday',
+      argsSchema: {
+        name: z.string().describe('Name to congratulate'),
+        age: z.string().describe('Age of the person to congratulate')
+      }
+    },
+    async (args): Promise<GetPromptResult> => {
+      return {
+        messages: [
+          {
+            role: 'user',
+            content: {
+              type: 'text',
+              text: `Please congratulate ${args.name} on their birthday. They are ${args.age} years old.`
+            }
+          }
+        ]
+      };
+    }
+  );
 
   const app = createMcpExpressApp();
 
