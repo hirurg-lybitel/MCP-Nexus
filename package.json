@@ -1,5 +1,5 @@
 {
-  "name": "turbo-monorepo",
+  "name": "mcp-nexus",
   "version": "1.0.0",
   "private": true,
   "description": "MCP-Nexus — a comprehensive demonstration of a full Model Context Protocol (MCP) server with universal access from various clients in a Next.js application",
