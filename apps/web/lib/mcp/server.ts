@@ -8,7 +8,7 @@ import { GetPromptResult, isInitializeRequest } from "@modelcontextprotocol/sdk/
 
 const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
 
-export function startMcpServer(port: number) {
+function createServer() {
   const server = new McpServer({
     name: "mock-mcp-server",
     version: "1.0.0",
@@ -206,6 +206,10 @@ export function startMcpServer(port: number) {
     }
   );
 
+  return server;
+}
+
+export function startMcpServer(port: number) {
   const app = createMcpExpressApp();
 
   // CORS middleware
@@ -278,7 +282,13 @@ export function startMcpServer(port: number) {
           }
         };
 
+        transport.onerror = (error) => {
+          console.error('Transport error:', error);
+        };
+
+        const server = createServer();
         await server.connect(transport);
+        
         console.log('Transport connected');
         await transport.handleRequest(req, res, req.body);
         console.log('Transport handled');
