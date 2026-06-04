@@ -1,14 +1,25 @@
 import { TODO_MESSAGE_ID } from "@/constants";
 import { ExecutionStep, Message } from "@/types";
-import { ListTodo, Loader, Square, SquareCheckBig, Zap } from "lucide-react";
+import { ListTodo, Loader, Square, SquareCheckBig } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import DataTableView from "./DataTableView";
+import QueryPlanView from "./QueryPlanView";
+import ToolCallPanel from "./ToolCallPanel";
+import { chatMarkdownComponents } from "@/lib/chat/markdown-components";
+import { stripMarkdownTables } from "@/lib/chat/strip-markdown-tables";
 
 
 interface MessageItemProps {
   message: Message;
+  /** Hide GFM tables when data was already shown via present_query_result. */
+  stripMarkdownTables?: boolean;
 }
 
-export default function MessageItem({ message }: MessageItemProps) {
+export default function MessageItem({
+  message,
+  stripMarkdownTables: stripTables = false,
+}: MessageItemProps) {
   const isUser = message.role === "user";
 
   const formatTime = (date: Date) => {
@@ -19,8 +30,24 @@ export default function MessageItem({ message }: MessageItemProps) {
     });
   };
 
+  const isToolPanel = Boolean(message.toolName);
+  const markdownContent =
+    stripTables && message.content.trim()
+      ? stripMarkdownTables(message.content)
+      : message.content;
+  const hasBody =
+    Boolean(message.tableData) ||
+    Boolean(message.planData) ||
+    message.id === TODO_MESSAGE_ID ||
+    message.content.trim().length > 0 ||
+    isToolPanel;
+
   return (
-    <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
+    <div
+      className={`flex gap-3 min-w-0 w-full ${
+        isUser ? "justify-end" : "justify-start"
+      }`}
+    >
       {!isUser && (
         <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
           <span className="text-white text-sm font-semibold">AI</span>
@@ -28,22 +55,25 @@ export default function MessageItem({ message }: MessageItemProps) {
       )}
 
       <div
-        className={`max-w-2xl rounded-lg px-4 py-3 ${
+        className={`rounded-lg px-4 min-w-0 ${
+          hasBody ? "py-3" : "py-2"
+        } ${message.tableData || message.planData || isToolPanel ? "max-w-full flex-1" : "max-w-2xl"} ${
           isUser
             ? "bg-blue-600 text-white rounded-br-none"
             : "bg-gray-800 text-gray-100 rounded-bl-none"
         }`}
       >
-        {message.toolName && (
-          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-600">
-            <Zap className="w-4 h-4 text-yellow-400" />
-            <span className="text-xs font-semibold text-yellow-400">
-              Using: {message.toolName}
-            </span>
-          </div>
-        )}
-
-        {message.id === TODO_MESSAGE_ID
+        {isToolPanel ? (
+          <ToolCallPanel
+            toolName={message.toolName!}
+            toolInput={message.toolInput}
+            toolResult={message.toolResult}
+          />
+        ) : message.planData ? (
+          <QueryPlanView data={message.planData} />
+        ) : message.tableData ? (
+          <DataTableView data={message.tableData} />
+        ) : message.id === TODO_MESSAGE_ID
           ? ((() => {
             let steps: ExecutionStep[] | undefined;
             try {
@@ -74,43 +104,24 @@ export default function MessageItem({ message }: MessageItemProps) {
           })()
             
           )
-          : (
+          : hasBody ? (
             <div className="prose prose-invert prose-sm max-w-none">
               <ReactMarkdown
-                components={{
-                  p: ({ children }) => <p className="text-sm mb-2">{children}</p>,
-                  ul: ({ children }) => (
-                    <ul className="text-sm list-disc list-inside mb-2">
-                      {children}
-                    </ul>
-                  ),
-                  ol: ({ children }) => (
-                    <ol className="text-sm list-decimal list-inside mb-2">
-                      {children}
-                    </ol>
-                  ),
-                  code: ({ children }) => (
-                    <code className="bg-gray-900 px-2 py-1 rounded text-xs font-mono">
-                      {children}
-                    </code>
-                  ),
-                  pre: ({ children }) => (
-                    <pre className="bg-gray-900 p-3 rounded mb-2 overflow-x-auto">
-                      {children}
-                    </pre>
-                  ),
-                }}
+                remarkPlugins={[remarkGfm]}
+                components={chatMarkdownComponents}
               >
-                {message.content}
+                {markdownContent}
               </ReactMarkdown>
             </div>
-          ) }
+          ) : null}
 
         
 
-        <span className="text-xs opacity-60 mt-2 block">
-          {formatTime(message.timestamp)}
-        </span>
+        {!isToolPanel && (
+          <span className="text-xs opacity-60 mt-2 block">
+            {formatTime(message.timestamp)}
+          </span>
+        )}
       </div>
 
       {isUser && (

@@ -18,7 +18,9 @@
     "type-check": "turbo run type-check",
     "clean": "del-cli node_modules && del-cli node_modules .turbo && del-cli \"apps/*/.next\" \"apps/*/.turbo\" \"apps/*/dist\" \"apps/*/build\" \"apps/*/.tsbuildinfo\" \"apps/*/node_modules\"",
     "docker:s:up": "docker compose -f docker-compose.yaml --env-file apps/web/.env up -d",
-    "docker:s:down": "docker compose -f docker-compose.yaml --env-file apps/web/.env down"
+    "docker:s:down": "docker compose -f docker-compose.yaml --env-file apps/web/.env down",
+    "firebird:smoke": "pnpm --filter @mcp-nexus/db-firebird smoke",
+    "firebird:build-native": "pnpm rebuild node-firebird-native-api"
   },
   "devDependencies": {
     "@turbo/gen": "^1.12.0",
@@ -31,5 +33,12 @@
   "packageManager": "pnpm@10.28.1",
   "engines": {
     "node": ">=23"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "node-firebird-native-api",
+      "esbuild",
+      "sharp"
+    ]
   }
 }

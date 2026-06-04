@@ -1,55 +1,81 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, type Dispatch, type SetStateAction } from 'react';
+import { flushSync } from 'react-dom';
 import MessageList from './MessageList';
 import InputArea from './InputArea';
 import ToolsPanel from './ToolsPanel';
 import { useMcpAdapter } from '@/lib/mcp/hook/useMcpAdapter';
-import { GPT_MODEL_GENERAL, GPT_PROXY_URL, TODO_MESSAGE_ID } from '@/constants';
+import {
+  CHAT_CONTENT_MAX_WIDTH,
+  GPT_MODEL_GENERAL,
+  GPT_PROXY_URL,
+  QUERY_PLAN_MESSAGE_ID,
+} from '@/constants';
+import {
+  markAllPlanStepsCompleted,
+  markPlanStepCompleted,
+  markPlanStepRunning,
+} from '@/lib/chat/plan-progress';
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions.js';
 import {
   ChatCompletionFunctionTool,
   ChatCompletionMessageParam,
-  ChatCompletionTool,
 } from 'openai/resources';
+import { executeAgentTool } from '@/lib/agent/execute-agent-tool';
+import { isAgentTool } from '@/lib/agent/tool-names';
+import { shouldShowToolCallPanel } from '@/lib/chat/tool-ui';
 import { GptFunctionName, GptFunctions } from '@/lib/openai/functions';
-import { ExecutionStep, Message, Tool } from '@/types';
+import { Message, QueryPlanData, Tool } from '@/types';
 import { getHoroscope } from '@/lib/openai/actions';
 import { useTokenStore } from '@/stores/useTokenStore';
 import Link from 'next/link';
 import { Trash, TriangleAlert } from 'lucide-react';
 import PromptArgsModal from './PromptArgsModal';
-import { McpPrompt, McpTool } from '@/lib/mcp/client';
+import { McpPrompt } from '@/lib/mcp/client';
 import Button from './basic/Button';
+import { parseQueryPlanFromToolResult } from '@/lib/chat/parse-query-plan';
+import { parseTableFromToolResult } from '@/lib/chat/parse-tool-table';
+import { stripMarkdownTables } from '@/lib/chat/strip-markdown-tables';
+import { buildSystemPrompt } from '@/lib/chat/system-prompt';
+import { toolResultPayload } from '@/lib/chat/tool-result-payload';
 
-const SYSTEM_PROMPT =
-  'You are a helpful AI assistant in the GPT Assistant app with MCP (Model Context Protocol) tools integration. ' +
-  'Your role: answer questions clearly, help with tasks, and use available MCP and OpenAI tools when needed. ' +
-  'Guidelines: be concise and relevant, explain tool results when useful, and stay helpful and professional. ' +
-  `Before executing tools, think step-by-step. If the user's request is complex (requires more than one tool call) you MUST` +
-  `1. First call ${GptFunctionName.Planning}, passing it a list of all stages.` +
-  '2. Then execute the MCP tools sequentially' +
-  '3. Give a general answer at the end.';
+const SYSTEM_PROMPT = buildSystemPrompt();
+
+function patchActivePlanMessage(
+  messages: Message[],
+  updater: (plan: QueryPlanData) => QueryPlanData
+): Message[] {
+  const idx = messages.findIndex(
+    (m) => m.id === QUERY_PLAN_MESSAGE_ID && m.planData
+  );
+  if (idx < 0) {
+    return messages;
+  }
+  return messages.map((m, i) =>
+    i === idx ? { ...m, planData: updater(m.planData!) } : m
+  );
+}
+
+/** Force plan To-do UI to paint before long await processTool / fetch. */
+function flushPlanProgress(
+  setMessages: Dispatch<SetStateAction<Message[]>>,
+  updater: (plan: QueryPlanData) => QueryPlanData
+): void {
+  flushSync(() => {
+    setMessages((prev) => patchActivePlanMessage(prev, updater));
+  });
+}
 
 export default function GPTAssistant() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [toolsList, setToolsList] = useState<Tool[]>([
-    ...GptFunctions.map((t) => ({
-      name: t.function.name,
-      description: t.function.description ?? '',
-      inputSchema: t.function.parameters ?? {},
-    })),
-  ]);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [mcpTools, setMcpTools] = useState<ChatCompletionTool[]>([]);
   const [showCommandMenu, setShowCommandMenu] = useState(false);
   const [commandFilter, setCommandFilter] = useState('');
   const [selectedPromptIndex, setSelectedPromptIndex] = useState(0);
-  const stepsRef = useRef<ExecutionStep[]>([]);
-
   const [showArgsModal, setShowArgsModal] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState<McpPrompt | null>(null);
 
@@ -70,16 +96,21 @@ export default function GPTAssistant() {
     );
   }, [prompts, commandFilter]);
 
-  useEffect(() => {
-    setSelectedPromptIndex(0);
-  }, [commandFilter, showCommandMenu]);
+  const hostTools = useMemo<Tool[]>(
+    () =>
+      GptFunctions.map((t) => ({
+        name: t.function.name,
+        description: t.function.description ?? '',
+        inputSchema: t.function.parameters ?? {},
+      })),
+    []
+  );
 
-  useEffect(() => {
+  const mcpTools = useMemo<ChatCompletionFunctionTool[]>(() => {
     if (!isConnected) {
-      return;
+      return [];
     }
-
-    const toOpenAiTools: ChatCompletionFunctionTool[] = tools.map((t: any) => ({
+    return tools.map((t: any) => ({
       type: 'function',
       function: {
         name: t.name,
@@ -87,32 +118,25 @@ export default function GPTAssistant() {
         parameters: t.inputSchema,
       },
     }));
-
-    setMcpTools(toOpenAiTools);
-    setToolsList([
-      ...GptFunctions.map((t) => ({
-        name: t.function.name,
-        description: t.function.description ?? '',
-        inputSchema: t.function.parameters ?? {},
-      })),
-      ...toOpenAiTools.map((t) => ({
-        name: t.function.name,
-        description: t.function.description ?? '',
-        inputSchema: t.function.parameters ?? {},
-      })),
-    ]);
   }, [isConnected, tools]);
+
+  const toolsList = useMemo<Tool[]>(
+    () => [
+      ...hostTools,
+      ...mcpTools.map((t) => ({
+        name: t.function.name,
+        description: t.function.description ?? '',
+        inputSchema: t.function.parameters ?? {},
+      })),
+    ],
+    [hostTools, mcpTools]
+  );
+
+  const displayError = error ?? mcpError ?? null;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
-  useEffect(() => {
-    if (!mcpError) {
-      return;
-    }
-    setError(mcpError);
-  }, [mcpError]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -120,8 +144,12 @@ export default function GPTAssistant() {
 
     const lastWord = value.split(/\s/).pop() || '';
     if (lastWord.startsWith('/')) {
+      const newFilter = lastWord.slice(1);
       setShowCommandMenu(true);
-      setCommandFilter(lastWord.slice(1));
+      if (!showCommandMenu || newFilter !== commandFilter) {
+        setSelectedPromptIndex(0);
+      }
+      setCommandFilter(newFilter);
     } else {
       setShowCommandMenu(false);
     }
@@ -249,29 +277,25 @@ export default function GPTAssistant() {
     console.log('processTool', { toolName, toolInput });
 
     switch (toolName) {
-    case GptFunctionName.Planning: {
-      if (!Array.isArray(toolInput.steps)) {
-        throw new Error('Invalid steps');
-      }
-
-      const newSteps: ExecutionStep[] = toolInput.steps.map(
-        ({ id, label }) => ({
-          id,
-          label,
-          status: 'pending',
-        })
-      );
-
-      stepsRef.current = newSteps;
-
-      return JSON.stringify({ steps: newSteps });
-    }
     case GptFunctionName.Horoscope:
       return await getHoroscope({
         name: 'name' in toolInput ? String(toolInput.name) : '',
         sign: 'sign' in toolInput ? String(toolInput.sign) : '',
         sex: 'sex' in toolInput ? String(toolInput.sex) : undefined,
       });
+    default:
+      break;
+    }
+
+    if (isAgentTool(toolName)) {
+      try {
+        return await executeAgentTool(toolName, toolInput);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'unknown';
+        return JSON.stringify({
+          error: `Agent tool failed. ${message}`,
+        });
+      }
     }
 
     try {
@@ -292,12 +316,7 @@ export default function GPTAssistant() {
         throw new Error(errorText ?? 'unknown');
       }
 
-      const extractedText = extractMcpText(response);
-      if (extractedText) {
-        return extractedText;
-      }
-
-      return JSON.stringify(response);
+      return toolResultPayload(response);
     } catch (err: any) {
       return JSON.stringify({
         error: `Tool execution failed. ${err.message ?? 'unknown'}`,
@@ -386,6 +405,8 @@ export default function GPTAssistant() {
         throw new Error('Invalid API response: no choices returned');
       }
 
+      let dataTablePresentedThisTurn = false;
+
       while (
         data.choices[0].finish_reason === 'tool_calls' &&
         data.choices[0].message?.tool_calls
@@ -409,96 +430,91 @@ export default function GPTAssistant() {
           try {
             console.log('toolCall', toolCall);
 
-            // TODO вынести в функцию
-            setMessages((prev) => {
-              const newMessages = [...prev];
-              const currentTodoMessageIdx = newMessages.findLastIndex(
-                (m) => m.id === TODO_MESSAGE_ID
-              );
+            const toolName = toolCall.function.name;
 
-              if (currentTodoMessageIdx < 0) {
-                return prev;
-              }
-              const steps: ExecutionStep[] = JSON.parse(
-                newMessages[currentTodoMessageIdx].content
-              ).steps;
-              const stepIdx = stepsRef.current.findIndex(
-                (s) => s.id === toolCall.function.name
-              );
-
-              if (stepIdx >= 0) {
-                steps[stepIdx].status = 'running';
-                newMessages[currentTodoMessageIdx].content = JSON.stringify({
-                  steps,
-                });
-              }
-
-              return newMessages;
-            });
+            flushPlanProgress(setMessages, (plan) =>
+              markPlanStepRunning(plan, toolName)
+            );
 
             const result = await processTool(
-              toolCall.function.name,
+              toolName,
               JSON.parse(toolCall.function.arguments)
             );
+
+            const planData = parseQueryPlanFromToolResult(
+              toolCall.function.name,
+              result
+            );
+            const tableData = parseTableFromToolResult(
+              toolCall.function.name,
+              result
+            );
+
+            let toolInput: Record<string, unknown> = {};
+            try {
+              toolInput = JSON.parse(toolCall.function.arguments) as Record<
+                string,
+                unknown
+              >;
+            } catch {
+              toolInput = { _raw: toolCall.function.arguments };
+            }
 
             const assistantToolMessage: Message = {
               id: `tool-${toolCall.id}`,
               role: 'assistant',
-              content: `Using tool: ${toolCall.function.name}`,
+              content: '',
               timestamp: new Date(),
               toolName: toolCall.function.name,
+              toolInput,
+              toolResult: result,
               isUiMessage: true,
             };
 
-            // Create TODO list message
-            let todoMessage: Message;
-            if (toolCall.function.name === GptFunctionName.Planning) {
-              // const newSteps = JSON.parse(result).steps;
-              // setSteps(newSteps);
-
-              // console.log('stepsRef.current', stepsRef.current);
-
-              todoMessage = {
-                id: TODO_MESSAGE_ID,
+            const planMessage: Message | undefined = planData
+              ? {
+                id: QUERY_PLAN_MESSAGE_ID,
                 role: 'assistant',
-                content: result,
+                content: '',
                 timestamp: new Date(),
+                planData,
                 isUiMessage: true,
-              };
-            }
+              }
+              : undefined;
 
-            setMessages((prev) => [
-              ...prev,
-              assistantToolMessage,
-              ...(todoMessage ? [todoMessage] : []),
-            ]);
+            const tableMessage: Message | undefined = tableData
+              ? (() => {
+                dataTablePresentedThisTurn = true;
+                return {
+                  id: `table-${toolCall.id}`,
+                  role: 'assistant' as const,
+                  content: '',
+                  timestamp: new Date(),
+                  tableData,
+                  isUiMessage: true,
+                };
+              })()
+              : undefined;
 
-            // TODO: need check error
             setMessages((prev) => {
-              const newMessages = [...prev];
-              const currentTodoMessageIdx = newMessages.findLastIndex(
-                (m) => m.id === TODO_MESSAGE_ID
-              );
-
-              if (currentTodoMessageIdx < 0) {
-                return prev;
-              }
-              const steps: ExecutionStep[] = JSON.parse(
-                newMessages[currentTodoMessageIdx].content
-              ).steps;
-              const stepIdx = stepsRef.current.findIndex(
-                (s) => s.id === toolCall.function.name
-              );
-
-              if (stepIdx >= 0) {
-                steps[stepIdx].status = 'completed';
-                newMessages[currentTodoMessageIdx].content = JSON.stringify({
-                  steps,
-                });
-              }
-
-              return newMessages;
+              const withoutActivePlan = planMessage
+                ? prev.filter((m) => m.id !== QUERY_PLAN_MESSAGE_ID)
+                : prev;
+              return [
+                ...withoutActivePlan,
+                ...(shouldShowToolCallPanel(toolName)
+                  ? [assistantToolMessage]
+                  : []),
+                ...(planMessage ? [planMessage] : []),
+                ...(tableMessage ? [tableMessage] : []),
+              ];
             });
+
+            if (!planMessage) {
+              flushPlanProgress(setMessages, (plan) =>
+                markPlanStepCompleted(plan, toolName)
+              );
+            }
 
             conversationMessages.push({
               role: 'tool',
@@ -506,14 +522,42 @@ export default function GPTAssistant() {
               content: result,
             });
           } catch (err: any) {
+            const errorResult = JSON.stringify({
+              error:
+                'Tool execution failed: ' +
+                `${err.message || 'Unknown error'}`,
+            });
+
+            let failedInput: Record<string, unknown> = {};
+            try {
+              failedInput = JSON.parse(toolCall.function.arguments) as Record<
+                string,
+                unknown
+              >;
+            } catch {
+              failedInput = { _raw: toolCall.function.arguments };
+            }
+
+            if (shouldShowToolCallPanel(toolCall.function.name)) {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: `tool-${toolCall.id}`,
+                  role: 'assistant',
+                  content: '',
+                  timestamp: new Date(),
+                  toolName: toolCall.function.name,
+                  toolInput: failedInput,
+                  toolResult: errorResult,
+                  isUiMessage: true,
+                },
+              ]);
+            }
+
             conversationMessages.push({
               role: 'tool',
               tool_call_id: toolCall.id,
-              content: JSON.stringify({
-                error:
-                  'Tool execution failed: ' +
-                  `${err.message || 'Unknown error'}`,
-              }),
+              content: errorResult,
             });
           }
         }
@@ -546,10 +590,17 @@ export default function GPTAssistant() {
         }
       }
 
+      flushPlanProgress(setMessages, markAllPlanStepsCompleted);
+
+      let finalContent = data.choices[0].message.content || 'No response';
+      if (dataTablePresentedThisTurn && finalContent.trim()) {
+        finalContent = stripMarkdownTables(finalContent);
+      }
+
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
-        content: data.choices[0].message.content || 'No response',
+        content: finalContent,
         timestamp: new Date(),
       };
 
@@ -579,7 +630,7 @@ export default function GPTAssistant() {
   }
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex h-full w-full min-w-0 overflow-hidden">
       <PromptArgsModal
         isOpen={showArgsModal}
         onClose={() => setShowArgsModal(false)}
@@ -590,68 +641,72 @@ export default function GPTAssistant() {
 
       <ToolsPanel tools={toolsList} />
 
-      <div className="flex flex-col flex-1 h-full">
-        <header className="bg-gray-900 border-b border-t border-gray-800 px-6 py-4 shadow-lg">
-          <div className="flex items-center gap-3 justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-white">GPT Assistant</h1>
-              <p className="text-sm text-gray-400">
-                Powered by OpenAI with MCP Tools Integration
-              </p>
+      <div className="relative flex flex-col flex-1 min-w-0 h-full overflow-hidden">
+        <header className="absolute w-full p-2 bg-transparent border-t border-gray-800">
+          <div className={`mx-auto w-full max-w-5xl min-w-0 px-2`}>
+
+            <div className="flex items-center gap-3 justify-between">
+              <div className="flex-1" />
+              {messages.length > 0 && (
+                <Button
+                  variant="danger"
+                  size="xs"
+                  onClick={handleClearHistory}
+                  disabled={loading}
+                  title="Clear History"
+                >
+                  <Trash className="h-5 w-5 " />
+                </Button>
+              )}
             </div>
-            {messages.length > 0 && (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={handleClearHistory}
-                disabled={loading}
-                title="Clear History"
-              >
-                <Trash className="h-5 w-5 " />
-              </Button>
+
+            {displayError && (
+              <div className="max-w-2xl mx-auto bg-gray-900">
+                <div className="mt-3 p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-300 text-sm">
+                  {displayError}
+                </div>
+              </div> 
+            )}
+
+            {!token && (
+              <div className="bg-gray-900 rounded-lg max-w-2xl mt-3 mx-auto">
+                <div className={`bg-blue-900/30 border border-blue-500/50 p-4 rounded-lg`}>
+                  <p className="flex items-center gap-1 text-sm text-blue-200">
+                    <TriangleAlert className="text-yellow-500 h-4 w-4" />
+                  To use the chat, you need to set{' '}
+                    <b>your personal access token</b>.
+                  </p>
+                  <p className="text-sm text-blue-200">
+                  Go to the{' '}
+                    <Link
+                      href="/about"
+                      className="font-bold underline"
+                    >
+                    About Us
+                    </Link>
+                  , where you will find the input field in the 'OpenAI
+                  Configuration' area."
+                  </p>
+                </div>
+              </div>
             )}
           </div>
-
-          {error && (
-            <div className="mt-3 p-3 bg-red-900/30 border border-red-700 rounded text-red-300 text-sm">
-              {error}
-            </div>
-          )}
-
-          {!token && (
-            <div className="bg-blue-900/30 border border-blue-500/50 mt-3 p-4 rounded-lg">
-              <p className="flex items-center gap-1 text-sm text-blue-200">
-                <TriangleAlert className="text-yellow-500 h-4 w-4" />
-                To use the chat, you need to set{' '}
-                <b>your personal access token</b>.
-              </p>
-              <p className="text-sm text-blue-200">
-                Go to the{' '}
-                <Link
-                  href="/about"
-                  className="font-bold underline"
-                >
-                  About Us
-                </Link>
-                , where you will find the input field in the 'OpenAI
-                Configuration' area."
-              </p>
-            </div>
-          )}
         </header>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
           <MessageList
             messages={messages}
             loading={loading}
           />
         </div>
 
-        <div className="relative">
+        <div
+          className={`relative mx-auto w-full ${CHAT_CONTENT_MAX_WIDTH} min-w-0 px-6`}
+        >
           {showCommandMenu && filteredPrompts.length > 0 && (
             <div
               aria-label="command-menu"
-              className="absolute bottom-full left-0 right-0 mb-2 mx-6 max-h-96 overflow-auto rounded-lg border border-gray-700 bg-gray-800 shadow-xl z-50 py-1"
+              className="absolute bottom-full left-0 right-0 mb-2 max-h-96 overflow-auto rounded-lg border border-gray-700 bg-gray-800 shadow-xl z-50 py-1"
             >
               {filteredPrompts.map((prompt, index) => (
                 <button

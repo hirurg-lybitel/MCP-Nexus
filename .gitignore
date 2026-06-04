@@ -19,6 +19,7 @@ dist
 *.pid.lock
 
 # Misc
+.research
 .DS_Store
 *.pem
 

@@ -29,7 +29,7 @@ export default function InputArea({
   };
 
   return (
-    <div className="bg-gray-900 border-t border-gray-800 px-6 py-4 shadow-lg">
+    <div className="border-gray-800 py-4 shadow-lg w-full min-w-0">
       <div className="flex gap-3 items-end relative">
         <textarea
           value={input}
@@ -48,7 +48,7 @@ export default function InputArea({
             variant="secondary"
             className="bg-transparent! shadow-none p-2.5! border-0! disabled:opacity-0!"
           >
-            <X className="w-5 h-5" />                
+            <X className="w-5 h-5" />
           </Button>
 
           <Button
@@ -56,10 +56,9 @@ export default function InputArea({
             onClick={onSendMessage}
             className="p-2.5! disabled:opacity-0!"
           >
-            <Send className="w-5 h-5" />            
+            <Send className="w-5 h-5" />
           </Button>
         </div>
-        
       </div>
       <div className="text-xs text-gray-500 mt-2">
         Tip: The AI can use available tools to answer your questions

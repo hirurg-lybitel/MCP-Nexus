@@ -44,6 +44,12 @@ export default function Navigation() {
               })}
             </div>
           </div>
+          <div className="content-center text-end">
+            <h1 className="text-xl font-bold text-white">GPT Assistant</h1>
+            <p className="text-sm text-gray-400">
+              Powered by OpenAI with MCP Tools Integration
+            </p>
+          </div>
         </div>
       </div>
     </nav>

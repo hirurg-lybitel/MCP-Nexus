@@ -18,7 +18,7 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
 
   return (
     <div
-      className={`bg-gray-900 border-r border-t border-gray-800 transition-all duration-300 ${
+      className={`shrink-0 bg-gray-900 border-r border-t border-gray-800 transition-all duration-300 ${
         isOpen ? "w-72" : "w-16"
       } overflow-hidden flex flex-col h-full`}
     >
@@ -56,7 +56,7 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
             >
               {isOpen ? (
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2" title={isOpenAiTool(tool.name) ? 'openai tool' : 'mcp tool'}>
+                  <div className="flex items-center gap-2" title={isOpenAiTool(tool.name) ? 'host agent tool' : 'mcp tool'}>
                     {isOpenAiTool(tool.name) ? <Zap className="w-4 h-4 text-yellow-500 shrink-0" /> : <DatabaseZap className="w-4 h-4 text-yellow-500 shrink-0" />}
                     <h3 className="text-xs font-semibold text-white truncate">
                       {tool.name}

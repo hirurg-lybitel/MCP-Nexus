@@ -1,8 +1,6 @@
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions";
-import dotenv from "dotenv";
-dotenv.config();
 
-export const HOST = process.env.HOSTNAME || 'localhost';
+export const HOST = process.env.HOST ?? process.env.HOSTNAME ?? 'localhost';
 export const PORT = process.env.PORT ?? '4004';
 export const MCP_PORT = process.env.NEXT_PUBLIC_MCP_PORT ?? '4005';
 // export const MCP_URL = `http://localhost:${MCP_PORT}/mcp`;
@@ -28,3 +26,9 @@ export const GPT_MODEL_GENERAL: GPT_MODEL = {
 };
 
 export const TODO_MESSAGE_ID = 'todo_message';
+
+/** Active query plan card for the current assistant turn (step progress). */
+export const QUERY_PLAN_MESSAGE_ID = 'query_plan_active';
+
+/** Max width of chat messages and input on wide screens (Tailwind class). */
+export const CHAT_CONTENT_MAX_WIDTH = 'max-w-4xl';

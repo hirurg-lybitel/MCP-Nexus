@@ -8,5 +8,5 @@ export default defineConfig({
   clean: true,
   minify: false, 
   outDir: 'dist',
-  external: ['next'],
+  external: ['next', '@mcp-nexus/db-firebird', 'node-firebird-driver-native'],
 });

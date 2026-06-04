@@ -1,0 +1,22 @@
+{
+  "name": "@mcp-nexus/db-firebird",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "test": "tsx --test src/**/*.test.ts",
+    "smoke": "tsx scripts/smoke-readonly.ts"
+  },
+  "dependencies": {
+    "node-firebird-driver-native": "^3.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.30",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

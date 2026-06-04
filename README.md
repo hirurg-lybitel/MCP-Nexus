@@ -45,18 +45,55 @@ pnpm install
 
 ### Environment Variables
 
-Create a `.env` file in the apps/web directory to configure the application:
+Copy [`apps/web/.env.example`](apps/web/.env.example) to `apps/web/.env` and adjust values:
 
 ```bash
 # Server Configuration
-NODE_ENV=development                    # Environment mode
-HOSTNAME=localhost                      # Server hostname (default: localhost)
-PORT=4004                               # Next.js server port (default: 4004)
-NEXT_PUBLIC_MCP_PORT=4005               # MCP server port (default: 4005)
-NEXT_PUBLIC_OPENAI_SECURITY_KEY=123     # OpenAI security key (replace with your own key)
+NODE_ENV=development
+HOST=localhost
+PORT=4004
+MCP_PORT=4005
+NEXT_PUBLIC_MCP_PORT=4005
+NEXT_PUBLIC_OPENAI_SECURITY_KEY=replace-with-your-key
+
+# Firebird (optional — enables Firebird MCP tools: search_tables, list_tables, describe_table, execute_sql)
+ISC_USER=SYSDBA
+ISC_PASSWORD=your_password
+NODE_FB_HOST=localhost
+NODE_FB_PORT=3050
+NODE_FB_DB=D:/path/to/database.fdb
+# FIREBIRD_MAX_ROWS=500
+# FIREBIRD_QUERY_TIMEOUT_MS=30000
 ```
 
-The `.env` file is already included in `.gitignore` and won't be committed to the repository. Make sure to create your own `.env` file based on your needs.
+The `.env` file is in `.gitignore`. Without Firebird variables the MCP server still starts; Firebird tools return a clear configuration error.
+
+### Firebird native driver (Windows / local dev)
+
+`node-firebird-driver-native` depends on a native addon (`node-firebird-native-api`). After `pnpm install`, if tools fail with **Could not locate the bindings file**:
+
+1. Ensure [Firebird client](https://firebirdsql.org/) (`fbclient.dll`) is installed and on `PATH`.
+2. Build the addon (requires Visual Studio Build Tools and Python for `node-gyp`):
+
+```bash
+pnpm firebird:build-native
+```
+
+If that does not produce `addon.node`, run manually inside the package:
+
+```bash
+cd node_modules/node-firebird-native-api
+npm run gyp:configure
+npm run gyp:build
+```
+
+Smoke test (read-only) against your `.env`:
+
+```bash
+# optional: use another project's .env without copying secrets into apps/web
+$env:FIREBIRD_ENV_FILE="D:\git\gdmn-nxt\.env"   # PowerShell
+pnpm firebird:smoke
+```
 
 ### Development
 
@@ -121,13 +158,40 @@ Useful for:
 - monitoring service availability
 - checking that the Next.js application launched correctly
 
+## Firebird MCP server (read-only, portable)
+
+Exposed at `http://localhost:4005/mcp` — usable from Cursor, VS Code, or any MCP client.
+
+| Tool | Description |
+|------|-------------|
+| `search_tables` | Search `AT_RELATIONS` by title / name (e.g. «групп товар») |
+| `list_tables` | User tables (`RDB$RELATIONS` + titles from `AT_RELATIONS`) |
+| `describe_table` | Columns + `refTable` for FK fields from `AT_FIELDS` / RDB$ |
+| `execute_sql` | Read-only SQL; validates table names before run |
+
+Database access lives in [`packages/db-firebird`](packages/db-firebird). MCP wiring: [`apps/web/lib/mcp/firebird-tools.ts`](apps/web/lib/mcp/firebird-tools.ts).
+
+## MCP-Nexus web agent (host-only tools)
+
+Registered in the Next.js chat (`GptFunctions`), not on the Firebird MCP server:
+
+| Tool | Description |
+|------|-------------|
+| `create_query_plan` | Structured plan → To-dos UI |
+| `present_query_result` | Final rows → chat table (uses `db-firebird` for AT_* labels when configured) |
+
+Implementation: [`apps/web/lib/agent/`](apps/web/lib/agent/).
+
+Cursor / external MCP clients: point to `http://localhost:4005/mcp` (see [`.cursor/mcp.json`](.cursor/mcp.json) `local-mcp`) — they get Firebird tools only; plan/present require the web assistant.
+
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 25
+- **Framework**: Next.js 16
 - **Language**: TypeScript
 - **Monorepo**: Turbo
 - **Package Manager**: pnpm
 - **MCP SDK**: @modelcontextprotocol/sdk
+- **Database**: Firebird via `node-firebird-driver-native` (`@mcp-nexus/db-firebird`)
 
 ## 🎯 Use Cases
 

@@ -1,19 +1,21 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
-import { z } from "zod";
 import { InMemoryEventStore } from "@modelcontextprotocol/sdk/examples/shared/inMemoryEventStore.js";
 import type { Request, Response } from 'express';
-import { GetPromptResult, isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
+import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
+import { registerDemoTools, registerDemoPrompts } from './demo-tools';
+import { registerFirebirdTools } from './firebird-tools';
+import { registerFirebirdPrompts } from './firebird-prompts';
 
 const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
 
 function createServer() {
   const server = new McpServer({
-    name: "mock-mcp-server",
-    version: "1.0.0",
-    description: "A mock MCP server for testing purposes.",
-    title: "Mock MCP Server",
+    name: "mcp-nexus-firebird",
+    version: "1.1.0",
+    description: "MCP server with Firebird read-only tools and demo weather tools.",
+    title: "MCP Nexus",
   }, {
     capabilities: { 
       tools: {},
@@ -25,186 +27,10 @@ function createServer() {
     },
   });
 
-  // Tools
-  server.registerTool(
-    'get_humidity',
-    {
-      description: 'Get humidity for a location. Use this to check humidity conditions for any city.',
-      inputSchema: {
-        city: z.string().describe('City'),
-      },
-    },
-    async ({ city }) => {
-      await pause(2000);
-      return {
-        content: [{ type: 'text', text: JSON.stringify({ message: `Humidity for ${city} is 50%` }) }],
-      };
-    }
-  );
-
-  server.registerTool(
-    'get_current_temperature',
-    {
-      description: 'Get current temperature for a location. Use this to check temperature conditions for any city.',
-      inputSchema: {
-        city: z.string().describe('City'),
-        unit: z.enum(['celsius', 'fahrenheit']).default('celsius').optional().describe('Temperature unit'),
-      },
-      outputSchema: {
-        temperature: z.number().describe('Temperature in degrees'),
-        unit: z.enum(['celsius', 'fahrenheit']).describe('Temperature unit'),
-      },
-    },
-    async ({ city, unit }) => {
-      // some api for getting current temperature in city
-      await pause(2000);
-      return {
-        content: [{ type: 'text', text: JSON.stringify({ temperature: 20, unit }) }],
-        structuredContent: {
-          temperature: 20,
-          unit
-        }
-      };
-    }
-  );
-
-  server.registerTool(
-    'get_rain_probability',
-    {
-      description: 'et the probability of rain for a specific location.',
-      inputSchema: {
-        city: z.string().describe('City'),
-        date: z.string().describe('Date in UTC format'),
-      },
-      outputSchema: {
-        probability: z.number().describe('Rain probability in percentage'),
-      },
-    },
-    async ({ city, date }) => {
-      await pause(2000);
-      // some api for getting current temperature in city
-      return {
-        content: [{ type: 'text', text: JSON.stringify({ probability: 20 }) }],
-        structuredContent: {
-          probability: 20
-        }
-      };
-    }
-  );
-
-  // Prompts
-  server.registerPrompt(
-    'get_basic_prompt',
-    {
-      description: 'Example of a basic complex prompt',
-      title: 'Basic Prompt',
-    },
-    async () => {
-      return {
-        messages: [
-          {
-            role: 'user',
-            content: {
-              type: 'text',
-              text: 'Show me the full forecast with temperature, chance of precipitation, cloud cover, etc. in London'
-            }
-          }
-        ]
-      };
-    }
-  );
-
-  server.registerPrompt(
-    'get_rain_probability_prompt',
-    {
-      description: 'A prompt for getting the probability of rain',
-      title: 'Rain Probability Prompt',
-    },
-    async () => {
-      return {
-        messages: [
-          {
-            role: 'user',
-            content: {
-              type: 'text',
-              text: 'What is the probability of rain in London today?'
-            }
-          }
-        ]
-      };
-    }
-  );
-
-  server.registerPrompt(
-    'get_temperature_prompt',
-    {
-      description: 'A prompt for getting the temperature',
-      title: 'Temperature Prompt',
-    },
-    async () => {
-      return {
-        messages: [
-          {
-            role: 'user',
-            content: {
-              type: 'text',
-              text: 'What is the temperature in Minsk today?'
-            }
-          }
-        ]
-      };
-    }
-  );
-
-  server.registerPrompt(
-    'greeting-template',
-    {
-      title: 'Greeting Template',
-      description: 'A simple greeting prompt template',
-      argsSchema: {
-        name: z.string().describe('Name to include in greeting')
-      }
-    },
-    async (args): Promise<GetPromptResult> => {
-      console.log('[DEBUG] MCP prompt greeting-template', args);
-      return {
-        messages: [
-          {
-            role: 'user',
-            content: {
-              type: 'text',
-              text: `Please greet ${args.name} in a friendly manner and add a sign BigTeam in the end of the message.`
-            }
-          }
-        ]
-      };
-    }
-  );
-
-  server.registerPrompt(
-    'birthday_congratulations',
-    {
-      title: 'Birthday Congratulations',
-      description: 'A prompt for congratulating a person on their birthday',
-      argsSchema: {
-        name: z.string().describe('Name to congratulate'),
-        age: z.string().describe('Age of the person to congratulate')
-      }
-    },
-    async (args): Promise<GetPromptResult> => {
-      return {
-        messages: [
-          {
-            role: 'user',
-            content: {
-              type: 'text',
-              text: `Please congratulate ${args.name} on their birthday. They are ${args.age} years old.`
-            }
-          }
-        ]
-      };
-    }
-  );
+  registerDemoTools(server);
+  registerFirebirdTools(server);
+  registerFirebirdPrompts(server);
+  registerDemoPrompts(server);
 
   return server;
 }
@@ -356,5 +182,3 @@ export function startMcpServer(port: number) {
     console.log(`MCP Streamable HTTP Server listening on port ${port}`);
   });
 }
-
-const pause = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
