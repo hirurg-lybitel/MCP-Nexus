@@ -4,6 +4,16 @@ FROM node:${NODE_VERSION}-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
+
+# node-firebird-native-api (node-gyp) + libfbclient at runtime
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        python3 \
+        make \
+        g++ \
+        libfbclient2 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # ---
@@ -16,7 +26,7 @@ COPY apps/web ./apps/web
 COPY packages/db-firebird ./packages/db-firebird
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 
-RUN pnpm install --frozen-lockfile --ignore-scripts \
+RUN pnpm install --frozen-lockfile \
     && pnpm turbo run build --filter=web... \
     && pnpm --filter web deploy --prod --ignore-scripts --legacy ./out \
     && cp -rL /app/apps/web/.next /app/out/.next \
@@ -24,9 +34,13 @@ RUN pnpm install --frozen-lockfile --ignore-scripts \
     && pnpm store prune
 
 # ---
-FROM node:${NODE_VERSION}-alpine AS runner
+FROM node:${NODE_VERSION}-slim AS runner
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libfbclient2 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-# Don't run production as root for security reasons
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
