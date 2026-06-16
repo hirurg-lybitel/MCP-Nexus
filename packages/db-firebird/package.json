@@ -2,13 +2,24 @@
   "name": "@mcp-nexus/db-firebird",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./query-result-summary": "./src/domain/query-result-summary.ts",
-    "./sensitive-field-compat": "./src/infrastructure/sensitivity/sensitive-field-compat.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./query-result-summary": {
+      "types": "./dist/domain/query-result-summary.d.ts",
+      "default": "./dist/domain/query-result-summary.js"
+    },
+    "./sensitive-field-compat": {
+      "types": "./dist/infrastructure/sensitivity/sensitive-field-compat.d.ts",
+      "default": "./dist/infrastructure/sensitivity/sensitive-field-compat.js"
+    }
   },
   "scripts": {
+    "build": "tsup",
     "type-check": "tsc --noEmit",
     "test": "tsx --test src/**/*.test.ts",
     "smoke": "tsx scripts/smoke-readonly.ts",
@@ -19,6 +30,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.19.30",
+    "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }

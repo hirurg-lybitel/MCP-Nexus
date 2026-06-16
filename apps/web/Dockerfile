@@ -28,8 +28,9 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 
 RUN pnpm install --frozen-lockfile \
     && pnpm turbo run build --filter=web... \
-    && pnpm --filter web deploy --prod --ignore-scripts --legacy ./out \
+    && pnpm --filter web deploy --prod --legacy ./out \
     && cp -rL /app/apps/web/.next /app/out/.next \
+    && cd /app/out && pnpm rebuild node-firebird-native-api \
     && rm -rf /app/apps /app/packages /app/node_modules /app/.turbo \
     && pnpm store prune
 
