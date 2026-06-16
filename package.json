@@ -17,8 +17,11 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "type-check": "turbo run type-check",
     "clean": "del-cli node_modules && del-cli node_modules .turbo && del-cli \"apps/*/.next\" \"apps/*/.turbo\" \"apps/*/dist\" \"apps/*/build\" \"apps/*/.tsbuildinfo\" \"apps/*/node_modules\"",
-    "docker:s:up": "docker compose -f docker-compose.yaml --env-file apps/web/.env up -d",
+    "docker:s:up": "docker compose -f docker-compose.yaml --env-file apps/web/.env up -d --build",
     "docker:s:down": "docker compose -f docker-compose.yaml --env-file apps/web/.env down",
+    "docker:prod:pull": "docker compose -f docker-compose.prod.yaml pull",
+    "docker:prod:up": "docker compose -f docker-compose.prod.yaml --env-file .env up -d",
+    "docker:prod:down": "docker compose -f docker-compose.prod.yaml down",
     "firebird:smoke": "pnpm --filter @mcp-nexus/db-firebird smoke",
     "firebird:build-native": "pnpm rebuild node-firebird-native-api"
   },

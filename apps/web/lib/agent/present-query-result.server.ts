@@ -1,5 +1,6 @@
 import {
   FirebirdConfigError,
+  FirebirdQueryError,
   requireDbServices,
 } from '@mcp-nexus/db-firebird';
 
@@ -8,7 +9,9 @@ const MAX_PRESENT_ROWS = 500;
 export interface PresentQueryResultInput {
   title?: string;
   tableName?: string;
-  rows: Record<string, unknown>[];
+  sql?: string;
+  params?: Record<string, unknown>;
+  rows?: Record<string, unknown>[];
   columnLabels?: Record<string, string>;
   rowCount?: number;
   truncated?: boolean;
@@ -17,9 +20,30 @@ export interface PresentQueryResultInput {
 export async function enrichPresentQueryResult(
   input: PresentQueryResultInput
 ): Promise<Record<string, unknown>> {
-  const rowObjects = input.rows.filter(
-    (r) => r && typeof r === 'object' && !Array.isArray(r)
-  );
+  let rowObjects: Record<string, unknown>[];
+  let rowCount = input.rowCount;
+  let truncated = input.truncated;
+
+  const sql = input.sql?.trim();
+  if (sql) {
+    const db = requireDbServices();
+    const result = await db.runValidatedQuery.run(sql, input.params);
+    rowObjects = result.rows;
+    rowCount = result.rowCount;
+    truncated = result.truncated;
+  } else if (Array.isArray(input.rows)) {
+    console.warn(
+      'present_query_result: rows is deprecated — pass sql (and optional params) instead.'
+    );
+    rowObjects = input.rows.filter(
+      (r) => r && typeof r === 'object' && !Array.isArray(r)
+    );
+    rowCount = rowCount ?? rowObjects.length;
+  } else {
+    throw new FirebirdQueryError(
+      'Either sql or rows is required for present_query_result.'
+    );
+  }
 
   const capped =
     rowObjects.length > MAX_PRESENT_ROWS
@@ -75,8 +99,8 @@ export async function enrichPresentQueryResult(
     title: resolvedTitle,
     tableName: normalizedTable,
     rows: capped,
-    rowCount: input.rowCount ?? rowObjects.length,
-    truncated: Boolean(input.truncated) || rowObjects.length > MAX_PRESENT_ROWS,
+    rowCount: rowCount ?? rowObjects.length,
+    truncated: Boolean(truncated) || rowObjects.length > MAX_PRESENT_ROWS,
   };
 
   if (Object.keys(mergedLabels).length > 0) {

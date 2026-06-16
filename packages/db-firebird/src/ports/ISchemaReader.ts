@@ -6,6 +6,7 @@ export interface TableInfo {
 }
 
 import type { TableFieldConstraints } from './table-field-constraints';
+import type { SensitivitySignal } from '../domain/sensitivity/sensitivity-verdict';
 
 export interface ColumnInfo {
   fieldName: string;
@@ -22,6 +23,10 @@ export interface ColumnInfo {
   /** Display field on referenced table (often NAME). */
   refListField?: string | null;
   refTableDisplayName?: string | null;
+  /** True for password/secret/token columns — must not be queried or displayed. */
+  sensitive?: boolean;
+  /** Which metadata signals marked the field sensitive (fieldName / displayName). */
+  sensitivitySignals?: SensitivitySignal[];
 }
 
 export interface ISchemaReader {

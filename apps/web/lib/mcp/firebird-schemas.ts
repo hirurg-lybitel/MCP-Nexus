@@ -45,6 +45,14 @@ export const columnInfoSchema = z.object({
     .nullable()
     .optional()
     .describe('Localized title of referenced table from AT_RELATIONS'),
+  sensitive: z
+    .boolean()
+    .optional()
+    .describe('True for password/secret/token columns — do not query or display'),
+  sensitivitySignals: z
+    .array(z.enum(['fieldName', 'displayName']))
+    .optional()
+    .describe('Metadata signals that marked the column sensitive'),
 });
 
 export const searchTablesOutputSchema = {

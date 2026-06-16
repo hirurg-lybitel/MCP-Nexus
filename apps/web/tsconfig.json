@@ -29,6 +29,12 @@
       ],
       "@mcp-nexus/db-firebird": [
         "../../packages/db-firebird/src/index.ts"
+      ],
+      "@mcp-nexus/db-firebird/query-result-summary": [
+        "../../packages/db-firebird/src/domain/query-result-summary.ts"
+      ],
+      "@mcp-nexus/db-firebird/sensitive-field-compat": [
+        "../../packages/db-firebird/src/infrastructure/sensitivity/sensitive-field-compat.ts"
       ]
     }
   },

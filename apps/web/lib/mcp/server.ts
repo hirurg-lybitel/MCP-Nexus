@@ -3,12 +3,43 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import { InMemoryEventStore } from "@modelcontextprotocol/sdk/examples/shared/inMemoryEventStore.js";
 import type { Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { registerDemoTools, registerDemoPrompts } from './demo-tools';
 import { registerFirebirdTools } from './firebird-tools';
 import { registerFirebirdPrompts } from './firebird-prompts';
+import {
+  getMcpApiKey,
+  isMcpAuthRequired,
+  requireMcpAuth,
+} from './auth';
+
+const SESSION_TTL_MS = 30 * 60 * 1000;
+const SESSION_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 
 const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
+const sessionLastActive: { [sessionId: string]: number } = {};
+
+function touchSession(sessionId: string): void {
+  sessionLastActive[sessionId] = Date.now();
+}
+
+function cleanupExpiredSessions(): void {
+  const now = Date.now();
+  for (const [sessionId, lastActive] of Object.entries(sessionLastActive)) {
+    if (now - lastActive <= SESSION_TTL_MS) {
+      continue;
+    }
+
+    const transport = transports[sessionId];
+    if (transport) {
+      void transport.close().catch(() => undefined);
+      delete transports[sessionId];
+    }
+    delete sessionLastActive[sessionId];
+    console.log(`Expired MCP session removed: ${sessionId}`);
+  }
+}
 
 function createServer() {
   const server = new McpServer({
@@ -36,7 +67,25 @@ function createServer() {
 }
 
 export function startMcpServer(port: number) {
+  if (isMcpAuthRequired() && !getMcpApiKey()) {
+    console.error(
+      'MCP_API_KEY is not set. MCP endpoints will return 503 in production.'
+    );
+  }
+
   const app = createMcpExpressApp();
+  const mcpRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  const sessionCleanupTimer = setInterval(
+    cleanupExpiredSessions,
+    SESSION_CLEANUP_INTERVAL_MS
+  );
+  sessionCleanupTimer.unref();
 
   // CORS middleware
   app.use((req: Request, res: Response, next) => {
@@ -61,10 +110,13 @@ export function startMcpServer(port: number) {
     next();
   });
 
+  app.use('/mcp', mcpRateLimiter);
+  app.use('/mcp', requireMcpAuth);
+
   const mcpPostHandler = async (req: Request, res: Response) => {
     const sessionId = req.headers['mcp-session-id'] as string | undefined;
-    console.log('Request body:', req.body);
     if (sessionId) {
+      touchSession(sessionId);
       console.log(`Received MCP request for session: ${sessionId}`);
     }
 
@@ -94,6 +146,7 @@ export function startMcpServer(port: number) {
           onsessioninitialized: (sessionId) => {
             console.log(`Session initialized with ID: ${sessionId}`);
             transports[sessionId] = transport;
+            touchSession(sessionId);
           },
           eventStore
         });
@@ -105,6 +158,7 @@ export function startMcpServer(port: number) {
           if (sid && transports[sid]) {
             console.log(`Transport closed for session ${sid}, removing from transports map`);
             delete transports[sid];
+            delete sessionLastActive[sid];
           }
         };
 
@@ -133,6 +187,8 @@ export function startMcpServer(port: number) {
       return;
     }
 
+    touchSession(sessionId);
+
     // Check for Last-Event-ID header for resumability
     const lastEventId = req.headers['last-event-id'] as string | undefined;
     if (lastEventId) {
@@ -151,6 +207,8 @@ export function startMcpServer(port: number) {
       res.status(400).send('Invalid or missing session ID');
       return;
     }
+
+    touchSession(sessionId);
 
     console.log(`Received session termination request for session ${sessionId}`);
 

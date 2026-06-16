@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   isIdentifierColumn,
+  isHiddenByDefaultColumn,
   pickDisplayColumns,
   projectRowsToColumns,
 } from './column-picker';
@@ -16,7 +17,22 @@ describe('isIdentifierColumn', () => {
   });
 });
 
+describe('isHiddenByDefaultColumn', () => {
+  it('hides sensitive columns such as PASSW', () => {
+    assert.equal(isHiddenByDefaultColumn('PASSW'), true);
+    assert.equal(isHiddenByDefaultColumn('PASSWORD'), true);
+    assert.equal(isHiddenByDefaultColumn('NAME'), false);
+  });
+});
+
 describe('pickDisplayColumns', () => {
+  it('omits PASSW from default display columns', () => {
+    const rows = [{ ID: 1, NAME: 'User', PASSW: '[REDACTED]' }];
+    const cols = pickDisplayColumns(rows, 8);
+    assert.ok(cols.includes('NAME'));
+    assert.ok(!cols.includes('PASSW'));
+  });
+
   it('prefers NAME over ID and GROUPKEY', () => {
     const rows = [
       {

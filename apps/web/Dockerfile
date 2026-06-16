@@ -9,13 +9,11 @@ WORKDIR /app
 # ---
 FROM base AS builder
 
-ARG NEXT_PUBLIC_OPENAI_SECURITY_KEY
-ENV NEXT_PUBLIC_OPENAI_SECURITY_KEY=$NEXT_PUBLIC_OPENAI_SECURITY_KEY
-
-ARG NEXT_PUBLIC_MCP_PORT
+ARG NEXT_PUBLIC_MCP_PORT=4005
 ENV NEXT_PUBLIC_MCP_PORT=$NEXT_PUBLIC_MCP_PORT
 
 COPY apps/web ./apps/web
+COPY packages/db-firebird ./packages/db-firebird
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 
 RUN pnpm install --frozen-lockfile --ignore-scripts \

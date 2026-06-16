@@ -20,9 +20,8 @@ export type GPT_MODEL = {
 export const MAX_TOKENS = 16384;
 
 export const GPT_MODEL_GENERAL: GPT_MODEL = {
-  model: "gpt-4.1-mini",
-  temperature: 0.1,
-  max_tokens: MAX_TOKENS,
+  model: 'gpt-5.4-mini',
+  max_completion_tokens: MAX_TOKENS,
 };
 
 export const TODO_MESSAGE_ID = 'todo_message';
@@ -32,3 +31,6 @@ export const QUERY_PLAN_MESSAGE_ID = 'query_plan_active';
 
 /** Max width of chat messages and input on wide screens (Tailwind class). */
 export const CHAT_CONTENT_MAX_WIDTH = 'max-w-4xl';
+
+/** Max characters for user-provided domain context appended to the chat system prompt. */
+export const MAX_DOMAIN_CONTEXT_CHARS = 8000;

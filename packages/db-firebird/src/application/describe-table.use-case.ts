@@ -1,4 +1,5 @@
 import type { ColumnInfo, ISchemaReader } from '../ports/ISchemaReader';
+import type { ITableSchemaRegistry } from '../ports/ITableSchemaRegistry';
 
 export interface DescribeTableResult {
   tableName: string;
@@ -7,19 +8,22 @@ export interface DescribeTableResult {
 }
 
 export class DescribeTableUseCase {
-  constructor(private readonly schemaReader: ISchemaReader) {}
+  constructor(
+    private readonly schemaRegistry: ITableSchemaRegistry,
+    private readonly schemaReader: ISchemaReader
+  ) {}
 
   async run(tableName: string): Promise<DescribeTableResult> {
     const normalized = tableName.trim().toUpperCase();
-    const [columns, tableDisplayName] = await Promise.all([
-      this.schemaReader.describeTable(normalized),
+    const [schema, tableDisplayName] = await Promise.all([
+      this.schemaRegistry.getTableSchema(normalized),
       this.schemaReader.getTableDisplayName(normalized),
     ]);
 
     return {
-      tableName: normalized,
+      tableName: schema.tableName,
       tableDisplayName,
-      columns,
+      columns: schema.columns,
     };
   }
 }

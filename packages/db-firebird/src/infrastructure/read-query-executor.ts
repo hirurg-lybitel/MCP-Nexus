@@ -7,6 +7,9 @@ import type { IFirebirdConfig } from '../config/firebird-config';
 import { FirebirdQueryError } from '../domain/errors';
 import { assertReadOnlySql } from './read-only-sql-guard';
 import { convertNamedParams } from './named-params';
+import { redactSensitiveRows } from './sensitivity/redact-sensitive-rows';
+import type { ISensitiveFieldClassifier } from '../ports/ISensitiveFieldClassifier';
+import { getDefaultSensitiveFieldClassifier } from './sensitivity/sensitive-field-compat';
 import type {
   IReadQueryExecutor,
   QueryParams,
@@ -18,7 +21,8 @@ import type { IFirebirdConnection } from '../ports/IFirebirdConnection';
 export class ReadQueryExecutor implements IReadQueryExecutor {
   constructor(
     private readonly connection: IFirebirdConnection,
-    private readonly config: IFirebirdConfig
+    private readonly config: IFirebirdConfig,
+    private readonly classifier: ISensitiveFieldClassifier = getDefaultSensitiveFieldClassifier()
   ) {}
 
   async execute(
@@ -62,14 +66,14 @@ export class ReadQueryExecutor implements IReadQueryExecutor {
         const rows = (await resultSet.fetchAsObject()) as Record<string, unknown>[];
         if (!applyRowLimit) {
           return {
-            rows,
+            rows: redactSensitiveRows(rows, this.classifier),
             rowCount: rows.length,
             truncated: false,
           };
         }
         const limited = rows.slice(0, this.config.maxRows);
         return {
-          rows: limited,
+          rows: redactSensitiveRows(limited, this.classifier),
           rowCount: limited.length,
           truncated: rows.length > this.config.maxRows,
         };

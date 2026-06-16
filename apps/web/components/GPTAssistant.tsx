@@ -29,6 +29,7 @@ import { GptFunctionName, GptFunctions } from '@/lib/openai/functions';
 import { Message, QueryPlanData, Tool } from '@/types';
 import { getHoroscope } from '@/lib/openai/actions';
 import { useTokenStore } from '@/stores/useTokenStore';
+import { useMcpKeyStore } from '@/stores/useMcpKeyStore';
 import Link from 'next/link';
 import { Trash, TriangleAlert } from 'lucide-react';
 import PromptArgsModal from './PromptArgsModal';
@@ -38,9 +39,11 @@ import { parseQueryPlanFromToolResult } from '@/lib/chat/parse-query-plan';
 import { parseTableFromToolResult } from '@/lib/chat/parse-tool-table';
 import { stripMarkdownTables } from '@/lib/chat/strip-markdown-tables';
 import { buildSystemPrompt } from '@/lib/chat/system-prompt';
+import { TurnUsageAccumulator } from '@/lib/chat/turn-usage';
+import { projectToolResultForModel } from '@/lib/agent/agent-tool-projector';
 import { toolResultPayload } from '@/lib/chat/tool-result-payload';
-
-const SYSTEM_PROMPT = buildSystemPrompt();
+import { sanitizeToolResultForUi } from '@/lib/chat/tool-result-ui-sanitize';
+import { useDomainContextStore } from '@/stores/useDomainContextStore';
 
 function patchActivePlanMessage(
   messages: Message[],
@@ -80,11 +83,15 @@ export default function GPTAssistant() {
   const [selectedPrompt, setSelectedPrompt] = useState<McpPrompt | null>(null);
 
   const { token } = useTokenStore();
+  const { mcpKey, isValidated } = useMcpKeyStore();
+  const { domainContext } = useDomainContextStore();
 
   const {
     tools,
     prompts,
     isConnected,
+    authRequired: mcpAuthRequired,
+    mcpKeyVerified,
     callTool,
     getPrompt,
     error: mcpError,
@@ -289,7 +296,10 @@ export default function GPTAssistant() {
 
     if (isAgentTool(toolName)) {
       try {
-        return await executeAgentTool(toolName, toolInput);
+        return await executeAgentTool(toolName, toolInput, {
+          mcpAuthToken:
+            isValidated && mcpKey ? mcpKey : undefined,
+        });
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'unknown';
         return JSON.stringify({
@@ -339,13 +349,15 @@ export default function GPTAssistant() {
     setLoading(true);
     setError(null);
 
+    const turnUsage = new TurnUsageAccumulator();
+
     try {
       if (!token) {
         throw new Error('OpenAI API key is not configured');
       }
 
       const conversationMessages: Array<ChatCompletionMessageParam> = [
-        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: buildSystemPrompt(domainContext) },
         ...messages
           .filter((msg) => !msg.isUiMessage)
           .map((msg) => ({
@@ -400,6 +412,7 @@ export default function GPTAssistant() {
       }
 
       let data = await response.json();
+      turnUsage.recordApiUsage(data.usage, GPT_MODEL_GENERAL.model);
 
       if (!data.choices?.[0]) {
         throw new Error('Invalid API response: no choices returned');
@@ -441,6 +454,8 @@ export default function GPTAssistant() {
               JSON.parse(toolCall.function.arguments)
             );
 
+            turnUsage.recordToolCall(toolName);
+
             const planData = parseQueryPlanFromToolResult(
               toolCall.function.name,
               result
@@ -467,7 +482,7 @@ export default function GPTAssistant() {
               timestamp: new Date(),
               toolName: toolCall.function.name,
               toolInput,
-              toolResult: result,
+              toolResult: sanitizeToolResultForUi(toolName, result),
               isUiMessage: true,
             };
 
@@ -519,7 +534,7 @@ export default function GPTAssistant() {
             conversationMessages.push({
               role: 'tool',
               tool_call_id: toolCall.id,
-              content: result,
+              content: projectToolResultForModel(toolName, result),
             });
           } catch (err: any) {
             const errorResult = JSON.stringify({
@@ -583,6 +598,7 @@ export default function GPTAssistant() {
         }
 
         data = await response.json();
+        turnUsage.recordApiUsage(data.usage, GPT_MODEL_GENERAL.model);
         if (!data?.choices?.[0]?.message) {
           throw new Error(
             'Invalid API response structure: missing choices or message'
@@ -602,6 +618,7 @@ export default function GPTAssistant() {
         role: 'assistant',
         content: finalContent,
         timestamp: new Date(),
+        usageMeta: turnUsage.build(GPT_MODEL_GENERAL.model),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -614,6 +631,7 @@ export default function GPTAssistant() {
         role: 'assistant',
         content: `Error: ${errorMessage}`,
         timestamp: new Date(),
+        usageMeta: turnUsage.build(GPT_MODEL_GENERAL.model),
       };
       setMessages((prev) => [...prev, errorAssistantMessage]);
     } finally {
@@ -646,7 +664,13 @@ export default function GPTAssistant() {
           <div className={`mx-auto w-full max-w-5xl min-w-0 px-2`}>
 
             <div className="flex items-center gap-3 justify-between">
-              <div className="flex-1" />
+              {domainContext.trim() ? (
+                <p className="text-xs text-gray-500 shrink-0">
+                  User context active
+                </p>
+              ) : (
+                <div className="flex-1" />
+              )}
               {messages.length > 0 && (
                 <Button
                   variant="danger"
@@ -677,15 +701,34 @@ export default function GPTAssistant() {
                     <b>your personal access token</b>.
                   </p>
                   <p className="text-sm text-blue-200">
-                  Go to the{' '}
+                  Go to{' '}
                     <Link
-                      href="/about"
+                      href="/settings"
                       className="font-bold underline"
                     >
-                    About Us
+                    Settings
                     </Link>
-                  , where you will find the input field in the 'OpenAI
-                  Configuration' area."
+                  {' '}
+                  and enter your token in the OpenAI Configuration section."
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {token && mcpAuthRequired && !mcpKeyVerified && (
+              <div className="bg-gray-900 rounded-lg max-w-2xl mt-3 mx-auto">
+                <div className="bg-amber-900/30 border border-amber-500/50 p-4 rounded-lg">
+                  <p className="flex items-center gap-1 text-sm text-amber-200">
+                    <TriangleAlert className="text-yellow-500 h-4 w-4" />
+                    Database tools require a verified{' '}
+                    <b>MCP access key</b>.
+                  </p>
+                  <p className="text-sm text-amber-200">
+                    Open{' '}
+                    <Link href="/settings" className="font-bold underline">
+                      Settings
+                    </Link>
+                    , enter your MCP key, and click Verify and save.
                   </p>
                 </div>
               </div>

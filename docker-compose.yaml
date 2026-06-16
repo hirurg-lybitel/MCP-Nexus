@@ -5,27 +5,18 @@ services:
       context: .
       dockerfile: ./apps/web/Dockerfile
       args:
-        - NEXT_PUBLIC_OPENAI_SECURITY_KEY=${NEXT_PUBLIC_OPENAI_SECURITY_KEY}
+        - NEXT_PUBLIC_MCP_PORT=${NEXT_PUBLIC_MCP_PORT}
     restart: always
     ports:
       - "${PORT}:${PORT}"
+    env_file:
+      - apps/web/.env
     environment:
       - TZ=Europe/Minsk
+      - NODE_ENV=production
     networks:
       - proxy_network
-  # api:
-  #   container_name: api
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/api/Dockerfile
-  #   restart: always
-  #   ports:
-  #     - 3001:3001
-  #   networks:
-  #     - app_network
 
-# Define a network, which allows containers to communicate
-# with each other, by using their container name as a hostname
 networks:
   proxy_network:
     external: true

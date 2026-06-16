@@ -1,20 +1,19 @@
 import { AgentToolName } from './tool-names';
 
-const MAX_PRESENT_ROWS = 500;
-
 function toolErrorJson(message: string, code: string): string {
   return JSON.stringify({ error: message, code });
 }
 
 export async function executeAgentTool(
   toolName: string,
-  toolInput: Record<string, unknown>
+  toolInput: Record<string, unknown>,
+  options?: { mcpAuthToken?: string }
 ): Promise<string> {
   switch (toolName) {
   case AgentToolName.CreateQueryPlan:
     return executeCreateQueryPlan(toolInput);
   case AgentToolName.PresentQueryResult:
-    return executePresentQueryResult(toolInput);
+    return executePresentQueryResult(toolInput, options?.mcpAuthToken);
   default:
     throw new Error(`Unknown agent tool: ${toolName}`);
   }
@@ -45,29 +44,37 @@ function executeCreateQueryPlan(input: Record<string, unknown>): string {
 }
 
 async function executePresentQueryResult(
-  input: Record<string, unknown>
+  input: Record<string, unknown>,
+  mcpAuthToken?: string
 ): Promise<string> {
-  const rows = input.rows;
-  if (!Array.isArray(rows)) {
-    return toolErrorJson('rows array is required', 'INVALID_PRESENT');
+  const sql = typeof input.sql === 'string' ? input.sql.trim() : '';
+  const hasRows = Array.isArray(input.rows);
+
+  if (!sql && !hasRows) {
+    return toolErrorJson(
+      'sql is required (pass the same SQL as execute_sql)',
+      'INVALID_PRESENT'
+    );
   }
 
-  const rowObjects = rows.filter(
-    (r) => r && typeof r === 'object' && !Array.isArray(r)
-  ) as Record<string, unknown>[];
+  const body: Record<string, unknown> = {};
 
-  const capped =
-    rowObjects.length > MAX_PRESENT_ROWS
-      ? rowObjects.slice(0, MAX_PRESENT_ROWS)
-      : rowObjects;
-
-  const body: Record<string, unknown> = {
-    rows: capped,
-    rowCount:
-      typeof input.rowCount === 'number' ? input.rowCount : rowObjects.length,
-    truncated:
-      Boolean(input.truncated) || rowObjects.length > MAX_PRESENT_ROWS,
-  };
+  if (sql) {
+    body.sql = sql;
+    if (
+      input.params &&
+      typeof input.params === 'object' &&
+      !Array.isArray(input.params)
+    ) {
+      body.params = input.params;
+    }
+  } else if (hasRows) {
+    const rowArray = input.rows as unknown[];
+    body.rows = input.rows;
+    body.rowCount =
+      typeof input.rowCount === 'number' ? input.rowCount : rowArray.length;
+    body.truncated = Boolean(input.truncated);
+  }
 
   if (typeof input.title === 'string' && input.title.trim()) {
     body.title = input.title.trim();
@@ -84,9 +91,16 @@ async function executePresentQueryResult(
   }
 
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (mcpAuthToken) {
+      headers.Authorization = `Bearer ${mcpAuthToken}`;
+    }
+
     const response = await fetch('/api/agent/present-query-result', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(body),
     });
 

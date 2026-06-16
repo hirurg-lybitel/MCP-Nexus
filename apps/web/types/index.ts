@@ -1,3 +1,5 @@
+import type { TurnUsageMeta } from '@/lib/chat/turn-usage';
+
 export interface TableColumn {
   key: string;
   label: string;
@@ -54,6 +56,8 @@ export interface Message {
   tableData?: TableDisplayData;
   /** Query plan from host agent tool create_query_plan. */
   planData?: QueryPlanData;
+  /** LLM cost and resource metrics for this assistant turn. */
+  usageMeta?: TurnUsageMeta;
 }
 
 export interface Tool {

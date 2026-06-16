@@ -2,40 +2,57 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { McpClientAdapter, McpPrompt, McpTool } from '../client';
+import { useMcpKeyStore } from '@/stores/useMcpKeyStore';
 
 export const useMcpAdapter = () => {
+  const { mcpKey, isValidated } = useMcpKeyStore();
   const [client, setClient] = useState<McpClientAdapter | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [tools, setTools] = useState<Array<McpTool>>([]);
   const [prompts, setPrompts] = useState<Array<McpPrompt>>([]);
   const [error, setError] = useState<string | null>(null);
-  const isMounted = useRef(false);
+  const [authRequired, setAuthRequired] = useState<boolean | null>(null);
+  const clientRef = useRef<McpClientAdapter | null>(null);
 
-  const autoConnect = useCallback(async () => {
-    if (client || isConnecting) {
+  const canConnect =
+    authRequired === false || (authRequired === true && isValidated && Boolean(mcpKey));
+
+  const disconnectClient = useCallback(async () => {
+    const active = clientRef.current;
+    if (!active) {
       return;
     }
+    clientRef.current = null;
+    setClient(null);
+    setIsConnected(false);
+    setTools([]);
+    setPrompts([]);
+    await active.disconnect().catch(() => undefined);
+  }, []);
+
+  const connectClient = useCallback(async () => {
+    if (!canConnect || isConnecting || clientRef.current) {
+      return;
+    }
+
     setIsConnecting(true);
+    setError(null);
 
     try {
-      const newClient = new McpClientAdapter(window.location.origin + '/api/mcp');
+      const authToken = authRequired ? mcpKey : undefined;
+      const newClient = new McpClientAdapter(
+        `${window.location.origin}/api/mcp`,
+        { authToken }
+      );
       await newClient.connect();
-
-      setClient(newClient);
-      setIsConnected(true);
 
       const toolsResult = await newClient.listTools();
       const promptsResult = await newClient.listPrompts();
 
-      // Check again before updating state
-      if (!isMounted.current) {
-        return;
-      }
-
-      console.log('Tools:', toolsResult.tools);
-      console.log('Prompts:', promptsResult.prompts);
-
+      clientRef.current = newClient;
+      setClient(newClient);
+      setIsConnected(true);
       setTools(
         toolsResult.tools.map((tool) => ({
           name: tool.name,
@@ -44,7 +61,6 @@ export const useMcpAdapter = () => {
           outputSchema: tool.outputSchema,
         }))
       );
-
       setPrompts(
         promptsResult.prompts.map((prompt) => ({
           name: prompt.name,
@@ -53,71 +69,90 @@ export const useMcpAdapter = () => {
         }))
       );
     } catch (err) {
-      // Ignore errors if component is unmounted
-      if (!isMounted.current) {
-        return;
-      }
-
       console.error('Error connecting to server:', err);
       setError(err instanceof Error ? err.message : 'Failed to connect');
       setIsConnected(false);
+      await disconnectClient();
     } finally {
-      if (isMounted.current) {
-        setIsConnecting(false);
-      }
+      setIsConnecting(false);
     }
-  }, [client, isConnecting]);
+  }, [authRequired, canConnect, disconnectClient, isConnecting, mcpKey]);
 
   useEffect(() => {
-    if (!isMounted.current) {
-      autoConnect();
+    let cancelled = false;
 
-      isMounted.current = true;
-    }
-  }, [autoConnect]);
-
-  useEffect(() => {
-    // Cleanup on unmount
-    return () => {
-      console.log('Disconnecting on unmount 1');
-      if (!client) {
-        return;
-      }
-      console.log('Disconnecting on unmount 2');
-      // Silently disconnect - ignore errors during unmount
-      client.disconnect().catch((e) => {
-        // Ignore errors during cleanup
-        console.log('Failed to disconnect on unmount', e);
+    fetch('/api/settings/mcp-auth-status')
+      .then((response) => response.json())
+      .then((data: { authRequired?: boolean }) => {
+        if (!cancelled) {
+          setAuthRequired(Boolean(data.authRequired));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAuthRequired(true);
+        }
       });
 
-      isMounted.current = false;
+    return () => {
+      cancelled = true;
     };
-  }, [client]);
+  }, []);
 
-  const callTool = useCallback(async (name: string, args: Record<string, unknown>) => {
-    if (!client) {
-      console.error('Not connected to mcp server.');
-      setError('Not connected to mcp server.');
+  useEffect(() => {
+    if (authRequired === null) {
       return;
     }
 
-    return await client.callTool(name, args);
-  }, [client]);
+    if (canConnect) {
+      void connectClient();
+      return;
+    }
+
+    void disconnectClient();
+    if (authRequired) {
+      setError('MCP access key is required. Verify your key in Settings.');
+    } else {
+      setError(null);
+    }
+  }, [authRequired, canConnect, connectClient, disconnectClient]);
+
+  useEffect(() => {
+    return () => {
+      void disconnectClient();
+    };
+  }, [disconnectClient]);
+
+  const callTool = useCallback(
+    async (name: string, args: Record<string, unknown>) => {
+      if (!clientRef.current) {
+        const message = 'Not connected to MCP server.';
+        setError(message);
+        throw new Error(message);
+      }
+
+      return await clientRef.current.callTool(name, args);
+    },
+    []
+  );
 
   const getPrompt = useCallback(
     async (name: string, args?: Record<string, unknown>) => {
-      if (!client) {
-        setError('Not connected to mcp server.');
-        throw new Error('Not connected to mcp server.');
+      if (!clientRef.current) {
+        const message = 'Not connected to MCP server.';
+        setError(message);
+        throw new Error(message);
       }
-      return await client.getPrompt(name, args);
+      return await clientRef.current.getPrompt(name, args);
     },
-    [client]
+    []
   );
 
   return {
     isConnected,
     isConnecting,
+    authRequired: authRequired ?? true,
+    mcpKeyVerified: isValidated && Boolean(mcpKey),
     error,
     tools,
     prompts,

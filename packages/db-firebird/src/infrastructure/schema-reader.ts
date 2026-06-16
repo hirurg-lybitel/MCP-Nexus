@@ -1,5 +1,3 @@
-import type { IFirebirdConfig } from '../config/firebird-config';
-import type { IFirebirdConnection } from '../ports/IFirebirdConnection';
 import type {
   ColumnInfo,
   ISchemaReader,
@@ -9,7 +7,7 @@ import type {
   FieldConstraintType,
   TableFieldConstraints,
 } from '../ports/table-field-constraints';
-import { ReadQueryExecutor } from './read-query-executor';
+import type { IReadQueryExecutor } from '../ports/IReadQueryExecutor';
 
 const DEFAULT_SEARCH_LIMIT = 30;
 
@@ -170,12 +168,9 @@ function mapTableRow(row: Record<string, unknown>): TableInfo {
 }
 
 export class SchemaReader implements ISchemaReader {
-  private readonly executor: ReadQueryExecutor;
   private userTableNamesCache: Set<string> | null = null;
 
-  constructor(connection: IFirebirdConnection, config: IFirebirdConfig) {
-    this.executor = new ReadQueryExecutor(connection, config);
-  }
+  constructor(private readonly executor: IReadQueryExecutor) {}
 
   async listTables(): Promise<TableInfo[]> {
     try {

@@ -1,9 +1,11 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { Loader } from "lucide-react";
 import MessageItem from "./MessageItem";
 import { CHAT_CONTENT_MAX_WIDTH } from "@/constants";
 import { Message } from "@/types";
 import { shouldStripTablesAfterPresentation } from "@/lib/chat/strip-markdown-tables";
+import { isToolCallPanelMessage } from "@/lib/chat/tool-ui";
+import { useDeveloperModeStore } from "@/stores/useDeveloperModeStore";
 
 interface MessageListProps {
   messages: Message[];
@@ -12,10 +14,19 @@ interface MessageListProps {
 
 export default function MessageList({ messages, loading }: MessageListProps) {
   const endRef = useRef<HTMLDivElement>(null);
+  const developerMode = useDeveloperModeStore((s) => s.developerMode);
+
+  const visibleMessages = useMemo(
+    () =>
+      developerMode
+        ? messages
+        : messages.filter((message) => !isToolCallPanelMessage(message)),
+    [developerMode, messages]
+  );
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+  }, [visibleMessages, loading]);
 
   return (
     <div className="flex-1 min-w-0 w-full overflow-y-auto overflow-x-hidden py-6 h-full flex justify-center">
@@ -36,12 +47,12 @@ export default function MessageList({ messages, loading }: MessageListProps) {
           </div>
         )}
 
-        {messages.map((message, idx) => (
+        {visibleMessages.map((message, idx) => (
           <MessageItem
             key={`${message.id}_${idx}`}
             message={message}
             stripMarkdownTables={shouldStripTablesAfterPresentation(
-              messages,
+              visibleMessages,
               idx
             )}
           />

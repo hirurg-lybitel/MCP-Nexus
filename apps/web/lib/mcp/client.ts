@@ -21,10 +21,12 @@ export class McpClientAdapter {
   private client: Client | null = null;
   private transport: StreamableHTTPClientTransport | null = null;
   private readonly serverUrl: string;
+  private readonly authToken?: string;
   private isDisconnecting: boolean = false;
 
-  constructor(serverUrl: string) {
+  constructor(serverUrl: string, options?: { authToken?: string }) {
     this.serverUrl = serverUrl;
+    this.authToken = options?.authToken;
   }
 
   /**
@@ -72,7 +74,17 @@ export class McpClientAdapter {
       };
 
       // Create transport
-      this.transport = new StreamableHTTPClientTransport(new URL(this.serverUrl));
+      const requestInit: RequestInit = {};
+      if (this.authToken) {
+        requestInit.headers = {
+          Authorization: `Bearer ${this.authToken}`,
+        };
+      }
+
+      this.transport = new StreamableHTTPClientTransport(
+        new URL(this.serverUrl),
+        { requestInit }
+      );
 
       // Connect the client
       await this.client.connect(this.transport);

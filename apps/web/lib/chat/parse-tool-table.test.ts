@@ -99,10 +99,10 @@ describe('parseTableFromToolResult', () => {
 });
 
 describe('isSilentFirebirdToolUi', () => {
-  it('marks Firebird MCP discovery/execute tools as silent', () => {
-    assert.equal(isSilentFirebirdToolUi('list_tables'), true);
-    assert.equal(isSilentFirebirdToolUi('describe_table'), true);
-    assert.equal(isSilentFirebirdToolUi('execute_sql'), true);
+  it('returns false — Firebird tools use sanitized ToolCallPanel', () => {
+    assert.equal(isSilentFirebirdToolUi('list_tables'), false);
+    assert.equal(isSilentFirebirdToolUi('describe_table'), false);
+    assert.equal(isSilentFirebirdToolUi('execute_sql'), false);
     assert.equal(isSilentFirebirdToolUi('create_query_plan'), false);
   });
 });
@@ -113,6 +113,7 @@ describe('shouldShowToolCallPanel', () => {
     assert.equal(shouldShowToolCallPanel('present_query_result'), false);
     assert.equal(shouldShowToolCallPanel('execute_sql'), true);
     assert.equal(shouldShowToolCallPanel('search_tables'), true);
+    assert.equal(shouldShowToolCallPanel('describe_table'), true);
     assert.equal(shouldShowToolCallPanel('get_horoscope'), true);
   });
 });

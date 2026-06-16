@@ -68,12 +68,22 @@ export const AgentFunctions: Array<ChatCompletionFunctionTool> = [
     function: {
       name: AgentToolName.PresentQueryResult,
       description:
-        '**Present rows in chat UI (host).** Call once after Firebird **execute_sql** when you have the final answer. ' +
-        'Pass rows from the final query only. UI shows ~8 business columns by default. ' +
+        '**Present rows in chat UI (host).** Call once after Firebird **execute_sql** with the **same sql** (and params if used). ' +
+        'Do not copy row values — the server re-runs the query for the UI. ' +
         'Pass tableName for AT_RELATION_FIELDS labels; use columnLabels for computed SQL aliases.',
       parameters: {
         type: 'object',
         properties: {
+          sql: {
+            type: 'string',
+            description:
+              'Final read-only SELECT/WITH — same SQL passed to execute_sql',
+          },
+          params: {
+            type: 'object',
+            description: 'Named SQL parameters, same as execute_sql',
+            additionalProperties: true,
+          },
           title: {
             type: 'string',
             description: 'Short title; defaults from AT_RELATIONS when tableName is set',
@@ -84,7 +94,7 @@ export const AgentFunctions: Array<ChatCompletionFunctionTool> = [
           },
           rows: {
             type: 'array',
-            description: 'Row objects from execute_sql',
+            description: 'Deprecated — use sql instead',
             items: { type: 'object' },
           },
           columnLabels: {
@@ -95,14 +105,13 @@ export const AgentFunctions: Array<ChatCompletionFunctionTool> = [
           },
           rowCount: {
             type: 'number',
-            description: 'Row count from SQL (defaults to rows.length)',
+            description: 'Deprecated when using sql — taken from query result',
           },
           truncated: {
             type: 'boolean',
-            description: 'True if execute_sql hit a row limit',
+            description: 'Deprecated when using sql — taken from query result',
           },
         },
-        required: ['rows'],
       },
     },
   },

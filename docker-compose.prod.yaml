@@ -1,0 +1,18 @@
+services:
+  web:
+    container_name: web
+    image: ghcr.io/hirurg-lybitel/mcp-nexus:latest
+    restart: always
+    ports:
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
+    environment:
+      - TZ=Europe/Minsk
+      - NODE_ENV=production
+    networks:
+      - proxy_network
+
+networks:
+  proxy_network:
+    external: true

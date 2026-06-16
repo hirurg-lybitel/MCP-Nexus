@@ -18,3 +18,21 @@ export class FirebirdQueryError extends Error {
     this.name = 'FirebirdQueryError';
   }
 }
+
+export class UnknownTablesError extends FirebirdQueryError {
+  constructor(
+    message: string,
+    readonly unknownTables: string[],
+    readonly referencedTables: string[]
+  ) {
+    super(message);
+    this.name = 'UnknownTablesError';
+  }
+}
+
+export class SensitiveColumnError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'SensitiveColumnError';
+  }
+}

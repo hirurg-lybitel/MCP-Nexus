@@ -1,3 +1,4 @@
+import { isSensitiveColumn } from '@mcp-nexus/db-firebird/sensitive-field-compat';
 import { isRdbKeyField, type TableKeyFields } from './table-key-fields';
 
 /** Default number of columns shown in the UI table (full data stays in tool JSON for the model). */
@@ -78,6 +79,10 @@ export function isHiddenByDefaultColumn(
   keyFields?: TableKeyFields
 ): boolean {
   const upper = normalizeKey(key);
+
+  if (isSensitiveColumn(key)) {
+    return true;
+  }
 
   if (keyFields) {
     if (isRdbKeyField(key, keyFields)) {

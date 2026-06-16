@@ -8,6 +8,7 @@ import QueryPlanView from "./QueryPlanView";
 import ToolCallPanel from "./ToolCallPanel";
 import { chatMarkdownComponents } from "@/lib/chat/markdown-components";
 import { stripMarkdownTables } from "@/lib/chat/strip-markdown-tables";
+import TurnUsageFooter from "./TurnUsageFooter";
 
 
 interface MessageItemProps {
@@ -118,9 +119,14 @@ export default function MessageItem({
         
 
         {!isToolPanel && (
-          <span className="text-xs opacity-60 mt-2 block">
-            {formatTime(message.timestamp)}
-          </span>
+          <>
+            {message.usageMeta && !isUser && (
+              <TurnUsageFooter meta={message.usageMeta} />
+            )}
+            <span className="text-xs opacity-60 mt-2 block">
+              {formatTime(message.timestamp)}
+            </span>
+          </>
         )}
       </div>
 

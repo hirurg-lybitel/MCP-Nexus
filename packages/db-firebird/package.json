@@ -4,12 +4,15 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./query-result-summary": "./src/domain/query-result-summary.ts",
+    "./sensitive-field-compat": "./src/infrastructure/sensitivity/sensitive-field-compat.ts"
   },
   "scripts": {
     "type-check": "tsc --noEmit",
     "test": "tsx --test src/**/*.test.ts",
-    "smoke": "tsx scripts/smoke-readonly.ts"
+    "smoke": "tsx scripts/smoke-readonly.ts",
+    "test:integration": "tsx scripts/integration-readonly.ts"
   },
   "dependencies": {
     "node-firebird-driver-native": "^3.2.2"

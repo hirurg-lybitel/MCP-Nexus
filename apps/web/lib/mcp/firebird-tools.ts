@@ -4,6 +4,8 @@ import {
   FirebirdConfigError,
   FirebirdQueryError,
   ReadOnlySqlError,
+  SensitiveColumnError,
+  UnknownTablesError,
   requireDbServices,
 } from '@mcp-nexus/db-firebird';
 import {
@@ -20,6 +22,9 @@ function toolErrorText(error: unknown): string {
   }
   if (error instanceof ReadOnlySqlError) {
     return JSON.stringify({ error: error.message, code: 'READ_ONLY_SQL' });
+  }
+  if (error instanceof SensitiveColumnError) {
+    return JSON.stringify({ error: error.message, code: 'SENSITIVE_COLUMN' });
   }
   if (error instanceof FirebirdQueryError) {
     return JSON.stringify({ error: error.message, code: 'QUERY_ERROR' });
@@ -119,8 +124,9 @@ export function registerFirebirdTools(server: McpServer): void {
     {
       description:
         'Execute a read-only SQL query (SELECT or WITH). Never use SELECT * — list only columns needed for the question. ' +
+        'Sensitive columns (PASSW, PASSWORD, TOKEN, …) are blocked or redacted server-side. ' +
         'Optional named params as :NAME in params. Result is for the model only (not shown in chat). ' +
-        'After the final query, call the host tool **present_query_result** with the rows (MCP-Nexus web agent only).',
+        'After the final query, call the host tool **present_query_result** with the same **sql** (and tableName) — do not copy row values (MCP-Nexus web agent only).',
       inputSchema: {
         sql: z.string().describe('Read-only SQL (SELECT or WITH only)'),
         params: z
@@ -133,31 +139,29 @@ export function registerFirebirdTools(server: McpServer): void {
     async ({ sql, params }) => {
       try {
         const db = requireDbServices();
-        const validation = await db.validateSqlTables.run(sql);
-        if (!validation.valid) {
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify({
-                  error: `Unknown table(s): ${validation.unknownTables.join(', ')}. Use search_tables or list_tables — do not invent names.`,
-                  code: 'UNKNOWN_TABLE',
-                  unknownTables: validation.unknownTables,
-                  referencedTables: validation.tables,
-                }),
-              },
-            ],
-            isError: true,
-          };
-        }
-
-        const result = await db.executeSql.run(sql, params);
+        const result = await db.runValidatedQuery.run(sql, params);
         return firebirdToolSuccess({
           rows: result.rows,
           rowCount: result.rowCount,
           truncated: result.truncated,
         });
       } catch (error) {
+        if (error instanceof UnknownTablesError) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  error: error.message,
+                  code: 'UNKNOWN_TABLE',
+                  unknownTables: error.unknownTables,
+                  referencedTables: error.referencedTables,
+                }),
+              },
+            ],
+            isError: true,
+          };
+        }
         return {
           content: [{ type: 'text', text: toolErrorText(error) }],
           isError: true,

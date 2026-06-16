@@ -10,7 +10,10 @@
       },
       "local-mcp": {
         "url": "http://localhost:4005/mcp",
-        "type": "http"
+        "type": "http",
+        "headers": {
+          "Authorization": "Bearer ${env:MCP_API_KEY}"
+        }
       },
       "local-mcp-std": {
         "command": "npx",
