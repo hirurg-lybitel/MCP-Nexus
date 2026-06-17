@@ -1,6 +1,6 @@
 services:
-  web:
-    container_name: web
+  mcp-nexus:
+    container_name: mcp-nexus
     image: ghcr.io/hirurg-lybitel/mcp-nexus:latest
     restart: always
     ports:

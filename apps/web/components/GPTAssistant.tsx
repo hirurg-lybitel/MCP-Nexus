@@ -23,7 +23,7 @@ import {
   ChatCompletionMessageParam,
 } from 'openai/resources';
 import { executeAgentTool } from '@/lib/agent/execute-agent-tool';
-import { isAgentTool } from '@/lib/agent/tool-names';
+import { AgentToolName, isAgentTool } from '@/lib/agent/tool-names';
 import { shouldShowToolCallPanel } from '@/lib/chat/tool-ui';
 import { GptFunctionName, GptFunctions } from '@/lib/openai/functions';
 import { Message, QueryPlanData, Tool } from '@/types';
@@ -526,9 +526,14 @@ export default function GPTAssistant() {
             });
 
             if (!planMessage) {
-              flushPlanProgress(setMessages, (plan) =>
-                markPlanStepCompleted(plan, toolName)
-              );
+              const stepSucceeded =
+                toolName !== AgentToolName.PresentQueryResult ||
+                Boolean(tableData);
+              if (stepSucceeded) {
+                flushPlanProgress(setMessages, (plan) =>
+                  markPlanStepCompleted(plan, toolName)
+                );
+              }
             }
 
             conversationMessages.push({

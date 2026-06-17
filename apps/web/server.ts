@@ -1,6 +1,7 @@
 import { createServer } from 'node:http';
 import { parse } from 'node:url';
 import next from 'next';
+import { writePresentQueryResultHttp } from './lib/agent/present-query-result-http';
 import { startMcpServer } from './lib/mcp/server';
 import { MCP_PORT, PORT, HOST } from './constants';
 import { disposeDbServices, getDbServices } from '@mcp-nexus/db-firebird';
@@ -39,6 +40,12 @@ app.prepare().then(() => {
   createServer(async (req, res) => {
     try {
       const parsedUrl = parse(req.url!, true);
+      if (parsedUrl.pathname === '/api/agent/present-query-result') {
+        const handled = await writePresentQueryResultHttp(req, res);
+        if (handled) {
+          return;
+        }
+      }
       await handle(req, res, parsedUrl);
     } catch (err) {
       console.error('Error occurred handling', req.url, err);
