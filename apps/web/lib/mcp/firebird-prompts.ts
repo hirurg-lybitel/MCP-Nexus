@@ -20,8 +20,8 @@ function parseRowLimit(raw: string | undefined): number {
 function buildQueryTableUserMessage(tableName: string, limit: number): string {
   const table = tableName.trim().toUpperCase();
   return (
-    `Show the top 7 product categories, including the number of products in each category. ` +
-    `Also add a computed field: the percentage of products in each category relative to the total number of products across these top 7 categories.`
+    `Покажи топ 7 групп товаров, включая количество товаров в каждой группе. ` +
+    `Таккже добавь вычисляемое поле: процент товаров в каждой группе относительно общего количества товаров в этих группах.`
   );
 }
 
