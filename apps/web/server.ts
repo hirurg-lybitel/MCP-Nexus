@@ -4,16 +4,12 @@ import next from 'next';
 import { writePresentQueryResultHttp } from './lib/agent/present-query-result-http';
 import { startMcpServer } from './lib/mcp/server';
 import { MCP_PORT, PORT, HOST } from './constants';
-import { disposeDbServices, getDbServices } from '@mcp-nexus/db-firebird';
+import { disposeDbServices } from '@mcp-nexus/db-firebird';
+import { logStartupDiagnostics } from './lib/log-startup-diagnostics';
 import dotenv from "dotenv";
 dotenv.config();
 
-const dbServices = getDbServices();
-if (dbServices) {
-  console.log('Firebird MCP tools: enabled');
-} else {
-  console.warn('Firebird MCP tools: disabled (set NODE_FB_* and ISC_* in .env)');
-}
+logStartupDiagnostics();
 
 const shutdown = async () => {
   await disposeDbServices();

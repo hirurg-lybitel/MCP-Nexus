@@ -55,6 +55,14 @@ export {
   getDefaultSensitiveFieldClassifier,
 } from './infrastructure/sensitivity/sensitive-field-compat';
 export { hasWildcardSelect } from './infrastructure/sensitive-sql-guard';
+export {
+  inspectLibfbclientOnDisk,
+  probeFirebirdNativeClient,
+} from './startup-diagnostics';
+export type {
+  FirebirdNativeProbeResult,
+  LibfbclientDiskReport,
+} from './startup-diagnostics';
 
 export interface DbServices {
   executeSql: ExecuteSqlUseCase;

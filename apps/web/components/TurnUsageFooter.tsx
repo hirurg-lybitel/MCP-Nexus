@@ -2,7 +2,7 @@ import { formatCostUsd } from '@/lib/chat/model-pricing';
 import type { TurnUsageMeta } from '@/lib/chat/turn-usage';
 
 function formatTokenCount(value: number): string {
-  return value.toLocaleString('en-US');
+  return value.toLocaleString('en-US').replaceAll(',', ' ');
 }
 
 export function formatTurnUsageLine(meta: TurnUsageMeta): string {

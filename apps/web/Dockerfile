@@ -12,8 +12,11 @@ RUN apt-get update \
         make \
         g++ \
         libfbclient2 \
-    && FB_LIB="$(dirname "$(find /usr/lib -name 'libfbclient.so.2' -print -quit)")" \
+    && FB_SO2="$(find /usr/lib -name 'libfbclient.so.2' -print -quit)" \
+    && test -n "$FB_SO2" \
+    && FB_LIB="$(dirname "$FB_SO2")" \
     && ln -sf libfbclient.so.2 "$FB_LIB/libfbclient.so" \
+    && test -e "$FB_LIB/libfbclient.so" \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -41,8 +44,11 @@ FROM node:${NODE_VERSION}-slim AS runner
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libfbclient2 \
-    && FB_LIB="$(dirname "$(find /usr/lib -name 'libfbclient.so.2' -print -quit)")" \
+    && FB_SO2="$(find /usr/lib -name 'libfbclient.so.2' -print -quit)" \
+    && test -n "$FB_SO2" \
+    && FB_LIB="$(dirname "$FB_SO2")" \
     && ln -sf libfbclient.so.2 "$FB_LIB/libfbclient.so" \
+    && test -e "$FB_LIB/libfbclient.so" \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
