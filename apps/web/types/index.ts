@@ -1,8 +1,18 @@
 import type { TurnUsageMeta } from '@/lib/chat/turn-usage';
+import type { TableKeyFields } from '@/lib/chat/table-key-fields';
+
+export interface TableColumnMeta {
+  fieldType?: string | null;
+  fieldLength?: number | null;
+  refTable?: string | null;
+  refListField?: string | null;
+  constraintType?: 'PRIMARY KEY' | 'FOREIGN KEY' | null;
+}
 
 export interface TableColumn {
   key: string;
   label: string;
+  meta?: TableColumnMeta;
 }
 
 export type QueryPlanStepStatus = 'pending' | 'running' | 'completed';
@@ -46,6 +56,8 @@ export interface TableDisplayData {
     /** Columns hidden in UI (still in tool JSON for the model). */
     hiddenColumnCount?: number;
     allColumnCount?: number;
+    /** PK/FK field names from RDB$ (for typed cell FK hints). */
+    keyFields?: TableKeyFields;
   };
 }
 

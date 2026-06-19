@@ -16,14 +16,15 @@ import {
 } from 'lucide-react';
 import TableQueryChip from './TableQueryChip';
 import TableChartView from './TableChartView';
+import TableCellValue from './TableCellValue';
 import TableResultOverlay from './TableResultOverlay';
 import { detectChartSpec } from '@/lib/chat/table-chart-detect';
 import type { TableColumn, TableDisplayData } from '@/types';
 import { useTranslations } from '@/lib/i18n/use-translations';
+import { useLocaleStore } from '@/stores/useLocaleStore';
 import {
   copyTableTsv,
   downloadTableCsv,
-  formatExportCell,
 } from '@/lib/chat/table-export';
 import {
   DEFAULT_PAGE_SIZE,
@@ -34,6 +35,11 @@ import {
   sortTableRows,
   type SortState,
 } from '@/lib/chat/table-view-state';
+import {
+  isUiRowNumberColumn,
+  shouldShowUiRowNumberColumn,
+  withUiRowNumberColumn,
+} from '@/lib/chat/table-row-number';
 
 interface DataTableViewProps {
   data: TableDisplayData;
@@ -45,6 +51,7 @@ const STRETCH_COLUMNS_THRESHOLD_EXPANDED = 12;
 
 export default function DataTableView({ data }: DataTableViewProps) {
   const { t } = useTranslations();
+  const locale = useLocaleStore((s) => s.locale);
   const [copyState, setCopyState] = useState<'idle' | 'success' | 'error'>(
     'idle'
   );
@@ -64,9 +71,24 @@ export default function DataTableView({ data }: DataTableViewProps) {
     [columns, hiddenColumns, showHiddenColumns]
   );
 
+  const showUiRowNumber = useMemo(
+    () => shouldShowUiRowNumberColumn(rows.length, visibleColumns),
+    [rows.length, visibleColumns]
+  );
+
+  const displayColumns = useMemo(
+    () =>
+      withUiRowNumberColumn(
+        visibleColumns,
+        showUiRowNumber,
+        t('table.rowNumber')
+      ),
+    [visibleColumns, showUiRowNumber, t]
+  );
+
   const processedRows = useMemo(() => {
     const filtered = filterTableRows(rows, visibleColumns, filterText);
-    return sortTableRows(filtered, sort);
+    return sortTableRows(filtered, sort, visibleColumns);
   }, [rows, visibleColumns, filterText, sort]);
 
   const chartSpec = useMemo(
@@ -84,10 +106,10 @@ export default function DataTableView({ data }: DataTableViewProps) {
   const exportData = useMemo(
     (): TableDisplayData => ({
       ...data,
-      columns: visibleColumns,
+      columns: displayColumns,
       rows: processedRows,
     }),
-    [data, visibleColumns, processedRows]
+    [data, displayColumns, processedRows]
   );
 
   const isPartialExport =
@@ -100,7 +122,7 @@ export default function DataTableView({ data }: DataTableViewProps) {
 
   async function handleCopy() {
     try {
-      await copyTableTsv(exportData);
+      await copyTableTsv(exportData, locale);
       setCopyState('success');
       window.setTimeout(() => setCopyState('idle'), 2000);
     } catch {
@@ -145,8 +167,8 @@ export default function DataTableView({ data }: DataTableViewProps) {
       ? STRETCH_COLUMNS_THRESHOLD_EXPANDED
       : STRETCH_COLUMNS_THRESHOLD;
     const stretchColumns =
-      visibleColumns.length > 0 &&
-      visibleColumns.length <= stretchThreshold;
+      displayColumns.length > 0 &&
+      displayColumns.length <= stretchThreshold;
 
     return (
       <div className="space-y-2 w-full min-w-0 max-w-full">
@@ -167,7 +189,7 @@ export default function DataTableView({ data }: DataTableViewProps) {
               <div className="flex items-center gap-0.5">
                 <button
                   type="button"
-                  onClick={() => downloadTableCsv(exportData)}
+                  onClick={() => downloadTableCsv(exportData, locale)}
                   title={downloadLabel}
                   aria-label={downloadLabel}
                   className="inline-flex items-center justify-center rounded-md border border-gray-600/80 bg-gray-800/60 p-1.5 text-gray-200 hover:bg-gray-700/80 transition-colors"
@@ -277,22 +299,35 @@ export default function DataTableView({ data }: DataTableViewProps) {
               >
                 <thead>
                   <tr className="bg-gray-700/80 border-b border-gray-600">
-                    {visibleColumns.map((col) => (
-                      <SortableHeader
-                        key={col.key}
-                        col={col}
-                        sort={sort}
-                        onSort={handleSort}
-                        stretch={stretchColumns}
-                      />
-                    ))}
+                    {displayColumns.map((col) =>
+                      isUiRowNumberColumn(col.key) ? (
+                        <th
+                          key={col.key}
+                          className={
+                            stretchColumns
+                              ? 'w-10 px-2 py-2.5 font-semibold text-gray-400 text-center'
+                              : 'w-10 px-2 py-2.5 font-semibold text-gray-400 text-center whitespace-nowrap'
+                          }
+                        >
+                          {col.label}
+                        </th>
+                      ) : (
+                        <SortableHeader
+                          key={col.key}
+                          col={col}
+                          sort={sort}
+                          onSort={handleSort}
+                          stretch={stretchColumns}
+                        />
+                      )
+                    )}
                   </tr>
                 </thead>
                 <tbody>
                   {pageRows.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={Math.max(visibleColumns.length, 1)}
+                        colSpan={Math.max(displayColumns.length, 1)}
                         className="px-3 py-4 text-center text-sm text-gray-500 italic"
                       >
                         {t('table.noFilterMatch')}
@@ -308,16 +343,29 @@ export default function DataTableView({ data }: DataTableViewProps) {
                             : 'bg-gray-800/20 hover:bg-gray-700/50'
                         }
                       >
-                        {visibleColumns.map((col) => (
+                        {displayColumns.map((col) => (
                           <td
                             key={col.key}
                             className={
-                              stretchColumns
-                                ? 'px-3 py-2 text-gray-100 border-t border-gray-700/50 align-top whitespace-normal break-words'
-                                : 'px-3 py-2 text-gray-100 border-t border-gray-700/50 align-top whitespace-normal break-words max-w-md'
+                              isUiRowNumberColumn(col.key)
+                                ? 'px-2 py-2 text-gray-400 border-t border-gray-700/50 align-top text-center tabular-nums text-xs'
+                                : stretchColumns
+                                  ? 'px-3 py-2 text-gray-100 border-t border-gray-700/50 align-top whitespace-normal break-words'
+                                  : 'px-3 py-2 text-gray-100 border-t border-gray-700/50 align-top whitespace-normal break-words max-w-md'
                             }
                           >
-                            {formatExportCell(row[col.key])}
+                            {isUiRowNumberColumn(col.key) ? (
+                              rangeStart + rowIndex
+                            ) : (
+                              <TableCellValue
+                                value={row[col.key]}
+                                columnKey={col.key}
+                                columnLabel={col.label}
+                                columnMeta={col.meta}
+                                keyFields={meta?.keyFields}
+                                locale={locale}
+                              />
+                            )}
                           </td>
                         ))}
                       </tr>

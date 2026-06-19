@@ -46,7 +46,10 @@ import { toolResultPayload } from '@/lib/chat/tool-result-payload';
 import { sanitizeToolResultForUi } from '@/lib/chat/tool-result-ui-sanitize';
 import { useDomainContextStore } from '@/stores/useDomainContextStore';
 import { useLocaleStore } from '@/stores/useLocaleStore';
+import { useNotificationSettingsStore } from '@/stores/useNotificationSettingsStore';
 import { useTranslations } from '@/lib/i18n/use-translations';
+import { notifyTurnCompleteIfBackground } from '@/lib/notifications/notify-turn-complete';
+import { useNotificationPermissionOnOpen } from '@/lib/notifications/use-notification-permission-on-open';
 
 const LOCALE_PROMPT_ARG = 'locale';
 
@@ -104,6 +107,10 @@ export default function GPTAssistant() {
   const { mcpKey, isValidated } = useMcpKeyStore();
   const { domainContext } = useDomainContextStore();
   const locale = useLocaleStore((s) => s.locale);
+  const completionNotificationsEnabled = useNotificationSettingsStore(
+    (s) => s.completionNotificationsEnabled
+  );
+  useNotificationPermissionOnOpen(completionNotificationsEnabled);
   const { t } = useTranslations();
 
   const {
@@ -373,6 +380,8 @@ export default function GPTAssistant() {
     setError(null);
 
     const turnUsage = new TurnUsageAccumulator();
+    let previewForNotify = '';
+    let hadError = false;
 
     try {
       if (!token) {
@@ -649,9 +658,12 @@ export default function GPTAssistant() {
         usageMeta: turnUsage.build(GPT_MODEL_GENERAL.model),
       };
 
+      previewForNotify = finalContent;
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      hadError = true;
+      previewForNotify = errorMessage;
       setError(errorMessage);
 
       const errorAssistantMessage: Message = {
@@ -664,6 +676,12 @@ export default function GPTAssistant() {
       setMessages((prev) => [...prev, errorAssistantMessage]);
     } finally {
       setLoading(false);
+      notifyTurnCompleteIfBackground({
+        preview: previewForNotify,
+        isError: hadError,
+        enabled: completionNotificationsEnabled,
+        t,
+      });
     }
   }
 

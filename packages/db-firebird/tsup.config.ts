@@ -3,6 +3,7 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
+    'sql-dialect': 'src/sql-dialect.ts',
     'domain/query-result-summary': 'src/domain/query-result-summary.ts',
     'infrastructure/sensitivity/sensitive-field-compat':
       'src/infrastructure/sensitivity/sensitive-field-compat.ts',

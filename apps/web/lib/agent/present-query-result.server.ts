@@ -53,15 +53,20 @@ export async function enrichPresentQueryResult(
   const normalizedTable = input.tableName?.trim().toUpperCase();
   let mergedLabels: Record<string, string> = { ...(input.columnLabels ?? {}) };
   let keyFields: { primaryKey: string[]; foreignKey: string[] } | undefined;
+  let columnMeta: Record<string, Record<string, unknown>> | undefined;
 
   if (normalizedTable && capped.length > 0) {
     try {
       const db = requireDbServices();
       const fieldNames = Object.keys(capped[0] ?? {});
+      const wantedKeys = new Set(
+        fieldNames.map((name) => name.trim().toUpperCase()).filter(Boolean)
+      );
 
-      const [fromAt, constraints] = await Promise.all([
+      const [fromAt, constraints, described] = await Promise.all([
         db.resolveFieldLabels.run(normalizedTable, fieldNames),
         db.getTableFieldConstraints.run(normalizedTable),
+        db.describeTable.run(normalizedTable),
       ]);
 
       mergedLabels = { ...fromAt, ...mergedLabels };
@@ -74,6 +79,38 @@ export async function enrichPresentQueryResult(
           primaryKey: constraints.primaryKey,
           foreignKey: constraints.foreignKey,
         };
+      }
+
+      const builtColumnMeta: Record<string, Record<string, unknown>> = {};
+      for (const col of described.columns) {
+        const upper = col.fieldName.trim().toUpperCase();
+        if (!wantedKeys.has(upper)) {
+          continue;
+        }
+        const entry: Record<string, unknown> = {};
+        if (col.fieldType != null && String(col.fieldType).trim()) {
+          entry.fieldType = col.fieldType;
+        }
+        if (typeof col.fieldLength === 'number') {
+          entry.fieldLength = col.fieldLength;
+        }
+        if (col.refTable != null && String(col.refTable).trim()) {
+          entry.refTable = col.refTable;
+        }
+        if (col.refListField != null && String(col.refListField).trim()) {
+          entry.refListField = col.refListField;
+        }
+        if (col.constraintType === 'PRIMARY KEY' || col.constraintType === 'FOREIGN KEY') {
+          entry.constraintType = col.constraintType;
+        }
+        if (Object.keys(entry).length > 0) {
+          builtColumnMeta[col.fieldName] = entry;
+          builtColumnMeta[upper] = entry;
+        }
+      }
+
+      if (Object.keys(builtColumnMeta).length > 0) {
+        columnMeta = builtColumnMeta;
       }
     } catch (err) {
       if (err instanceof FirebirdConfigError) {
@@ -109,6 +146,10 @@ export async function enrichPresentQueryResult(
 
   if (keyFields) {
     payload.keyFields = keyFields;
+  }
+
+  if (columnMeta && Object.keys(columnMeta).length > 0) {
+    payload.columnMeta = columnMeta;
   }
 
   if (sql) {

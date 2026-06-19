@@ -1,3 +1,11 @@
+import {
+  parseFirebirdSqlDialect,
+  type FirebirdSqlDialect,
+} from '../sql-dialect';
+
+export type { FirebirdSqlDialect } from '../sql-dialect';
+export { parseFirebirdSqlDialect } from '../sql-dialect';
+
 export interface IFirebirdConfig {
   host: string;
   port: number;
@@ -6,6 +14,7 @@ export interface IFirebirdConfig {
   password: string;
   maxRows: number;
   queryTimeoutMs: number;
+  sqlDialect: FirebirdSqlDialect;
 }
 
 export function buildConnectionString(config: Pick<IFirebirdConfig, 'host' | 'port' | 'database'>): string {
@@ -39,5 +48,6 @@ export function loadFirebirdConfig(env: NodeJS.ProcessEnv = process.env): IFireb
     password,
     maxRows: Number.isFinite(maxRows) && maxRows > 0 ? maxRows : 500,
     queryTimeoutMs: Number.isFinite(queryTimeoutMs) && queryTimeoutMs > 0 ? queryTimeoutMs : 30_000,
+    sqlDialect: parseFirebirdSqlDialect(env),
   };
 }

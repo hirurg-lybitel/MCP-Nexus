@@ -50,6 +50,32 @@ describe('parseTableFromToolResult', () => {
     assert.equal(result!.tableName, 'GD_GOOD');
   });
 
+  it('parses columnMeta onto columns and keyFields into meta', () => {
+    const result = parseTableFromToolResult(
+      AGENT_PRESENT_TABLE_TOOL,
+      JSON.stringify({
+        rows: [{ NAME: 'Widget', GROUPKEY: 5, GOODSCOUNT: 10 }],
+        rowCount: 1,
+        columnMeta: {
+          GROUPKEY: {
+            fieldType: 'INTEGER',
+            refTable: 'GD_GOODGROUP',
+            constraintType: 'FOREIGN KEY',
+          },
+          GOODSCOUNT: { fieldType: 'INTEGER' },
+        },
+        keyFields: { primaryKey: ['ID'], foreignKey: ['GROUPKEY'] },
+      })
+    );
+    assert.ok(result);
+    const countCol = result!.columns.find((c) => c.key === 'GOODSCOUNT');
+    assert.equal(countCol?.meta?.fieldType, 'INTEGER');
+    const hiddenGroup = result!.hiddenColumns?.find((c) => c.key === 'GROUPKEY');
+    assert.equal(hiddenGroup?.meta?.fieldType, 'INTEGER');
+    assert.equal(hiddenGroup?.meta?.refTable, 'GD_GOODGROUP');
+    assert.deepEqual(result!.meta?.keyFields?.foreignKey, ['GROUPKEY']);
+  });
+
   it('hides RDB key columns when keyFields in payload', () => {
     const result = parseTableFromToolResult(
       AGENT_PRESENT_TABLE_TOOL,

@@ -16,6 +16,10 @@
     "./sensitive-field-compat": {
       "types": "./dist/infrastructure/sensitivity/sensitive-field-compat.d.ts",
       "default": "./dist/infrastructure/sensitivity/sensitive-field-compat.js"
+    },
+    "./sql-dialect": {
+      "types": "./dist/sql-dialect.d.ts",
+      "default": "./dist/sql-dialect.js"
     }
   },
   "scripts": {

@@ -55,7 +55,10 @@ export const AgentFunctions: Array<ChatCompletionFunctionTool> = [
           },
           sqlStrategy: {
             type: 'string',
-            description: 'How you will query (joins, aggregates, limit)',
+            description:
+              'How you will query (joins, aggregates, SELECT FIRST limit). ' +
+              'Use flat SELECT … JOIN … for dialect 2.5 — no WITH, no window functions. ' +
+              'Do not add row-number columns; the UI prepends № automatically.',
           },
           notes: { type: 'string' },
         },
@@ -70,7 +73,8 @@ export const AgentFunctions: Array<ChatCompletionFunctionTool> = [
       description:
         '**Present rows in chat UI (host).** Call once after Firebird **execute_sql** with the **same sql** (and params if used). ' +
         'Do not copy row values — the server re-runs the query for the UI. ' +
-        'Pass tableName for AT_RELATION_FIELDS labels; use columnLabels for computed SQL aliases.',
+        'Pass tableName for AT_RELATION_FIELDS labels; use columnLabels for computed SQL aliases. ' +
+        'The UI adds a № row-number column automatically — do not include ROW_NUMBER in SQL.',
       parameters: {
         type: 'object',
         properties: {

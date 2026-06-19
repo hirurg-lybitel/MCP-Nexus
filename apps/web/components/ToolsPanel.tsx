@@ -12,7 +12,7 @@ interface ToolsPanelProps {
 }
 
 export default function ToolsPanel({ tools }: ToolsPanelProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const { t } = useTranslations();
 

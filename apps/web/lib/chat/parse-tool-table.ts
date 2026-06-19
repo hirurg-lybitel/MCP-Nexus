@@ -2,6 +2,7 @@ import { AgentToolName } from '@/lib/agent/tool-names';
 import type { TableDisplayData } from '@/types';
 import { labelForColumn, normalizeColumnLabels } from './column-labels';
 import { buildDisplayTableFromRows } from './column-picker';
+import { columnMetaForKey, normalizeColumnMetaMap } from './column-meta';
 import { normalizeTableKeyFields } from './table-key-fields';
 
 export { isSilentFirebirdToolUi, shouldShowToolCallPanel } from './tool-ui';
@@ -50,6 +51,7 @@ export function parseTableFromToolResult(
 
   const columnLabels = normalizeColumnLabels(record.columnLabels);
   const keyFields = normalizeTableKeyFields(record.keyFields);
+  const columnMetaMap = normalizeColumnMetaMap(record.columnMeta);
   const built = buildDisplayTableFromRows(rowObjects, { keyFields });
 
   const title =
@@ -60,6 +62,7 @@ export function parseTableFromToolResult(
   const columns = built.columns.map((key) => ({
     key,
     label: labelForColumn(key, columnLabels),
+    meta: columnMetaForKey(columnMetaMap, key),
   }));
 
   const displayKeySet = new Set(built.columns);
@@ -71,6 +74,7 @@ export function parseTableFromToolResult(
     .map((key) => ({
       key,
       label: labelForColumn(key, columnLabels),
+      meta: columnMetaForKey(columnMetaMap, key),
     }));
 
   const sql =
@@ -105,6 +109,7 @@ export function parseTableFromToolResult(
       truncated: Boolean(record.truncated),
       hiddenColumnCount: built.hiddenColumnCount,
       allColumnCount: built.allColumnCount,
+      keyFields,
     },
   };
 }

@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { Check, Copy, Download } from 'lucide-react';
 import type { TableDisplayData } from '@/types';
 import TableQueryChip from './TableQueryChip';
+import TableCellValue from './TableCellValue';
 import { useTranslations } from '@/lib/i18n/use-translations';
+import { useLocaleStore } from '@/stores/useLocaleStore';
 import {
   copyTableTsv,
   downloadTableCsv,
-  formatExportCell,
 } from '@/lib/chat/table-export';
 
 interface ScalarResultViewProps {
@@ -17,6 +18,7 @@ interface ScalarResultViewProps {
 
 export default function ScalarResultView({ data }: ScalarResultViewProps) {
   const { t } = useTranslations();
+  const locale = useLocaleStore((s) => s.locale);
   const [copyState, setCopyState] = useState<'idle' | 'success' | 'error'>(
     'idle'
   );
@@ -27,7 +29,7 @@ export default function ScalarResultView({ data }: ScalarResultViewProps) {
 
   const handleCopy = async () => {
     try {
-      await copyTableTsv(data);
+      await copyTableTsv(data, locale);
       setCopyState('success');
     } catch {
       setCopyState('error');
@@ -58,7 +60,7 @@ export default function ScalarResultView({ data }: ScalarResultViewProps) {
             <div className="flex items-center gap-0.5">
               <button
                 type="button"
-                onClick={() => downloadTableCsv(data)}
+                onClick={() => downloadTableCsv(data, locale)}
                 title={t('table.downloadCsv')}
                 aria-label={t('table.downloadCsv')}
                 className="inline-flex items-center justify-center rounded-md border border-gray-600/80 bg-gray-800/60 p-1.5 text-gray-200 hover:bg-gray-700/80 transition-colors"
@@ -93,7 +95,14 @@ export default function ScalarResultView({ data }: ScalarResultViewProps) {
           >
             <dt className="text-gray-400 font-medium break-words">{col.label}</dt>
             <dd className="text-gray-100 break-words min-w-0">
-              {formatExportCell(row[col.key])}
+              <TableCellValue
+                value={row[col.key]}
+                columnKey={col.key}
+                columnLabel={col.label}
+                columnMeta={col.meta}
+                keyFields={meta?.keyFields}
+                locale={locale}
+              />
             </dd>
           </div>
         ))}

@@ -36,3 +36,10 @@ export class SensitiveColumnError extends Error {
     this.name = 'SensitiveColumnError';
   }
 }
+
+export class DialectSqlError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'DialectSqlError';
+  }
+}

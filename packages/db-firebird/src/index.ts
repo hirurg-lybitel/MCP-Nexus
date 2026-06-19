@@ -18,14 +18,23 @@ import { SchemaReader } from './infrastructure/schema-reader';
 import { PatternSensitiveFieldClassifier } from './infrastructure/sensitivity/pattern-sensitive-field-classifier';
 import { CachingTableSchemaRegistry } from './infrastructure/sensitivity/caching-table-schema-registry';
 
-export type { IFirebirdConfig } from './config/firebird-config';
-export { loadFirebirdConfig, buildConnectionString } from './config/firebird-config';
+export type { IFirebirdConfig, FirebirdSqlDialect } from './config/firebird-config';
+export {
+  loadFirebirdConfig,
+  buildConnectionString,
+  parseFirebirdSqlDialect,
+} from './config/firebird-config';
+export {
+  parseFirebirdSqlDialectValue,
+  describeFirebirdSqlDialect,
+} from './sql-dialect';
 export {
   FirebirdConfigError,
   ReadOnlySqlError,
   FirebirdQueryError,
   SensitiveColumnError,
   UnknownTablesError,
+  DialectSqlError,
 } from './domain/errors';
 export type { FieldDescriptor } from './domain/sensitivity/field-descriptor';
 export type {
@@ -47,6 +56,9 @@ export type {
 } from './ports/table-field-constraints';
 export type { DescribeTableResult } from './application/describe-table.use-case';
 export { assertReadOnlySql } from './infrastructure/read-only-sql-guard';
+export {
+  assertDialectCompatibleSql,
+} from './infrastructure/firebird-sql-dialect-guard';
 export { extractTableNamesFromSql } from './infrastructure/sql-table-names';
 export {
   isSensitiveColumn,

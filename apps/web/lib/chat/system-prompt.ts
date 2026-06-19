@@ -1,12 +1,30 @@
 import { MAX_DOMAIN_CONTEXT_CHARS } from '@/constants';
 import type { Locale } from '@/lib/i18n/types';
 import { DEFAULT_LOCALE } from '@/lib/i18n/types';
+import {
+  describeFirebirdSqlDialect,
+  parseFirebirdSqlDialect,
+  type FirebirdSqlDialect,
+} from '@mcp-nexus/db-firebird/sql-dialect';
 
 /**
  * Firebird assistant — Claude Code–style phases:
  * Plan (read-only) → Discover (read-only tools) → Execute → Present (UI).
  */
-function buildBaseSystemPrompt(): string {
+function buildFirebirdSqlDialectSection(dialect: FirebirdSqlDialect): string {
+  const bullets = describeFirebirdSqlDialect(dialect);
+  return (
+    `\n\n## Firebird SQL dialect (${dialect})\n` +
+    bullets.map((line) => `- ${line}`).join('\n')
+  );
+}
+
+function buildBaseSystemPrompt(dialect: FirebirdSqlDialect): string {
+  const executeSqlNote =
+    dialect === '3'
+      ? 'read-only SELECT or WITH'
+      : 'read-only SELECT only (no WITH/CTE on dialect 2.5)';
+
   return (
     'You are a Firebird data assistant with Gedemin metadata (AT_RELATIONS, AT_RELATION_FIELDS, AT_FIELDS).\n\n' +
     '## Host tools (MCP-Nexus web UI only)\n' +
@@ -20,7 +38,7 @@ function buildBaseSystemPrompt(): string {
     '- **list_tables** — full catalog when search is too narrow.\n' +
     '**Never invent** table names (GD_GROUP, GD_PRODUCTS, etc.). Only names from search_tables, list_tables, or describe_table refTable.\n\n' +
     '## Execute\n' +
-    '- **execute_sql** — read-only SELECT/WITH. You receive **rowCount**, **columns**, **truncated**, and up to **5 sampleRows** (redacted) for exploration — not the full result set.\n' +
+    `- **execute_sql** — ${executeSqlNote}. You receive **rowCount**, **columns**, **truncated**, and up to **5 sampleRows** (redacted) for exploration — not the full result set.\n` +
     '- Use refTable from describe_table for JOINs. No SELECT * on tables with sensitive columns.\n' +
     '- Prefer **SELECT FIRST 20** for exploration unless the user needs more.\n' +
     '- If rowCount is 0, try other tables from search_tables — do not give up after one empty SELECT.\n' +
@@ -36,7 +54,8 @@ function buildBaseSystemPrompt(): string {
     '- Say "см. таблицу выше" / "see the table above" instead of reprinting data.\n\n' +
     '## Tool UI\n' +
     'Firebird MCP tools show brief activity lines in chat (search, schema, SQL summary — no row values). ' +
-    'create_query_plan shows To-dos; present_query_result shows the data table only.'
+    'create_query_plan shows To-dos; present_query_result shows the data table only.' +
+    buildFirebirdSqlDialectSection(dialect)
   );
 }
 
@@ -57,9 +76,11 @@ export function truncateDomainContext(userContext: string): string {
 
 export function buildSystemPrompt(
   userContext?: string,
-  locale: Locale = DEFAULT_LOCALE
+  locale: Locale = DEFAULT_LOCALE,
+  dialectOverride?: FirebirdSqlDialect
 ): string {
-  const base = buildBaseSystemPrompt() + buildResponseLanguageSection(locale);
+  const dialect = dialectOverride ?? parseFirebirdSqlDialect();
+  const base = buildBaseSystemPrompt(dialect) + buildResponseLanguageSection(locale);
   const trimmed = userContext?.trim();
   if (!trimmed) {
     return base;

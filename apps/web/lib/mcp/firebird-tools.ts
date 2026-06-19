@@ -1,11 +1,13 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import {
+  DialectSqlError,
   FirebirdConfigError,
   FirebirdQueryError,
   ReadOnlySqlError,
   SensitiveColumnError,
   UnknownTablesError,
+  parseFirebirdSqlDialect,
   requireDbServices,
 } from '@mcp-nexus/db-firebird';
 import {
@@ -26,6 +28,9 @@ function toolErrorText(error: unknown): string {
   if (error instanceof SensitiveColumnError) {
     return JSON.stringify({ error: error.message, code: 'SENSITIVE_COLUMN' });
   }
+  if (error instanceof DialectSqlError) {
+    return JSON.stringify({ error: error.message, code: 'DIALECT_SQL' });
+  }
   if (error instanceof FirebirdQueryError) {
     return JSON.stringify({ error: error.message, code: 'QUERY_ERROR' });
   }
@@ -36,6 +41,12 @@ function toolErrorText(error: unknown): string {
 }
 
 export function registerFirebirdTools(server: McpServer): void {
+  const sqlDialect = parseFirebirdSqlDialect();
+  const executeSqlDialectNote =
+    sqlDialect === '3'
+      ? 'Dialect 3: WITH and window functions allowed. '
+      : 'Dialect 2.5: SELECT only — no WITH/CTE, no window functions (ROW_NUMBER, OVER). UI adds row numbers automatically. ';
+
   server.registerTool(
     'search_tables',
     {
@@ -123,6 +134,7 @@ export function registerFirebirdTools(server: McpServer): void {
     'execute_sql',
     {
       description:
+        executeSqlDialectNote +
         'Execute a read-only SQL query (SELECT or WITH). Never use SELECT * — list only columns needed for the question. ' +
         'Sensitive columns (PASSW, PASSWORD, TOKEN, …) are blocked or redacted server-side. ' +
         'Optional named params as :NAME in params. Result is for the model only (not shown in chat). ' +

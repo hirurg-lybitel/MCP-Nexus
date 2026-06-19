@@ -1,9 +1,41 @@
+import type { Locale } from '@/lib/i18n/types';
 import type { TableColumn, TableDisplayData } from '@/types';
+import {
+  formatCellPlainText,
+  resolveDisplayKind,
+} from './cell-format';
+import { isUiRowNumberColumn } from './table-row-number';
 
-export function formatExportCell(value: unknown): string {
-  if (value == null) return '—';
-  if (typeof value === 'boolean') return value ? 'yes' : 'no';
-  if (typeof value === 'object') return JSON.stringify(value);
+export function formatExportCell(
+  value: unknown,
+  columnKey?: string,
+  columnMeta?: import('@/types').TableColumnMeta,
+  locale: Locale = 'en',
+  columnLabel?: string
+): string {
+  if (columnKey && isUiRowNumberColumn(columnKey)) {
+    return String(value ?? '');
+  }
+
+  if (columnKey) {
+    const kind = resolveDisplayKind(
+      value,
+      columnKey,
+      columnMeta,
+      columnLabel
+    );
+    return formatCellPlainText(value, kind, locale);
+  }
+
+  if (value == null || value === '') {
+    return '—';
+  }
+  if (typeof value === 'boolean') {
+    return value ? 'yes' : 'no';
+  }
+  if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
   return String(value);
 }
 
@@ -22,23 +54,55 @@ function serializeTableRows(
   columns: TableColumn[],
   rows: Record<string, unknown>[],
   escapeField: (value: string) => string,
-  delimiter: string
+  delimiter: string,
+  locale: Locale = 'en'
 ): string {
   const header = columns.map((col) => escapeField(col.label)).join(delimiter);
-  const body = rows.map((row) =>
+  const body = rows.map((row, rowIndex) =>
     columns
-      .map((col) => escapeField(formatExportCell(row[col.key])))
+      .map((col) => {
+        const cellValue = isUiRowNumberColumn(col.key)
+          ? rowIndex + 1
+          : row[col.key];
+        return escapeField(
+          formatExportCell(
+            cellValue,
+            col.key,
+            col.meta,
+            locale,
+            col.label
+          )
+        );
+      })
       .join(delimiter)
   );
   return [header, ...body].join('\r\n');
 }
 
-export function serializeTableToCsv(data: TableDisplayData): string {
-  return serializeTableRows(data.columns, data.rows, escapeCsvField, ',');
+export function serializeTableToCsv(
+  data: TableDisplayData,
+  locale: Locale = 'en'
+): string {
+  return serializeTableRows(
+    data.columns,
+    data.rows,
+    escapeCsvField,
+    ',',
+    locale
+  );
 }
 
-export function serializeTableToTsv(data: TableDisplayData): string {
-  return serializeTableRows(data.columns, data.rows, escapeTsvField, '\t');
+export function serializeTableToTsv(
+  data: TableDisplayData,
+  locale: Locale = 'en'
+): string {
+  return serializeTableRows(
+    data.columns,
+    data.rows,
+    escapeTsvField,
+    '\t',
+    locale
+  );
 }
 
 export function buildExportFilename(title: string | undefined): string {
@@ -49,8 +113,11 @@ export function buildExportFilename(title: string | undefined): string {
   return `${base}_${date}.csv`;
 }
 
-export function downloadTableCsv(data: TableDisplayData): void {
-  const csv = serializeTableToCsv(data);
+export function downloadTableCsv(
+  data: TableDisplayData,
+  locale: Locale = 'en'
+): void {
+  const csv = serializeTableToCsv(data, locale);
   const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -60,6 +127,9 @@ export function downloadTableCsv(data: TableDisplayData): void {
   URL.revokeObjectURL(url);
 }
 
-export async function copyTableTsv(data: TableDisplayData): Promise<void> {
-  await navigator.clipboard.writeText(serializeTableToTsv(data));
+export async function copyTableTsv(
+  data: TableDisplayData,
+  locale: Locale = 'en'
+): Promise<void> {
+  await navigator.clipboard.writeText(serializeTableToTsv(data, locale));
 }

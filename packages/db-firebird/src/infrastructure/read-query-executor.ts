@@ -5,6 +5,7 @@ import {
 } from 'node-firebird-driver-native';
 import type { IFirebirdConfig } from '../config/firebird-config';
 import { FirebirdQueryError } from '../domain/errors';
+import { assertDialectCompatibleSql } from './firebird-sql-dialect-guard';
 import { assertReadOnlySql } from './read-only-sql-guard';
 import { convertNamedParams } from './named-params';
 import { redactSensitiveRows } from './sensitivity/redact-sensitive-rows';
@@ -31,6 +32,7 @@ export class ReadQueryExecutor implements IReadQueryExecutor {
     options?: ReadQueryOptions
   ): Promise<QueryResult> {
     assertReadOnlySql(sql);
+    assertDialectCompatibleSql(sql, this.config.sqlDialect);
 
     const attachment = await this.connection.getAttachment();
     const { sql: executableSql, values } = params

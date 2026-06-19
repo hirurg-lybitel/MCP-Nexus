@@ -4,19 +4,29 @@ import Button from '@/components/basic/Button';
 import Card from '@/components/basic/Card';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDeveloperModeStore } from '@/stores/useDeveloperModeStore';
 import { useDomainContextStore } from '@/stores/useDomainContextStore';
 import { useMcpKeyStore } from '@/stores/useMcpKeyStore';
+import { useNotificationSettingsStore } from '@/stores/useNotificationSettingsStore';
 import { useTokenStore } from '@/stores/useTokenStore';
 import { MAX_DOMAIN_CONTEXT_CHARS } from '@/constants';
 import { useTranslations } from '@/lib/i18n/use-translations';
 import { localeToBcp47 } from '@/lib/i18n/types';
 import { useLocaleStore } from '@/stores/useLocaleStore';
+import {
+  playCompletionChime,
+  requestNotificationPermission,
+  showAssistantCompleteNotification,
+} from '@/lib/notifications/assistant-complete';
 
 export default function SettingsPage() {
   const { token, setToken, clearToken } = useTokenStore();
   const { developerMode, setDeveloperMode } = useDeveloperModeStore();
+  const {
+    completionNotificationsEnabled,
+    setCompletionNotificationsEnabled,
+  } = useNotificationSettingsStore();
   const { domainContext, setDomainContext, clearDomainContext } =
     useDomainContextStore();
   const {
@@ -32,7 +42,20 @@ export default function SettingsPage() {
   const [mcpKeyInput, setMcpKeyInput] = useState(mcpKey);
   const [mcpError, setMcpError] = useState<string | null>(null);
   const [mcpSaving, setMcpSaving] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<
+    NotificationPermission | 'unsupported'
+  >('default');
+  const [notificationTesting, setNotificationTesting] = useState(false);
   const numberLocale = localeToBcp47(locale);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      setNotificationPermission('unsupported');
+      return;
+    }
+
+    setNotificationPermission(Notification.permission);
+  }, [completionNotificationsEnabled]);
 
   const handleVerifyMcpKey = useCallback(async () => {
     setMcpError(null);
@@ -75,6 +98,26 @@ export default function SettingsPage() {
     setMcpKeyInput('');
     setMcpError(null);
   }, [clearMcpKey]);
+
+  const handleTestNotification = useCallback(async () => {
+    setNotificationTesting(true);
+
+    try {
+      const permission = await requestNotificationPermission();
+      setNotificationPermission(permission);
+
+      if (permission === 'granted') {
+        playCompletionChime();
+        showAssistantCompleteNotification({
+          title: t('notifications.testTitle'),
+          body: t('notifications.testBody'),
+          tag: 'mcp-nexus-assistant-test',
+        });
+      }
+    } finally {
+      setNotificationTesting(false);
+    }
+  }, [t]);
 
   return (
     <div className="py-8 text-gray-100">
@@ -199,6 +242,60 @@ export default function SettingsPage() {
                   >
                     {t('settings.clear')}
                   </Button>
+                )}
+              </div>
+            </div>
+          </Card>
+
+          <Card title={t('settings.notificationsTitle')}>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-400">
+                {t('settings.notificationsDescription')}
+              </p>
+              <label className="flex items-center gap-3 cursor-pointer w-fit">
+                <input
+                  type="checkbox"
+                  checked={completionNotificationsEnabled}
+                  onChange={(e) =>
+                    setCompletionNotificationsEnabled(e.target.checked)
+                  }
+                  className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 focus:ring-offset-gray-900"
+                />
+                <span className="text-sm text-gray-200">
+                  {t('settings.completionNotifications')}
+                </span>
+              </label>
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  size="sm"
+                  onClick={handleTestNotification}
+                  disabled={
+                    notificationTesting || notificationPermission === 'unsupported'
+                  }
+                >
+                  {notificationTesting
+                    ? t('settings.testingNotification')
+                    : t('settings.testNotification')}
+                </Button>
+                {notificationPermission === 'granted' && (
+                  <p className="text-sm text-green-400">
+                    {t('settings.notificationsPermissionGranted')}
+                  </p>
+                )}
+                {notificationPermission === 'default' && (
+                  <p className="text-sm text-gray-500">
+                    {t('settings.notificationsPermissionDefault')}
+                  </p>
+                )}
+                {notificationPermission === 'denied' && (
+                  <p className="text-sm text-amber-400">
+                    {t('settings.notificationsPermissionDenied')}
+                  </p>
+                )}
+                {notificationPermission === 'unsupported' && (
+                  <p className="text-sm text-gray-500">
+                    {t('settings.notificationsUnsupported')}
+                  </p>
                 )}
               </div>
             </div>

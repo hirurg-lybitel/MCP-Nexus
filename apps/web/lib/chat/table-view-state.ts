@@ -22,7 +22,9 @@ export function filterTableRows(
 
   return rows.filter((row) =>
     columns.some((col) =>
-      formatExportCell(row[col.key]).toLowerCase().includes(q)
+      formatExportCell(row[col.key], col.key, col.meta, 'en', col.label)
+        .toLowerCase()
+        .includes(q)
     )
   );
 }
@@ -51,7 +53,10 @@ function parseSortableNumber(value: unknown): number | null {
 export function compareRowValues(
   a: unknown,
   b: unknown,
-  direction: SortDirection
+  direction: SortDirection,
+  columnKey?: string,
+  columnMeta?: TableColumn['meta'],
+  columnLabel?: string
 ): number {
   const sign = direction === 'asc' ? 1 : -1;
 
@@ -71,22 +76,43 @@ export function compareRowValues(
     return (numA - numB) * sign;
   }
 
-  const strA = formatExportCell(a).toLowerCase();
-  const strB = formatExportCell(b).toLowerCase();
+  const strA = formatExportCell(
+    a,
+    columnKey,
+    columnMeta,
+    'en',
+    columnLabel
+  ).toLowerCase();
+  const strB = formatExportCell(
+    b,
+    columnKey,
+    columnMeta,
+    'en',
+    columnLabel
+  ).toLowerCase();
   return strA.localeCompare(strB, undefined, { numeric: true }) * sign;
 }
 
 export function sortTableRows(
   rows: Record<string, unknown>[],
-  sort: SortState | null
+  sort: SortState | null,
+  columns: TableColumn[] = []
 ): Record<string, unknown>[] {
   if (!sort) {
     return rows;
   }
 
   const { columnKey, direction } = sort;
+  const column = columns.find((c) => c.key === columnKey);
   return [...rows].sort((rowA, rowB) =>
-    compareRowValues(rowA[columnKey], rowB[columnKey], direction)
+    compareRowValues(
+      rowA[columnKey],
+      rowB[columnKey],
+      direction,
+      columnKey,
+      column?.meta,
+      column?.label
+    )
   );
 }
 

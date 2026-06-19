@@ -35,6 +35,19 @@ describe('buildSystemPrompt', () => {
     const prompt = buildSystemPrompt(undefined, 'by');
     assert.ok(prompt.includes('Заўсёды адказвай на беларускай мове'));
   });
+
+  it('includes Firebird SQL dialect section', () => {
+    const prompt = buildSystemPrompt(undefined, 'en', '2.5');
+    assert.ok(prompt.includes('## Firebird SQL dialect (2.5)'));
+    assert.ok(prompt.includes('UI prepends №'));
+    assert.ok(prompt.includes('no WITH (CTE)'));
+  });
+
+  it('includes dialect 3 allowances in prompt', () => {
+    const prompt = buildSystemPrompt(undefined, 'en', '3');
+    assert.ok(prompt.includes('## Firebird SQL dialect (3)'));
+    assert.ok(prompt.includes('window functions'));
+  });
 });
 
 describe('truncateDomainContext', () => {

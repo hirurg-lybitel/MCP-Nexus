@@ -6,6 +6,7 @@ import {
   validateClientMcpAuth,
 } from '@/lib/mcp/auth';
 import {
+  DialectSqlError,
   FirebirdConfigError,
   FirebirdQueryError,
   SensitiveColumnError,
@@ -117,6 +118,12 @@ export async function handlePresentQueryResultPost(
     if (err instanceof SensitiveColumnError) {
       return jsonResponse(
         { error: err.message, code: 'SENSITIVE_COLUMN' },
+        400
+      );
+    }
+    if (err instanceof DialectSqlError) {
+      return jsonResponse(
+        { error: err.message, code: 'DIALECT_SQL' },
         400
       );
     }

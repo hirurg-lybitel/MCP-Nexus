@@ -35,6 +35,9 @@
       ],
       "@mcp-nexus/db-firebird/sensitive-field-compat": [
         "../../packages/db-firebird/src/infrastructure/sensitivity/sensitive-field-compat.ts"
+      ],
+      "@mcp-nexus/db-firebird/sql-dialect": [
+        "../../packages/db-firebird/src/sql-dialect.ts"
       ]
     }
   },
