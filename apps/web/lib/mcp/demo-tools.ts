@@ -1,6 +1,16 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import type { GetPromptResult } from '@modelcontextprotocol/sdk/types.js';
+import {
+  getBasicPrompt,
+  getBirthdayCongratulations,
+  getGreetingTemplate,
+  getRainProbabilityPrompt,
+  getTemperaturePrompt,
+  LOCALE_ARG_SCHEMA,
+} from '@/lib/i18n/mcp-prompts';
+
+const localeSchema = z.enum(LOCALE_ARG_SCHEMA).optional();
 
 const pause = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -89,14 +99,17 @@ export function registerDemoPrompts(server: McpServer): void {
     {
       description: 'Example of a basic complex prompt',
       title: 'Basic Prompt',
+      argsSchema: {
+        locale: localeSchema.describe('UI language for prompt text (en, ru, by)'),
+      },
     },
-    async () => ({
+    async (args) => ({
       messages: [
         {
           role: 'user',
           content: {
             type: 'text',
-            text: 'Show me the full forecast with temperature, chance of precipitation, cloud cover, etc. in London',
+            text: getBasicPrompt(args?.locale),
           },
         },
       ],
@@ -108,14 +121,17 @@ export function registerDemoPrompts(server: McpServer): void {
     {
       description: 'A prompt for getting the probability of rain',
       title: 'Rain Probability Prompt',
+      argsSchema: {
+        locale: localeSchema.describe('UI language for prompt text (en, ru, by)'),
+      },
     },
-    async () => ({
+    async (args) => ({
       messages: [
         {
           role: 'user',
           content: {
             type: 'text',
-            text: 'What is the probability of rain in London today?',
+            text: getRainProbabilityPrompt(args?.locale),
           },
         },
       ],
@@ -127,14 +143,17 @@ export function registerDemoPrompts(server: McpServer): void {
     {
       description: 'A prompt for getting the temperature',
       title: 'Temperature Prompt',
+      argsSchema: {
+        locale: localeSchema.describe('UI language for prompt text (en, ru, by)'),
+      },
     },
-    async () => ({
+    async (args) => ({
       messages: [
         {
           role: 'user',
           content: {
             type: 'text',
-            text: 'What is the temperature in Minsk today?',
+            text: getTemperaturePrompt(args?.locale),
           },
         },
       ],
@@ -148,6 +167,7 @@ export function registerDemoPrompts(server: McpServer): void {
       description: 'A simple greeting prompt template',
       argsSchema: {
         name: z.string().describe('Name to include in greeting'),
+        locale: localeSchema.describe('UI language for prompt text (en, ru, by)'),
       },
     },
     async (args): Promise<GetPromptResult> => ({
@@ -156,7 +176,7 @@ export function registerDemoPrompts(server: McpServer): void {
           role: 'user',
           content: {
             type: 'text',
-            text: `Please greet ${args.name} in a friendly manner and add a sign BigTeam in the end of the message.`,
+            text: getGreetingTemplate(args.locale, args.name),
           },
         },
       ],
@@ -171,6 +191,7 @@ export function registerDemoPrompts(server: McpServer): void {
       argsSchema: {
         name: z.string().describe('Name to congratulate'),
         age: z.string().describe('Age of the person to congratulate'),
+        locale: localeSchema.describe('UI language for prompt text (en, ru, by)'),
       },
     },
     async (args): Promise<GetPromptResult> => ({
@@ -179,7 +200,7 @@ export function registerDemoPrompts(server: McpServer): void {
           role: 'user',
           content: {
             type: 'text',
-            text: `Please congratulate ${args.name} on their birthday. They are ${args.age} years old.`,
+            text: getBirthdayCongratulations(args.locale, args.name, args.age),
           },
         },
       ],

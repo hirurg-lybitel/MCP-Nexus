@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Card from '@/components/basic/Card';
 import Button from '@/components/basic/Button';
+import { useTranslations } from '@/lib/i18n/use-translations';
 
 interface PromptArgsModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export default function PromptArgsModal({
   const [args, setArgs] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const overlayRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslations();
 
   const handleClose = useCallback(() => {
     onClose();
@@ -55,7 +57,7 @@ export default function PromptArgsModal({
 
     promptArgs.forEach(({ name, required }) => {
       if (required && (!args[name] || args[name].trim() === '')) {
-        newErrors[name] = 'Required';
+        newErrors[name] = t('promptModal.required');
         valid = false;
       }
     });
@@ -75,12 +77,14 @@ export default function PromptArgsModal({
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
       onClick={handleClickOutside}
     >
-      <Card title={`Enter arguments for /${promptName}`} className="w-md max-w-full">
+      <Card title={t('promptModal.title', { name: promptName })} className="w-md max-w-full">
         <div className="space-y-4">
           {promptArgs.map(({ name, description, required }) => (
             <div key={name}>
               <label className="block text-sm font-medium text-gray-300 mb-1">
-                {name} {required ? '(required)' : '(optional)'} {description ? `- ${description}` : ''}
+                {name}{' '}
+                {required ? t('promptModal.requiredLabel') : t('promptModal.optionalLabel')}{' '}
+                {description ? `- ${description}` : ''}
               </label>
               <input
                 type="text"
@@ -93,8 +97,8 @@ export default function PromptArgsModal({
           ))}
         </div>
         <div className="mt-6 flex justify-end gap-3">
-          <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-          <Button onClick={validateAndSubmit}>Submit</Button>
+          <Button variant="secondary" onClick={handleClose}>{t('promptModal.cancel')}</Button>
+          <Button onClick={validateAndSubmit}>{t('promptModal.submit')}</Button>
         </div>
       </Card>
     </div>

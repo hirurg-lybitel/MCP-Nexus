@@ -83,7 +83,7 @@ describe('formatTurnUsageLine', () => {
         },
       },
       pricingNote: 'test',
-    });
+    }, 'en-US');
 
     assert.equal(line, '≈ $0.0023 in/out 3 840/210');
   });

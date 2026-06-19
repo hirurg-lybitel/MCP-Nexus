@@ -2,6 +2,7 @@
 
 import Button from '@/components/basic/Button';
 import Card from '@/components/basic/Card';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Link from 'next/link';
 import { useCallback, useState } from 'react';
 import { useDeveloperModeStore } from '@/stores/useDeveloperModeStore';
@@ -9,6 +10,9 @@ import { useDomainContextStore } from '@/stores/useDomainContextStore';
 import { useMcpKeyStore } from '@/stores/useMcpKeyStore';
 import { useTokenStore } from '@/stores/useTokenStore';
 import { MAX_DOMAIN_CONTEXT_CHARS } from '@/constants';
+import { useTranslations } from '@/lib/i18n/use-translations';
+import { localeToBcp47 } from '@/lib/i18n/types';
+import { useLocaleStore } from '@/stores/useLocaleStore';
 
 export default function SettingsPage() {
   const { token, setToken, clearToken } = useTokenStore();
@@ -22,10 +26,13 @@ export default function SettingsPage() {
     setValidated,
     clearMcpKey,
   } = useMcpKeyStore();
+  const locale = useLocaleStore((s) => s.locale);
+  const { t } = useTranslations();
 
   const [mcpKeyInput, setMcpKeyInput] = useState(mcpKey);
   const [mcpError, setMcpError] = useState<string | null>(null);
   const [mcpSaving, setMcpSaving] = useState(false);
+  const numberLocale = localeToBcp47(locale);
 
   const handleVerifyMcpKey = useCallback(async () => {
     setMcpError(null);
@@ -48,8 +55,8 @@ export default function SettingsPage() {
         setValidated(false);
         setMcpError(
           response.status === 401
-            ? 'Invalid MCP access key.'
-            : data.error ?? 'Failed to verify MCP access key.'
+            ? t('settings.mcpInvalid')
+            : data.error ?? t('settings.mcpVerifyFailed')
         );
         return;
       }
@@ -57,11 +64,11 @@ export default function SettingsPage() {
       saveValidatedMcpKey(mcpKeyInput);
     } catch {
       setValidated(false);
-      setMcpError('Failed to verify MCP access key.');
+      setMcpError(t('settings.mcpVerifyFailed'));
     } finally {
       setMcpSaving(false);
     }
-  }, [mcpKeyInput, saveValidatedMcpKey, setValidated]);
+  }, [mcpKeyInput, saveValidatedMcpKey, setValidated, t]);
 
   const handleClearMcpKey = useCallback(() => {
     clearMcpKey();
@@ -72,24 +79,23 @@ export default function SettingsPage() {
   return (
     <div className="py-8 text-gray-100">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-white mb-2">Settings</h1>
+        <h1 className="text-4xl font-bold text-white mb-2">{t('settings.title')}</h1>
         <p className="text-gray-400 mb-8">
-          Configure access keys for OpenAI chat and MCP server connections.
+          {t('settings.subtitle')}
         </p>
 
         <div className="space-y-6">
-          <Card title="OpenAI Configuration">
+          <Card title={t('settings.openAiTitle')}>
             <div className="space-y-4">
               <p className="text-sm text-gray-400">
-                Enter your personal access token for the GPT proxy. It is saved
-                locally in your browser session.
+                {t('settings.openAiDescription')}
               </p>
               <div className="flex flex-col gap-2">
                 <input
                   type="password"
                   value={token}
                   onChange={(e) => setToken(e.target.value)}
-                  placeholder="Enter token (e.g. QgUSEaduJBT3B...)"
+                  placeholder={t('settings.tokenPlaceholder')}
                   className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-gray-600"
                 />
                 {token && (
@@ -99,19 +105,17 @@ export default function SettingsPage() {
                     onClick={clearToken}
                     className="w-fit"
                   >
-                    Remove token
+                    {t('settings.removeToken')}
                   </Button>
                 )}
               </div>
             </div>
           </Card>
 
-          <Card title="MCP Access Key">
+          <Card title={t('settings.mcpTitle')}>
             <div className="space-y-4">
               <p className="text-sm text-gray-400">
-                Enter the MCP server access key to unlock database tools in the
-                chat. The key is verified against the server and saved locally
-                after a successful check.
+                {t('settings.mcpDescription')}
               </p>
               <div className="flex flex-col gap-2">
                 <input
@@ -124,7 +128,7 @@ export default function SettingsPage() {
                       setValidated(false);
                     }
                   }}
-                  placeholder="Enter MCP API key"
+                  placeholder={t('settings.mcpPlaceholder')}
                   className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-gray-600"
                 />
                 <div className="flex flex-wrap gap-2">
@@ -133,7 +137,7 @@ export default function SettingsPage() {
                     onClick={handleVerifyMcpKey}
                     disabled={mcpSaving || !mcpKeyInput.trim()}
                   >
-                    {mcpSaving ? 'Verifying…' : 'Verify and save'}
+                    {mcpSaving ? t('settings.verifying') : t('settings.verifyAndSave')}
                   </Button>
                   {(mcpKey || isValidated) && (
                     <Button
@@ -141,13 +145,13 @@ export default function SettingsPage() {
                       size="sm"
                       onClick={handleClearMcpKey}
                     >
-                      Remove key
+                      {t('settings.removeKey')}
                     </Button>
                   )}
                 </div>
                 {isValidated && (
                   <p className="text-sm text-green-400">
-                    MCP access key verified successfully.
+                    {t('settings.mcpVerified')}
                   </p>
                 )}
                 {mcpError && (
@@ -157,25 +161,19 @@ export default function SettingsPage() {
             </div>
           </Card>
 
-          <Card title="Domain context">
+          <Card title={t('settings.domainTitle')}>
             <div className="space-y-4">
               <p className="text-sm text-gray-400">
-                Describe table relationships and business rules for the chat
-                assistant. Saved locally in your browser and appended to the
-                system prompt on every message in{' '}
+                {t('settings.domainDescription')}{' '}
                 <Link href="/chat" className="text-blue-400 hover:underline">
-                  Chat
+                  {t('navigation.chat')}
                 </Link>
-                . Does not affect external MCP clients (e.g. Cursor).
+                {t('settings.domainDescriptionEnd')}
               </p>
               <textarea
                 value={domainContext}
                 onChange={(e) => setDomainContext(e.target.value)}
-                placeholder={
-                  'Example:\n' +
-                  '- GD_GOOD.GROUP_ID → GD_GROUP.ID (product category; GD_GROUP has PARENT_ID)\n' +
-                  '- Use GD_REMAINS.QUANTITY for stock, not GD_GOOD'
-                }
+                placeholder={t('settings.domainPlaceholder')}
                 rows={10}
                 className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-gray-600 resize-y min-h-[160px]"
               />
@@ -187,8 +185,10 @@ export default function SettingsPage() {
                       : 'text-gray-500'
                   }`}
                 >
-                  {domainContext.length.toLocaleString()} /{' '}
-                  {MAX_DOMAIN_CONTEXT_CHARS.toLocaleString()} characters
+                  {t('settings.characters', {
+                    current: domainContext.length.toLocaleString(numberLocale),
+                    max: MAX_DOMAIN_CONTEXT_CHARS.toLocaleString(numberLocale),
+                  })}
                 </p>
                 {domainContext && (
                   <Button
@@ -197,20 +197,17 @@ export default function SettingsPage() {
                     onClick={clearDomainContext}
                     className="w-fit"
                   >
-                    Clear
+                    {t('settings.clear')}
                   </Button>
                 )}
               </div>
             </div>
           </Card>
 
-          <Card title="Developer">
+          <Card title={t('settings.developerTitle')}>
             <div className="space-y-4">
               <p className="text-sm text-gray-400">
-                When enabled, the chat shows collapsible &quot;Using:&quot;
-                panels for each tool call (SQL input, summaries, and raw
-                results). Tables, query plans, and assistant replies are always
-                visible.
+                {t('settings.developerDescription')}
               </p>
               <label className="flex items-center gap-3 cursor-pointer w-fit">
                 <input
@@ -219,18 +216,18 @@ export default function SettingsPage() {
                   onChange={(e) => setDeveloperMode(e.target.checked)}
                   className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 focus:ring-offset-gray-900"
                 />
-                <span className="text-sm text-gray-200">Developer mode</span>
+                <span className="text-sm text-gray-200">{t('settings.developerMode')}</span>
               </label>
             </div>
           </Card>
 
-          <Card title="Navigation">
+          <Card title={t('settings.navTitle')}>
             <div className="flex flex-wrap gap-3">
               <Link href="/chat">
-                <Button>Go to Chat</Button>
+                <Button>{t('settings.goToChat')}</Button>
               </Link>
               <Link href="/about">
-                <Button variant="secondary">About</Button>
+                <Button variant="secondary">{t('settings.about')}</Button>
               </Link>
             </div>
           </Card>

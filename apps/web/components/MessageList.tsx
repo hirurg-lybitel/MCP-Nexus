@@ -1,3 +1,5 @@
+'use client';
+
 import { useRef, useEffect, useMemo } from "react";
 import { Loader } from "lucide-react";
 import MessageItem from "./MessageItem";
@@ -6,6 +8,7 @@ import { Message } from "@/types";
 import { shouldStripTablesAfterPresentation } from "@/lib/chat/strip-markdown-tables";
 import { isToolCallPanelMessage } from "@/lib/chat/tool-ui";
 import { useDeveloperModeStore } from "@/stores/useDeveloperModeStore";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface MessageListProps {
   messages: Message[];
@@ -15,6 +18,7 @@ interface MessageListProps {
 export default function MessageList({ messages, loading }: MessageListProps) {
   const endRef = useRef<HTMLDivElement>(null);
   const developerMode = useDeveloperModeStore((s) => s.developerMode);
+  const { t } = useTranslations();
 
   const visibleMessages = useMemo(
     () =>
@@ -38,10 +42,10 @@ export default function MessageList({ messages, loading }: MessageListProps) {
             <div className="text-center space-y-4">
               <div className="text-6xl">💬</div>
               <p className="text-gray-400 text-lg">
-              Start a conversation with AI assistant
+                {t('chat.emptyTitle')}
               </p>
               <p className="text-gray-500 text-sm">
-              Ask anything and watch the AI use available tools
+                {t('chat.emptySubtitle')}
               </p>
             </div>
           </div>
@@ -64,7 +68,7 @@ export default function MessageList({ messages, loading }: MessageListProps) {
               <Loader className="w-4 h-4 animate-spin" />
             </div>
             <div className="bg-gray-800 rounded-lg px-4 py-3 max-w-md">
-              <p className="text-gray-300 text-sm">Thinking...</p>
+              <p className="text-gray-300 text-sm">{t('chat.thinking')}</p>
             </div>
           </div>
         )}

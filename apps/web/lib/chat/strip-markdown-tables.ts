@@ -1,8 +1,15 @@
+import type { Locale } from '@/lib/i18n/types';
+import { DEFAULT_LOCALE } from '@/lib/i18n/types';
+import { translate } from '@/lib/i18n/get-messages';
+
 /**
  * Removes GFM pipe tables from assistant text when rows are already shown
  * via present_query_result (Claude Brief pattern — no duplicate table in prose).
  */
-export function stripMarkdownTables(text: string): string {
+export function stripMarkdownTables(
+  text: string,
+  locale: Locale = DEFAULT_LOCALE
+): string {
   const lines = text.split('\n');
   const out: string[] = [];
   let inTable = false;
@@ -33,7 +40,7 @@ export function stripMarkdownTables(text: string): string {
   const result = out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 
   if (skippedTable && result.length === 0) {
-    return 'Данные приведены в таблице выше.';
+    return translate(locale, 'chat.tableAboveFallback');
   }
 
   return result;

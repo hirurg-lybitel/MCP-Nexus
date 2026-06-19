@@ -3,15 +3,18 @@
 import { PackageOpen } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-const navItems = [
-  { href: '/chat', label: 'Chat' },
-  { href: '/settings', label: 'Settings' },
-  { href: '/about', label: 'About' },
-];
+import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslations } from '@/lib/i18n/use-translations';
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { t } = useTranslations();
+
+  const navItems = [
+    { href: '/chat', label: t('navigation.chat') },
+    { href: '/settings', label: t('navigation.settings') },
+    { href: '/about', label: t('navigation.about') },
+  ];
 
   return (
     <nav className="bg-gray-900 shadow-md fixed top-0 left-0 right-0 z-50">
@@ -22,7 +25,7 @@ export default function Navigation() {
               <Link href="/" className="flex items-center">
                 <PackageOpen className="text-blue-500 mr-2" />
                 <span className="text-xl font-bold text-blue-500">
-                  MCP Nexus
+                  {t('navigation.brand')}
                 </span>
               </Link>
             </div>
@@ -45,11 +48,14 @@ export default function Navigation() {
               })}
             </div>
           </div>
-          <div className="content-center text-end">
-            <h1 className="text-xl font-bold text-white">GPT Assistant</h1>
-            <p className="text-sm text-gray-400">
-              Powered by OpenAI with MCP Tools Integration
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="content-center text-end hidden sm:block">
+              <h1 className="text-xl font-bold text-white">{t('navigation.title')}</h1>
+              <p className="text-sm text-gray-400">
+                {t('navigation.subtitle')}
+              </p>
+            </div>
+            <LanguageSwitcher variant="dropdown" />
           </div>
         </div>
       </div>

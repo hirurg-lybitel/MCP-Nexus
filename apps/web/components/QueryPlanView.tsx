@@ -9,18 +9,10 @@ import {
   ListTodo,
   Loader2,
 } from 'lucide-react';
+import { useTranslations } from '@/lib/i18n/use-translations';
 
 interface QueryPlanViewProps {
   data: QueryPlanData;
-}
-
-function stepLabel(step: QueryPlanStep): string {
-  const text = step.description?.trim();
-  if (text) {
-    return text;
-  }
-  const tool = step.tool?.replace(/^functions\./i, '').replace(/_/g, ' ');
-  return tool || 'Step';
 }
 
 function PlanStepIcon({ status }: { status: QueryPlanStep['status'] }) {
@@ -48,6 +40,16 @@ function PlanStepIcon({ status }: { status: QueryPlanStep['status'] }) {
 export default function QueryPlanView({ data }: QueryPlanViewProps) {
   const steps = data.discoverySteps;
   const [expanded, setExpanded] = useState(true);
+  const { t } = useTranslations();
+
+  const stepLabel = (step: QueryPlanStep): string => {
+    const text = step.description?.trim();
+    if (text) {
+      return text;
+    }
+    const tool = step.tool?.replace(/^functions\./i, '').replace(/_/g, ' ');
+    return tool || t('plan.step');
+  };
 
   if (steps.length === 0) {
     return null;
@@ -63,7 +65,7 @@ export default function QueryPlanView({ data }: QueryPlanViewProps) {
       >
         <ListTodo className="w-4 h-4 shrink-0 text-yellow-400" />
         <span className="text-xs font-semibold text-yellow-400 flex-1 min-w-0">
-          To-dos
+          {t('plan.todos')}
         </span>
         <span className="text-xs tabular-nums text-yellow-400/70 shrink-0">
           {steps.length}

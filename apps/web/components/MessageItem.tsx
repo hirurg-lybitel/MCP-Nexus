@@ -1,3 +1,5 @@
+'use client';
+
 import { TODO_MESSAGE_ID } from "@/constants";
 import { ExecutionStep, Message } from "@/types";
 import { ListTodo, Loader, Square, SquareCheckBig } from "lucide-react";
@@ -9,6 +11,9 @@ import ToolCallPanel from "./ToolCallPanel";
 import { chatMarkdownComponents } from "@/lib/chat/markdown-components";
 import { stripMarkdownTables } from "@/lib/chat/strip-markdown-tables";
 import TurnUsageFooter from "./TurnUsageFooter";
+import { useLocaleStore } from "@/stores/useLocaleStore";
+import { localeToBcp47 } from "@/lib/i18n/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 
 interface MessageItemProps {
@@ -22,9 +27,11 @@ export default function MessageItem({
   stripMarkdownTables: stripTables = false,
 }: MessageItemProps) {
   const isUser = message.role === "user";
+  const locale = useLocaleStore((s) => s.locale);
+  const { t } = useTranslations();
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
+    return date.toLocaleTimeString(localeToBcp47(locale), {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
@@ -34,7 +41,7 @@ export default function MessageItem({
   const isToolPanel = Boolean(message.toolName);
   const markdownContent =
     stripTables && message.content.trim()
-      ? stripMarkdownTables(message.content)
+      ? stripMarkdownTables(message.content, locale)
       : message.content;
   const hasBody =
     Boolean(message.tableData) ||
@@ -51,7 +58,7 @@ export default function MessageItem({
     >
       {!isUser && (
         <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
-          <span className="text-white text-sm font-semibold">AI</span>
+          <span className="text-white text-sm font-semibold">{t('message.ai')}</span>
         </div>
       )}
 
@@ -87,7 +94,7 @@ export default function MessageItem({
               <div className="rounded-lg my-2 space-y-2">
                 <div className="flex items-center gap-2">
                   <ListTodo className="w-4 h-4 text-yellow-400" />
-                  <h4 className="text-sm font-medium text-yellow-400">To-Do</h4>
+                  <h4 className="text-sm font-medium text-yellow-400">{t('plan.todo')}</h4>
                   <span className="text-xs opacity-60">{steps?.length}</span>
                 </div>
                 {steps?.map((step: ExecutionStep) => (
@@ -132,7 +139,7 @@ export default function MessageItem({
 
       {isUser && (
         <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center shrink-0">
-          <span className="text-white text-sm font-semibold">You</span>
+          <span className="text-white text-sm font-semibold">{t('message.you')}</span>
         </div>
       )}
     </div>

@@ -1,10 +1,16 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import type { GetPromptResult } from '@modelcontextprotocol/sdk/types.js';
+import {
+  getQueryTableUserMessage,
+  LOCALE_ARG_SCHEMA,
+} from '@/lib/i18n/mcp-prompts';
 
 const DEFAULT_TABLE = 'GD_GOOD';
 const DEFAULT_ROW_LIMIT = 10;
 const MAX_ROW_LIMIT = 50;
+
+const localeSchema = z.enum(LOCALE_ARG_SCHEMA).optional();
 
 function parseRowLimit(raw: string | undefined): number {
   if (!raw?.trim()) {
@@ -17,14 +23,6 @@ function parseRowLimit(raw: string | undefined): number {
   return Math.min(n, MAX_ROW_LIMIT);
 }
 
-function buildQueryTableUserMessage(tableName: string, limit: number): string {
-  const table = tableName.trim().toUpperCase();
-  return (
-    `Покажи топ 7 групп товаров, включая количество товаров в каждой группе. ` +
-    `Таккже добавь вычисляемое поле: процент товаров в каждой группе относительно общего количества товаров в этих группах.`
-  );
-}
-
 /**
  * Default slash-command prompt for a small tabular Firebird sample (like get_temperature_prompt).
  */
@@ -35,14 +33,21 @@ export function registerFirebirdPrompts(server: McpServer): void {
       title: 'Query table rows (sample)',
       description:
         'Default prompt: fetch a small row sample from a Firebird table for UI table display',
+      argsSchema: {
+        locale: localeSchema.describe('UI language for prompt text (en, ru, by)'),
+      },
     },
-    async (): Promise<GetPromptResult> => ({
+    async (args): Promise<GetPromptResult> => ({
       messages: [
         {
           role: 'user',
           content: {
             type: 'text',
-            text: buildQueryTableUserMessage(DEFAULT_TABLE, DEFAULT_ROW_LIMIT),
+            text: getQueryTableUserMessage(
+              args?.locale,
+              DEFAULT_TABLE,
+              DEFAULT_ROW_LIMIT
+            ),
           },
         },
       ],
@@ -63,6 +68,7 @@ export function registerFirebirdPrompts(server: McpServer): void {
           .string()
           .optional()
           .describe(`Max rows to fetch (default ${DEFAULT_ROW_LIMIT}, max ${MAX_ROW_LIMIT})`),
+        locale: localeSchema.describe('UI language for prompt text (en, ru, by)'),
       },
     },
     async (args): Promise<GetPromptResult> => ({
@@ -71,7 +77,8 @@ export function registerFirebirdPrompts(server: McpServer): void {
           role: 'user',
           content: {
             type: 'text',
-            text: buildQueryTableUserMessage(
+            text: getQueryTableUserMessage(
+              args.locale,
               args.tableName,
               parseRowLimit(args.limit)
             ),

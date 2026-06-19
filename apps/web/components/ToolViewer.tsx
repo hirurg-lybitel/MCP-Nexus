@@ -1,15 +1,19 @@
+'use client';
+
 import { Tool } from "@/types";
 import { X, Zap } from "lucide-react";
 import Button from "./basic/Button";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 function SchemaViewer({ schema }: { schema: Record<string, unknown> }) {
+  const { t } = useTranslations();
   const properties = schema.properties as Record<string, any> || {};
   const required = schema.required as string[] || [];
 
   return (
     <div className="space-y-3 text-xs">
       {Object.entries(properties).length === 0 ? (
-        <p className="text-gray-400 italic">No parameters required</p>
+        <p className="text-gray-400 italic">{t('tools.noParameters')}</p>
       ) : (
         <div className="space-y-2">
           {Object.entries(properties).map(([key, prop]) => (
@@ -21,7 +25,7 @@ function SchemaViewer({ schema }: { schema: Record<string, unknown> }) {
                 </span>
                 {required.includes(key) && (
                   <span className="px-1.5 py-0.5 bg-red-900/50 text-red-300 rounded text-xs">
-                    Required
+                    {t('tools.required')}
                   </span>
                 )}
               </div>
@@ -38,6 +42,8 @@ function SchemaViewer({ schema }: { schema: Record<string, unknown> }) {
 
 
 export default function ToolViewer({ tool, onClose }: { tool: Tool, onClose: () => void }) {
+  const { t } = useTranslations();
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 border border-gray-700 rounded-lg max-w-md w-full max-h-96 flex flex-col shadow-xl">
@@ -59,7 +65,7 @@ export default function ToolViewer({ tool, onClose }: { tool: Tool, onClose: () 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div>
             <h3 className="text-sm font-semibold text-gray-300 mb-2">
-                Description
+              {t('tools.description')}
             </h3>
             <p className="text-sm text-gray-300">
               {tool.description}
@@ -68,7 +74,7 @@ export default function ToolViewer({ tool, onClose }: { tool: Tool, onClose: () 
 
           <div>
             <h3 className="text-sm font-semibold text-gray-300 mb-2">
-                Parameters
+              {t('tools.parameters')}
             </h3>
             <SchemaViewer schema={tool.inputSchema} />
           </div>
@@ -79,12 +85,10 @@ export default function ToolViewer({ tool, onClose }: { tool: Tool, onClose: () 
             onClick={() => onClose()}
             className="w-full"
           >
-            Close
+            {t('tools.close')}
           </Button>
         </div>
       </div>
     </div>
   );
 }
-
-

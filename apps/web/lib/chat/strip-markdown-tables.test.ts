@@ -14,7 +14,7 @@ describe('stripMarkdownTables', () => {
 | 1 | 2 |
 
 Краткий вывод.`;
-    const out = stripMarkdownTables(input);
+    const out = stripMarkdownTables(input, 'ru');
     assert.ok(!out.includes('|'));
     assert.ok(out.includes('Краткий вывод'));
   });

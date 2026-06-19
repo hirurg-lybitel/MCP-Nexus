@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Navigation from '@/components/Navigation';
+import LocaleHtmlLang from '@/components/LocaleHtmlLang';
 
 export const metadata: Metadata = {
   title: 'MCP Nexus',
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
+        <LocaleHtmlLang />
         <div className="flex flex-col min-h-screen bg-linear-to-b from-gray-950 via-gray-900 to-gray-950 text-gray-100">
           <Navigation />
           <main className="flex-1 pt-16">{children}</main>

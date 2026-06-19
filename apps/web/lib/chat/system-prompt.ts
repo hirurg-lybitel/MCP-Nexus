@@ -1,4 +1,6 @@
 import { MAX_DOMAIN_CONTEXT_CHARS } from '@/constants';
+import type { Locale } from '@/lib/i18n/types';
+import { DEFAULT_LOCALE } from '@/lib/i18n/types';
 
 /**
  * Firebird assistant — Claude Code–style phases:
@@ -38,12 +40,26 @@ function buildBaseSystemPrompt(): string {
   );
 }
 
+function buildResponseLanguageSection(locale: Locale): string {
+  switch (locale) {
+  case 'ru':
+    return '\n\n## Language\nВсегда отвечай на русском языке, если пользователь явно не просит другой язык.';
+  case 'by':
+    return '\n\n## Language\nЗаўсёды адказвай на беларускай мове, калі карыстальнік яўна не просіць іншую мову.';
+  default:
+    return '\n\n## Language\nAlways respond in English unless the user explicitly asks for another language.';
+  }
+}
+
 export function truncateDomainContext(userContext: string): string {
   return userContext.slice(0, MAX_DOMAIN_CONTEXT_CHARS);
 }
 
-export function buildSystemPrompt(userContext?: string): string {
-  const base = buildBaseSystemPrompt();
+export function buildSystemPrompt(
+  userContext?: string,
+  locale: Locale = DEFAULT_LOCALE
+): string {
+  const base = buildBaseSystemPrompt() + buildResponseLanguageSection(locale);
   const trimmed = userContext?.trim();
   if (!trimmed) {
     return base;

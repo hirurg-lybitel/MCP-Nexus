@@ -1,5 +1,8 @@
+'use client';
+
 import { Send, X } from "lucide-react";
 import Button from "./basic/Button";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface InputAreaProps {
   disabled?: boolean;
@@ -20,6 +23,8 @@ export default function InputArea({
   onSendMessage,
   onClearMessage
 }: InputAreaProps) {
+  const { t } = useTranslations();
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     onKeyDown?.(e);
     if (!e.defaultPrevented && e.key === "Enter" && !e.shiftKey) {
@@ -35,7 +40,7 @@ export default function InputArea({
           value={input}
           onChange={onChange}
           onKeyDown={handleKeyDown}
-          placeholder="Type your message or / for commands... (Shift+Enter for new line)"
+          placeholder={t('chat.placeholder')}
           disabled={disabled || loading}
           rows={4}
           className="flex-1 bg-gray-800 text-white px-4 py-3 pr-16 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed resize-none placeholder-gray-500 border border-gray-700"
@@ -61,7 +66,7 @@ export default function InputArea({
         </div>
       </div>
       <div className="text-xs text-gray-500 mt-2">
-        Tip: The AI can use available tools to answer your questions
+        {t('chat.tip')}
       </div>
     </div>
   );

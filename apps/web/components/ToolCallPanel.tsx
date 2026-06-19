@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, Zap } from 'lucide-react';
+import { useTranslations } from '@/lib/i18n/use-translations';
 
 function prettifyJson(text: string): string {
   try {
@@ -29,6 +30,7 @@ export default function ToolCallPanel({
   toolResult,
 }: ToolCallPanelProps) {
   const [expanded, setExpanded] = useState(false);
+  const { t } = useTranslations();
   const hasDetails =
     (toolInput && Object.keys(toolInput).length > 0) ||
     Boolean(toolResult?.trim());
@@ -45,7 +47,7 @@ export default function ToolCallPanel({
       >
         <Zap className="w-4 h-4 shrink-0 text-yellow-400" />
         <span className="text-xs font-semibold text-yellow-400 flex-1 min-w-0 truncate">
-          Using: {formatToolLabel(toolName)}
+          {t('tools.using', { tool: formatToolLabel(toolName) })}
         </span>
         {hasDetails && (
           <ChevronDown
@@ -61,7 +63,7 @@ export default function ToolCallPanel({
           {toolInput && Object.keys(toolInput).length > 0 && (
             <div className="space-y-1 min-w-0">
               <span className="text-gray-400 font-medium uppercase tracking-wide text-[10px]">
-                Input
+                {t('tools.input')}
               </span>
               <pre className="overflow-x-auto max-h-48 rounded bg-gray-950/80 p-2 text-gray-200 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words">
                 {prettifyJson(JSON.stringify(toolInput))}
@@ -71,7 +73,7 @@ export default function ToolCallPanel({
           {toolResult?.trim() && (
             <div className="space-y-1 min-w-0">
               <span className="text-gray-400 font-medium uppercase tracking-wide text-[10px]">
-                Result
+                {t('tools.result')}
               </span>
               <pre className="overflow-x-auto max-h-64 rounded bg-gray-950/80 p-2 text-gray-200 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words">
                 {prettifyJson(toolResult)}

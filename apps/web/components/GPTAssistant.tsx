@@ -44,6 +44,22 @@ import { projectToolResultForModel } from '@/lib/agent/agent-tool-projector';
 import { toolResultPayload } from '@/lib/chat/tool-result-payload';
 import { sanitizeToolResultForUi } from '@/lib/chat/tool-result-ui-sanitize';
 import { useDomainContextStore } from '@/stores/useDomainContextStore';
+import { useLocaleStore } from '@/stores/useLocaleStore';
+import { useTranslations } from '@/lib/i18n/use-translations';
+
+const LOCALE_PROMPT_ARG = 'locale';
+
+function getUserPromptArguments(
+  prompt: McpPrompt
+): NonNullable<McpPrompt['arguments']> {
+  return (
+    prompt.arguments?.filter((arg) => arg.name !== LOCALE_PROMPT_ARG) ?? []
+  );
+}
+
+function promptNeedsArgsModal(prompt: McpPrompt): boolean {
+  return getUserPromptArguments(prompt).length > 0;
+}
 
 function patchActivePlanMessage(
   messages: Message[],
@@ -85,6 +101,8 @@ export default function GPTAssistant() {
   const { token } = useTokenStore();
   const { mcpKey, isValidated } = useMcpKeyStore();
   const { domainContext } = useDomainContextStore();
+  const locale = useLocaleStore((s) => s.locale);
+  const { t } = useTranslations();
 
   const {
     tools,
@@ -184,7 +202,7 @@ export default function GPTAssistant() {
   }
 
   async function handleSelectPrompt(prompt: McpPrompt) {
-    if (prompt.arguments) {
+    if (promptNeedsArgsModal(prompt)) {
       setSelectedPrompt(prompt);
       setShowArgsModal(true);
       setShowCommandMenu(false);
@@ -192,12 +210,11 @@ export default function GPTAssistant() {
     }
 
     try {
-      // TODO: Prompt could has required arguments, which we must to send with getPrompt
-      const result = await getPrompt(prompt.name);
+      const result = await getPrompt(prompt.name, { locale });
       const text = extractPromptText(result.messages ?? []);
       setInput((prev) => prev.replace(/\/\S*$/, '').trim() + text);
     } catch {
-      setError('Failed to load prompt');
+      setError(t('chat.failedLoadPrompt'));
     } finally {
       setShowCommandMenu(false);
     }
@@ -207,11 +224,11 @@ export default function GPTAssistant() {
     if (!selectedPrompt) return;
 
     try {
-      const result = await getPrompt(selectedPrompt.name, args);
+      const result = await getPrompt(selectedPrompt.name, { ...args, locale });
       const text = extractPromptText(result.messages ?? []);
       setInput((prev) => prev.replace(/\/\S*$/, '').trim() + text);
     } catch {
-      setError('Failed to load parameterized prompt');
+      setError(t('chat.failedLoadParameterizedPrompt'));
     }
   }
 
@@ -357,7 +374,7 @@ export default function GPTAssistant() {
       }
 
       const conversationMessages: Array<ChatCompletionMessageParam> = [
-        { role: 'system', content: buildSystemPrompt(domainContext) },
+        { role: 'system', content: buildSystemPrompt(domainContext, locale) },
         ...messages
           .filter((msg) => !msg.isUiMessage)
           .map((msg) => ({
@@ -428,7 +445,7 @@ export default function GPTAssistant() {
 
         conversationMessages.push({
           role: 'assistant',
-          content: data.choices[0].message.content || 'Calling tools...',
+          content: data.choices[0].message.content || t('chat.callingTools'),
           tool_calls: toolCalls.map((toolCall: any) => ({
             type: 'function',
             id: toolCall.id,
@@ -613,9 +630,9 @@ export default function GPTAssistant() {
 
       flushPlanProgress(setMessages, markAllPlanStepsCompleted);
 
-      let finalContent = data.choices[0].message.content || 'No response';
+      let finalContent = data.choices[0].message.content || t('chat.noResponse');
       if (dataTablePresentedThisTurn && finalContent.trim()) {
-        finalContent = stripMarkdownTables(finalContent);
+        finalContent = stripMarkdownTables(finalContent, locale);
       }
 
       const assistantMessage: Message = {
@@ -634,7 +651,7 @@ export default function GPTAssistant() {
       const errorAssistantMessage: Message = {
         id: `error-${Date.now()}`,
         role: 'assistant',
-        content: `Error: ${errorMessage}`,
+        content: t('chat.errorPrefix', { message: errorMessage }),
         timestamp: new Date(),
         usageMeta: turnUsage.build(GPT_MODEL_GENERAL.model),
       };
@@ -658,7 +675,9 @@ export default function GPTAssistant() {
         isOpen={showArgsModal}
         onClose={() => setShowArgsModal(false)}
         onSubmit={handleArgsSubmit}
-        arguments={selectedPrompt?.arguments || []}
+        arguments={
+          selectedPrompt ? getUserPromptArguments(selectedPrompt) : []
+        }
         promptName={selectedPrompt?.name || ''}
       />
 
@@ -671,7 +690,7 @@ export default function GPTAssistant() {
             <div className="flex items-center gap-3 justify-between">
               {domainContext.trim() ? (
                 <p className="text-xs text-gray-500 shrink-0">
-                  User context active
+                  {t('chat.userContextActive')}
                 </p>
               ) : (
                 <div className="flex-1" />
@@ -682,7 +701,7 @@ export default function GPTAssistant() {
                   size="xs"
                   onClick={handleClearHistory}
                   disabled={loading}
-                  title="Clear History"
+                  title={t('chat.clearHistory')}
                 >
                   <Trash className="h-5 w-5 " />
                 </Button>
@@ -702,19 +721,18 @@ export default function GPTAssistant() {
                 <div className={`bg-blue-900/30 border border-blue-500/50 p-4 rounded-lg`}>
                   <p className="flex items-center gap-1 text-sm text-blue-200">
                     <TriangleAlert className="text-yellow-500 h-4 w-4" />
-                  To use the chat, you need to set{' '}
-                    <b>your personal access token</b>.
+                    {t('chat.tokenBannerLead')}{' '}
+                    <b>{t('chat.tokenBannerBold')}</b>.
                   </p>
                   <p className="text-sm text-blue-200">
-                  Go to{' '}
+                    {t('chat.tokenBannerTail')}{' '}
                     <Link
                       href="/settings"
                       className="font-bold underline"
                     >
-                    Settings
-                    </Link>
-                  {' '}
-                  and enter your token in the OpenAI Configuration section."
+                      {t('chat.tokenBannerSettings')}
+                    </Link>{' '}
+                    {t('chat.tokenBannerEnd')}
                   </p>
                 </div>
               </div>
@@ -725,15 +743,15 @@ export default function GPTAssistant() {
                 <div className="bg-amber-900/30 border border-amber-500/50 p-4 rounded-lg">
                   <p className="flex items-center gap-1 text-sm text-amber-200">
                     <TriangleAlert className="text-yellow-500 h-4 w-4" />
-                    Database tools require a verified{' '}
-                    <b>MCP access key</b>.
+                    {t('chat.mcpBannerLead')}{' '}
+                    <b>{t('chat.mcpBannerBold')}</b>.
                   </p>
                   <p className="text-sm text-amber-200">
-                    Open{' '}
+                    {t('chat.mcpBannerTail')}{' '}
                     <Link href="/settings" className="font-bold underline">
-                      Settings
+                      {t('chat.mcpBannerSettings')}
                     </Link>
-                    , enter your MCP key, and click Verify and save.
+                    {t('chat.mcpBannerEnd')}
                   </p>
                 </div>
               </div>

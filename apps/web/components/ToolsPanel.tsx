@@ -1,8 +1,11 @@
+'use client';
+
 import { Zap, ChevronDown, DatabaseZap } from "lucide-react";
 import { useCallback, useState } from "react";
 import ToolViewer from "./ToolViewer";
 import { Tool } from "@/types";
 import { GptFunctions } from "@/lib/openai/functions";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface ToolsPanelProps {
   tools: Tool[];
@@ -11,6 +14,7 @@ interface ToolsPanelProps {
 export default function ToolsPanel({ tools }: ToolsPanelProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
+  const { t } = useTranslations();
 
   const handleCloseTool = () => setSelectedTool(null);
 
@@ -26,7 +30,7 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
         {isOpen && (
           <div className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-blue-500" />
-            <h2 className="text-sm font-bold text-white">Tools</h2>
+            <h2 className="text-sm font-bold text-white">{t('tools.title')}</h2>
           </div>
         )}
         <button
@@ -56,7 +60,7 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
             >
               {isOpen ? (
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2" title={isOpenAiTool(tool.name) ? 'host agent tool' : 'mcp tool'}>
+                  <div className="flex items-center gap-2" title={isOpenAiTool(tool.name) ? t('tools.hostTool') : t('tools.mcpTool')}>
                     {isOpenAiTool(tool.name) ? <Zap className="w-4 h-4 text-yellow-500 shrink-0" /> : <DatabaseZap className="w-4 h-4 text-yellow-500 shrink-0" />}
                     <h3 className="text-xs font-semibold text-white truncate">
                       {tool.name}
@@ -75,7 +79,7 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
 
         {tools.length === 0 && isOpen && (
           <div className="text-center py-8">
-            <p className="text-xs text-gray-500">No tools available</p>
+            <p className="text-xs text-gray-500">{t('tools.noTools')}</p>
           </div>
         )}
       </div>
@@ -83,7 +87,9 @@ export default function ToolsPanel({ tools }: ToolsPanelProps) {
       {isOpen && (
         <div className="p-3 border-t border-gray-800 bg-gray-800/50">
           <p className="text-xs text-gray-400 text-center">
-            {tools.length} tool{tools.length !== 1 ? "s" : ""} available
+            {tools.length === 1
+              ? t('tools.countOne', { count: tools.length })
+              : t('tools.countMany', { count: tools.length })}
           </p>
         </div>
       )}

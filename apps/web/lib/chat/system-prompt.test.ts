@@ -8,6 +8,7 @@ describe('buildSystemPrompt', () => {
     const prompt = buildSystemPrompt();
     assert.ok(prompt.includes('You are a Firebird data assistant'));
     assert.ok(!prompt.includes('## Domain context'));
+    assert.ok(prompt.includes('Always respond in English'));
   });
 
   it('appends domain context section when provided', () => {
@@ -23,6 +24,16 @@ describe('buildSystemPrompt', () => {
   it('ignores whitespace-only user context', () => {
     const prompt = buildSystemPrompt('   \n  ');
     assert.ok(!prompt.includes('## Domain context'));
+  });
+
+  it('includes Russian response language instruction', () => {
+    const prompt = buildSystemPrompt(undefined, 'ru');
+    assert.ok(prompt.includes('Всегда отвечай на русском языке'));
+  });
+
+  it('includes Belarusian response language instruction', () => {
+    const prompt = buildSystemPrompt(undefined, 'by');
+    assert.ok(prompt.includes('Заўсёды адказвай на беларускай мове'));
   });
 });
 
