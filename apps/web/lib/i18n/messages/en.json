@@ -165,7 +165,13 @@
     "rowNumber": "№",
     "expand": "Expand",
     "collapse": "Close expanded view",
-    "expandedHint": "Expanded view open"
+    "expandedHint": "Expanded view open",
+    "pin": "Pin table",
+    "unpin": "Unpin",
+    "pinned": "Pinned",
+    "pinnedDockLabel": "Pinned result",
+    "collapseDock": "Collapse",
+    "expandDock": "Expand"
   },
   "settings": {
     "title": "Settings",

@@ -165,7 +165,13 @@
     "rowNumber": "№",
     "expand": "Развернуть",
     "collapse": "Закрыть развёрнутый вид",
-    "expandedHint": "Открыт развёрнутый вид"
+    "expandedHint": "Открыт развёрнутый вид",
+    "pin": "Закрепить таблицу",
+    "unpin": "Открепить",
+    "pinned": "Закреплено",
+    "pinnedDockLabel": "Закреплённый результат",
+    "collapseDock": "Свернуть",
+    "expandDock": "Развернуть"
   },
   "settings": {
     "title": "Настройки",

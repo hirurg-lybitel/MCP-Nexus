@@ -92,7 +92,7 @@ export default function MessageItem({
           detectResultViewMode(message.tableData) === 'scalar' ? (
             <ScalarResultView data={message.tableData} />
           ) : (
-            <DataTableView data={message.tableData} />
+            <DataTableView data={message.tableData} messageId={message.id} />
           )
         ) : message.id === TODO_MESSAGE_ID
           ? ((() => {

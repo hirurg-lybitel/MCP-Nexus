@@ -165,7 +165,13 @@
     "rowNumber": "№",
     "expand": "Разгарнуць",
     "collapse": "Закрыць разгорнуты выгляд",
-    "expandedHint": "Адкрыты разгорнуты выгляд"
+    "expandedHint": "Адкрыты разгорнуты выгляд",
+    "pin": "Замацаваць табліцу",
+    "unpin": "Адмацаваць",
+    "pinned": "Замацавана",
+    "pinnedDockLabel": "Замацаваны вынік",
+    "collapseDock": "Згарнуць",
+    "expandDock": "Разгарнуць"
   },
   "settings": {
     "title": "Налады",

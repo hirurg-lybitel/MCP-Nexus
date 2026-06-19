@@ -13,6 +13,8 @@ import {
   Download,
   Maximize2,
   Minimize2,
+  Pin,
+  PinOff,
 } from 'lucide-react';
 import TableQueryChip from './TableQueryChip';
 import TableChartView from './TableChartView';
@@ -22,6 +24,7 @@ import { detectChartSpec } from '@/lib/chat/table-chart-detect';
 import type { TableColumn, TableDisplayData } from '@/types';
 import { useTranslations } from '@/lib/i18n/use-translations';
 import { useLocaleStore } from '@/stores/useLocaleStore';
+import { usePinnedTableStore } from '@/stores/usePinnedTableStore';
 import {
   copyTableTsv,
   downloadTableCsv,
@@ -43,15 +46,29 @@ import {
 
 interface DataTableViewProps {
   data: TableDisplayData;
+  messageId?: string;
+  variant?: 'inline' | 'pinned';
 }
 
 /** At or below this count, columns share the full container width. */
 const STRETCH_COLUMNS_THRESHOLD = 8;
 const STRETCH_COLUMNS_THRESHOLD_EXPANDED = 12;
 
-export default function DataTableView({ data }: DataTableViewProps) {
+export default function DataTableView({
+  data,
+  messageId,
+  variant = 'inline',
+}: DataTableViewProps) {
   const { t } = useTranslations();
   const locale = useLocaleStore((s) => s.locale);
+  const pin = usePinnedTableStore((s) => s.pin);
+  const unpin = usePinnedTableStore((s) => s.unpin);
+  const pinnedMessageId = usePinnedTableStore((s) => s.messageId);
+  const isPinned =
+    variant === 'inline' &&
+    Boolean(messageId) &&
+    pinnedMessageId === messageId;
+  const showPinControl = variant === 'inline' && Boolean(messageId);
   const [copyState, setCopyState] = useState<'idle' | 'success' | 'error'>(
     'idle'
   );
@@ -156,6 +173,19 @@ export default function DataTableView({ data }: DataTableViewProps) {
 
   const expandLabel = expanded ? t('table.collapse') : t('table.expand');
 
+  function handlePinToggle() {
+    if (!messageId) {
+      return;
+    }
+    if (isPinned) {
+      unpin();
+    } else {
+      pin(messageId, data);
+    }
+  }
+
+  const pinLabel = isPinned ? t('table.unpin') : t('table.pin');
+
   if (columns.length === 0 && rows.length === 0) {
     return (
       <p className="text-sm text-gray-400 italic">{t('table.noRows')}</p>
@@ -173,9 +203,16 @@ export default function DataTableView({ data }: DataTableViewProps) {
     return (
       <div className="space-y-2 w-full min-w-0 max-w-full">
         <div className="flex flex-wrap items-start justify-between gap-2">
-          {title && (
-            <h4 className="text-sm font-semibold text-emerald-400">{title}</h4>
-          )}
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            {title && (
+              <h4 className="text-sm font-semibold text-emerald-400">{title}</h4>
+            )}
+            {isPinned && (
+              <span className="rounded border border-emerald-500/40 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-400">
+                {t('table.pinned')}
+              </span>
+            )}
+          </div>
           <div className="flex flex-col items-end gap-1.5 text-xs text-gray-400 tabular-nums">
             <div className="flex flex-wrap items-center justify-end gap-2">
               {meta?.rowCount != null && (
@@ -209,6 +246,26 @@ export default function DataTableView({ data }: DataTableViewProps) {
                     <Copy className="h-3.5 w-3.5" aria-hidden />
                   )}
                 </button>
+                {showPinControl && (
+                  <button
+                    type="button"
+                    onClick={handlePinToggle}
+                    title={pinLabel}
+                    aria-label={pinLabel}
+                    aria-pressed={isPinned}
+                    className={`inline-flex items-center justify-center rounded-md border p-1.5 transition-colors ${
+                      isPinned
+                        ? 'border-emerald-500/60 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
+                        : 'border-gray-600/80 bg-gray-800/60 text-gray-200 hover:bg-gray-700/80'
+                    }`}
+                  >
+                    {isPinned ? (
+                      <PinOff className="h-3.5 w-3.5" aria-hidden />
+                    ) : (
+                      <Pin className="h-3.5 w-3.5" aria-hidden />
+                    )}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => setExpanded((v) => !v)}

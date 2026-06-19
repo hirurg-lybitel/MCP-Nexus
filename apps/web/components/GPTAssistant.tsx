@@ -5,6 +5,7 @@ import { flushSync } from 'react-dom';
 import MessageList from './MessageList';
 import InputArea from './InputArea';
 import ToolsPanel from './ToolsPanel';
+import PinnedTableDock from './PinnedTableDock';
 import { useMcpAdapter } from '@/lib/mcp/hook/useMcpAdapter';
 import {
   CHAT_CONTENT_MAX_WIDTH,
@@ -47,6 +48,7 @@ import { sanitizeToolResultForUi } from '@/lib/chat/tool-result-ui-sanitize';
 import { useDomainContextStore } from '@/stores/useDomainContextStore';
 import { useLocaleStore } from '@/stores/useLocaleStore';
 import { useNotificationSettingsStore } from '@/stores/useNotificationSettingsStore';
+import { usePinnedTableStore } from '@/stores/usePinnedTableStore';
 import { useTranslations } from '@/lib/i18n/use-translations';
 import { notifyTurnCompleteIfBackground } from '@/lib/notifications/notify-turn-complete';
 import { useNotificationPermissionOnOpen } from '@/lib/notifications/use-notification-permission-on-open';
@@ -691,6 +693,7 @@ export default function GPTAssistant() {
 
   function handleConfirmClearHistory() {
     setMessages([]);
+    usePinnedTableStore.getState().unpin();
   }
 
   return (
@@ -793,6 +796,8 @@ export default function GPTAssistant() {
             )}
           </div>
         </header>
+
+        <PinnedTableDock />
 
         <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
           <MessageList
