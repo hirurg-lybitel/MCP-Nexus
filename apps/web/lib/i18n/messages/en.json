@@ -156,7 +156,10 @@
     "scalarTitle": "Result",
     "viewTable": "Table",
     "viewChart": "Chart",
-    "chartUnavailable": "Chart not available for this data"
+    "chartUnavailable": "Chart not available for this data",
+    "expand": "Expand",
+    "collapse": "Close expanded view",
+    "expandedHint": "Expanded view open"
   },
   "settings": {
     "title": "Settings",

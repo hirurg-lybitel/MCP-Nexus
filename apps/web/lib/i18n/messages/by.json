@@ -156,7 +156,10 @@
     "scalarTitle": "Вынік",
     "viewTable": "Табліца",
     "viewChart": "Графік",
-    "chartUnavailable": "Графік недаступны для гэтых дадзеных"
+    "chartUnavailable": "Графік недаступны для гэтых дадзеных",
+    "expand": "Разгарнуць",
+    "collapse": "Закрыць разгорнуты выгляд",
+    "expandedHint": "Адкрыты разгорнуты выгляд"
   },
   "settings": {
     "title": "Налады",

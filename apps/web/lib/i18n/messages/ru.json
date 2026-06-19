@@ -156,7 +156,10 @@
     "scalarTitle": "Результат",
     "viewTable": "Таблица",
     "viewChart": "График",
-    "chartUnavailable": "График недоступен для этих данных"
+    "chartUnavailable": "График недоступен для этих данных",
+    "expand": "Развернуть",
+    "collapse": "Закрыть развёрнутый вид",
+    "expandedHint": "Открыт развёрнутый вид"
   },
   "settings": {
     "title": "Настройки",
