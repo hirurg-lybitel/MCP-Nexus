@@ -73,6 +73,20 @@
     "ai": "AI",
     "you": "You"
   },
+  "table": {
+    "noRows": "No rows returned.",
+    "rowCountOne": "{{count}} row",
+    "rowCountMany": "{{count}} rows",
+    "truncated": "(truncated)",
+    "hiddenColumnsOne": "{{count}} more column hidden — ask in chat to show it",
+    "hiddenColumnsMany": "{{count}} more columns hidden — ask in chat to show them",
+    "downloadCsv": "Download CSV",
+    "downloadCsvPartial": "Download CSV (shown rows)",
+    "copy": "Copy",
+    "copyPartial": "Copy (shown rows)",
+    "copySuccess": "Copied",
+    "copyFailed": "Copy failed"
+  },
   "settings": {
     "title": "Settings",
     "subtitle": "Configure access keys for OpenAI chat and MCP server connections.",

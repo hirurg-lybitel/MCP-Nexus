@@ -785,13 +785,13 @@ export default function GPTAssistant() {
           {showCommandMenu && filteredPrompts.length > 0 && (
             <div
               aria-label="command-menu"
-              className="absolute bottom-full left-0 right-0 mb-2 max-h-96 overflow-auto rounded-lg border border-gray-700 bg-gray-800 shadow-xl z-50 py-1"
+              className="absolute bottom-full left-0 right-0 mb-2 max-h-96 overflow-auto rounded-lg border border-gray-700 bg-gray-800 shadow-xl z-50 p-1"
             >
               {filteredPrompts.map((prompt, index) => (
                 <button
                   key={prompt.name}
                   type="button"
-                  className={`w-full text-left px-4 py-2.5 flex flex-col gap-0.5 transition-colors ${
+                  className={`w-full text-left rounded-md px-4 py-2.5 flex flex-col gap-0.5 transition-colors ${
                     index === selectedPromptIndex
                       ? 'bg-gray-700 text-white'
                       : 'hover:bg-gray-700/80'

@@ -73,6 +73,20 @@
     "ai": "AI",
     "you": "Вы"
   },
+  "table": {
+    "noRows": "Радкоў не вярнута.",
+    "rowCountOne": "{{count}} радок",
+    "rowCountMany": "{{count}} радкоў",
+    "truncated": "(абрэзана)",
+    "hiddenColumnsOne": "Яшчэ {{count}} слупок схаваны — папросіце паказаць у чаце",
+    "hiddenColumnsMany": "Яшчэ {{count}} слупкоў схавана — папросіце паказаць у чаце",
+    "downloadCsv": "Спампаваць CSV",
+    "downloadCsvPartial": "Спампаваць CSV (паказаныя радкі)",
+    "copy": "Капіраваць",
+    "copyPartial": "Капіраваць (паказаныя радкі)",
+    "copySuccess": "Скапіравана",
+    "copyFailed": "Не ўдалося скапіраваць"
+  },
   "settings": {
     "title": "Налады",
     "subtitle": "Наладзьце ключы доступу для чата OpenAI і падключэнняў да MCP-сервера.",

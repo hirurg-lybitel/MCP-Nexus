@@ -72,6 +72,8 @@ export function parseTableFromToolResult(
           ? record.rowCount
           : rowObjects.length,
       truncated: Boolean(record.truncated),
+      hiddenColumnCount: built.hiddenColumnCount,
+      allColumnCount: built.allColumnCount,
     },
   };
 }
