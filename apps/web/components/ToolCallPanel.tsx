@@ -45,6 +45,7 @@ interface ToolCallPanelProps {
   toolInput?: Record<string, unknown>;
   toolResult?: string;
   developerMode?: boolean;
+  onSuggestFollowUp?: (text: string) => void;
 }
 
 function GenericToolCallPanel({
@@ -114,6 +115,7 @@ export default function ToolCallPanel({
   toolInput,
   toolResult,
   developerMode = false,
+  onSuggestFollowUp,
 }: ToolCallPanelProps) {
   const defaultExpanded = useMemo(
     // () => hasToolError(toolResult), // TODO: Uncomment this when we have a way to handle tool errors
@@ -126,6 +128,7 @@ export default function ToolCallPanel({
     toolResult,
     defaultExpanded,
     developerMode,
+    onSuggestFollowUp,
   };
 
   if (isFirebirdTool(toolName)) {

@@ -91,6 +91,18 @@
         "ref": "Спасылка",
         "sensitiveBadge": "чувств."
       },
+      "schema": {
+        "suggestFollowUp": "Прапанаваць працяг",
+        "notNull": "NOT NULL",
+        "sensitiveBannerOne": "{{count}} чувствінае поле ў табліцы",
+        "sensitiveBannerMany": "{{count}} чувствіных палёў у табліцы",
+        "groups": {
+          "identifiers": "Ідэнтыфікатары",
+          "references": "Спасылкі",
+          "business": "Бізнес-полі",
+          "sensitive": "Чувствіныя"
+        }
+      },
       "tableList": {
         "filterPlaceholder": "Фільтр табліц…",
         "noMatch": "Няма падыходных табліц"
@@ -136,7 +148,15 @@
     "paginationRange": "{{start}}–{{end}} з {{total}}",
     "paginationPage": "Стар. {{page}} / {{totalPages}}",
     "paginationPrev": "Папярэдняя старонка",
-    "paginationNext": "Наступная старонка"
+    "paginationNext": "Наступная старонка",
+    "queryLabel": "Запыт",
+    "showQuery": "Паказаць",
+    "hideQuery": "Схаваць",
+    "paramsLabel": "Параметры",
+    "scalarTitle": "Вынік",
+    "viewTable": "Табліца",
+    "viewChart": "Графік",
+    "chartUnavailable": "Графік недаступны для гэтых дадзеных"
   },
   "settings": {
     "title": "Налады",

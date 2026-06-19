@@ -36,6 +36,10 @@ export interface TableDisplayData {
   rows: Record<string, unknown>[];
   /** Columns hidden by default; user can toggle in UI. */
   hiddenColumns?: TableColumn[];
+  /** SQL echoed from present_query_result for UI display. */
+  sql?: string;
+  params?: Record<string, unknown>;
+  tableName?: string;
   meta?: {
     rowCount?: number;
     truncated?: boolean;

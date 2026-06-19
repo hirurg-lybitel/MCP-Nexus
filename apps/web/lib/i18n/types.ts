@@ -1,4 +1,4 @@
-export const LOCALES = ['en', 'ru', 'by'] as const;
+export const LOCALES = ['en', 'by', 'ru'] as const;
 
 export type Locale = (typeof LOCALES)[number];
 
@@ -6,14 +6,14 @@ export const DEFAULT_LOCALE: Locale = 'en';
 
 export const LOCALE_LABELS: Record<Locale, string> = {
   en: 'EN',
-  ru: 'RU',
   by: 'BY',
+  ru: 'RU',
 };
 
 export const LOCALE_NAMES: Record<Locale, string> = {
   en: 'English',
-  ru: 'Русский',
   by: 'Беларуская',
+  ru: 'Русский',
 };
 
 /** BCP-47 tags for Intl formatting APIs. */

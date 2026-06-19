@@ -33,6 +33,23 @@ describe('parseTableFromToolResult', () => {
     assert.ok(result!.hiddenColumns?.some((c) => c.key === 'ID'));
   });
 
+  it('parses sql and params from present_query_result', () => {
+    const result = parseTableFromToolResult(
+      AGENT_PRESENT_TABLE_TOOL,
+      JSON.stringify({
+        rows: [{ CNT: 42 }],
+        rowCount: 1,
+        sql: 'SELECT COUNT(*) AS CNT FROM GD_GOOD',
+        params: { id: 5 },
+        tableName: 'GD_GOOD',
+      })
+    );
+    assert.ok(result);
+    assert.equal(result!.sql, 'SELECT COUNT(*) AS CNT FROM GD_GOOD');
+    assert.deepEqual(result!.params, { id: 5 });
+    assert.equal(result!.tableName, 'GD_GOOD');
+  });
+
   it('hides RDB key columns when keyFields in payload', () => {
     const result = parseTableFromToolResult(
       AGENT_PRESENT_TABLE_TOOL,

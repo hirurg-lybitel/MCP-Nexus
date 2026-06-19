@@ -234,6 +234,10 @@ export default function GPTAssistant() {
     }
   }
 
+  function handleSuggestFollowUp(text: string) {
+    setInput(text.trim());
+  }
+
   function handleInputKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (!showCommandMenu || filteredPrompts.length === 0) return;
     if (e.key === 'Escape') {
@@ -776,6 +780,7 @@ export default function GPTAssistant() {
           <MessageList
             messages={messages}
             loading={loading}
+            onSuggestFollowUp={handleSuggestFollowUp}
           />
         </div>
 

@@ -91,6 +91,18 @@
         "ref": "Ссылка",
         "sensitiveBadge": "чувств."
       },
+      "schema": {
+        "suggestFollowUp": "Предложить продолжение",
+        "notNull": "NOT NULL",
+        "sensitiveBannerOne": "{{count}} чувствительное поле в таблице",
+        "sensitiveBannerMany": "{{count}} чувствительных полей в таблице",
+        "groups": {
+          "identifiers": "Идентификаторы",
+          "references": "Ссылки",
+          "business": "Бизнес-поля",
+          "sensitive": "Чувствительные"
+        }
+      },
       "tableList": {
         "filterPlaceholder": "Фильтр таблиц…",
         "noMatch": "Нет подходящих таблиц"
@@ -136,7 +148,15 @@
     "paginationRange": "{{start}}–{{end}} из {{total}}",
     "paginationPage": "Стр. {{page}} / {{totalPages}}",
     "paginationPrev": "Предыдущая страница",
-    "paginationNext": "Следующая страница"
+    "paginationNext": "Следующая страница",
+    "queryLabel": "Запрос",
+    "showQuery": "Показать",
+    "hideQuery": "Скрыть",
+    "paramsLabel": "Параметры",
+    "scalarTitle": "Результат",
+    "viewTable": "Таблица",
+    "viewChart": "График",
+    "chartUnavailable": "График недоступен для этих данных"
   },
   "settings": {
     "title": "Настройки",

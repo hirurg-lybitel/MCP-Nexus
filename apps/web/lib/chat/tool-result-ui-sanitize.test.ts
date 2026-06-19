@@ -50,7 +50,8 @@ describe('sanitizeToolResultForUi', () => {
 
     assert.equal(ui.columns.length, 2);
     assert.equal(ui.columns[0]?.fieldName, 'NAME');
-    assert.equal(ui.columns[0]?.fieldType, undefined);
+    assert.equal(ui.columns[0]?.fieldType, 'VARCHAR');
+    assert.equal(ui.columns[0]?.fieldLength, 80);
     assert.equal(ui.columns[1]?.sensitive, true);
   });
 

@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import CollapsibleToolPanel from './CollapsibleToolPanel';
+import SchemaExplorerView from './SchemaExplorerView';
 import {
   countSensitiveColumns,
   parseDescribeTableTool,
@@ -13,6 +14,7 @@ interface DescribeTableToolPanelProps {
   toolResult?: string;
   defaultExpanded?: boolean;
   developerMode?: boolean;
+  onSuggestFollowUp?: (text: string) => void;
 }
 
 export default function DescribeTableToolPanel({
@@ -20,6 +22,7 @@ export default function DescribeTableToolPanel({
   toolResult = '',
   defaultExpanded = false,
   developerMode = false,
+  onSuggestFollowUp,
 }: DescribeTableToolPanelProps) {
   const { t } = useTranslations();
   const parsed = useMemo(
@@ -95,44 +98,10 @@ export default function DescribeTableToolPanel({
       toolResult={toolResult}
       {...rawLabels}
     >
-      <div className="overflow-x-auto max-w-full min-w-0">
-        <table className="min-w-max w-full text-left text-[11px] border-collapse">
-          <thead>
-            <tr className="border-b border-gray-600/80 text-gray-400">
-              <th className="px-2 py-1.5 font-medium">{t('tools.firebird.describeTable.field')}</th>
-              <th className="px-2 py-1.5 font-medium">{t('tools.firebird.describeTable.displayName')}</th>
-              <th className="px-2 py-1.5 font-medium">{t('tools.firebird.describeTable.ref')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {columns.map((col) => (
-              <tr
-                key={col.fieldName}
-                className="border-t border-gray-700/50 even:bg-gray-800/30"
-              >
-                <td className="px-2 py-1.5 font-mono text-gray-100 whitespace-nowrap">
-                  {col.fieldName}
-                  {col.sensitive && (
-                    <span className="ml-1.5 text-[10px] uppercase text-red-400/90 font-sans">
-                      {t('tools.firebird.describeTable.sensitiveBadge')}
-                    </span>
-                  )}
-                </td>
-                <td className="px-2 py-1.5 text-gray-300 max-w-[12rem] truncate">
-                  {col.displayName?.trim() || '—'}
-                </td>
-                <td className="px-2 py-1.5 font-mono text-gray-400 whitespace-nowrap">
-                  {col.refTable
-                    ? col.refListField
-                      ? `${col.refTable}.${col.refListField}`
-                      : col.refTable
-                    : '—'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <SchemaExplorerView
+        columns={columns}
+        onSuggestFollowUp={onSuggestFollowUp}
+      />
     </CollapsibleToolPanel>
   );
 }

@@ -28,7 +28,7 @@ export function isToolPanelVisible(
     return false;
   }
   if (isFirebirdTool(toolName)) {
-    return developerMode; // Maybe it should be true for all tools in the future
+    return developerMode; // TODO: Maybe it should be true for all tools in the future
   }
   return developerMode;
 }

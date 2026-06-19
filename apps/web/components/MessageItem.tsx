@@ -6,6 +6,8 @@ import { ListTodo, Loader, Square, SquareCheckBig } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import DataTableView from "./DataTableView";
+import ScalarResultView from "./ScalarResultView";
+import { detectResultViewMode } from "@/lib/chat/table-result-shape";
 import QueryPlanView from "./QueryPlanView";
 import ToolCallPanel from "./ToolCallPanel";
 import { chatMarkdownComponents } from "@/lib/chat/markdown-components";
@@ -21,11 +23,13 @@ interface MessageItemProps {
   message: Message;
   /** Hide GFM tables when data was already shown via present_query_result. */
   stripMarkdownTables?: boolean;
+  onSuggestFollowUp?: (text: string) => void;
 }
 
 export default function MessageItem({
   message,
   stripMarkdownTables: stripTables = false,
+  onSuggestFollowUp,
 }: MessageItemProps) {
   const isUser = message.role === "user";
   const locale = useLocaleStore((s) => s.locale);
@@ -80,11 +84,16 @@ export default function MessageItem({
             toolInput={message.toolInput}
             toolResult={message.toolResult}
             developerMode={developerMode}
+            onSuggestFollowUp={onSuggestFollowUp}
           />
         ) : message.planData ? (
           <QueryPlanView data={message.planData} />
         ) : message.tableData ? (
-          <DataTableView data={message.tableData} />
+          detectResultViewMode(message.tableData) === 'scalar' ? (
+            <ScalarResultView data={message.tableData} />
+          ) : (
+            <DataTableView data={message.tableData} />
+          )
         ) : message.id === TODO_MESSAGE_ID
           ? ((() => {
             let steps: ExecutionStep[] | undefined;

@@ -113,6 +113,36 @@ describe('parseDescribeTableTool', () => {
       assert.equal(countSensitiveColumns(result.columns), 1);
     }
   });
+
+  it('parses extended column metadata for schema explorer', () => {
+    const result = parseDescribeTableTool(
+      { tableName: 'GD_GOOD' },
+      JSON.stringify({
+        tableName: 'GD_GOOD',
+        columns: [
+          {
+            fieldName: 'GROUPKEY',
+            fieldType: 'INTEGER',
+            fieldLength: 4,
+            nullable: false,
+            refTable: 'GD_GOODGROUP',
+            refListField: 'NAME',
+            refTableDisplayName: 'Groups',
+          },
+        ],
+      })
+    );
+    assert.equal(result.kind, 'success');
+    if (result.kind === 'success') {
+      const col = result.columns[0];
+      assert.equal(col?.fieldType, 'INTEGER');
+      assert.equal(col?.fieldLength, 4);
+      assert.equal(col?.nullable, false);
+      assert.equal(col?.refTable, 'GD_GOODGROUP');
+      assert.equal(col?.refListField, 'NAME');
+      assert.equal(col?.refTableDisplayName, 'Groups');
+    }
+  });
 });
 
 describe('formatColumnList', () => {

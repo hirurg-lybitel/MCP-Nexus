@@ -13,9 +13,14 @@ import { useTranslations } from "@/lib/i18n/use-translations";
 interface MessageListProps {
   messages: Message[];
   loading: boolean;
+  onSuggestFollowUp?: (text: string) => void;
 }
 
-export default function MessageList({ messages, loading }: MessageListProps) {
+export default function MessageList({
+  messages,
+  loading,
+  onSuggestFollowUp,
+}: MessageListProps) {
   const endRef = useRef<HTMLDivElement>(null);
   const developerMode = useDeveloperModeStore((s) => s.developerMode);
   const { t } = useTranslations();
@@ -61,6 +66,7 @@ export default function MessageList({ messages, loading }: MessageListProps) {
               visibleMessages,
               idx
             )}
+            onSuggestFollowUp={onSuggestFollowUp}
           />
         ))}
 

@@ -11,6 +11,9 @@ import {
   Copy,
   Download,
 } from 'lucide-react';
+import TableQueryChip from './TableQueryChip';
+import TableChartView from './TableChartView';
+import { detectChartSpec } from '@/lib/chat/table-chart-detect';
 import type { TableColumn, TableDisplayData } from '@/types';
 import { useTranslations } from '@/lib/i18n/use-translations';
 import {
@@ -44,8 +47,9 @@ export default function DataTableView({ data }: DataTableViewProps) {
   const [sort, setSort] = useState<SortState | null>(null);
   const [page, setPage] = useState(1);
   const [showHiddenColumns, setShowHiddenColumns] = useState(false);
+  const [viewMode, setViewMode] = useState<'table' | 'chart'>('table');
 
-  const { title, columns, hiddenColumns, rows, meta } = data;
+  const { title, columns, hiddenColumns, rows, meta, sql, params } = data;
   const hiddenColumnCount =
     hiddenColumns?.length ?? meta?.hiddenColumnCount ?? 0;
 
@@ -58,6 +62,13 @@ export default function DataTableView({ data }: DataTableViewProps) {
     const filtered = filterTableRows(rows, visibleColumns, filterText);
     return sortTableRows(filtered, sort);
   }, [rows, visibleColumns, filterText, sort]);
+
+  const chartSpec = useMemo(
+    () => detectChartSpec(visibleColumns, processedRows),
+    [visibleColumns, processedRows]
+  );
+
+  const showChartTab = chartSpec.chartable;
 
   const { pageRows, totalPages, page: safePage } = useMemo(
     () => paginateRows(processedRows, page, DEFAULT_PAGE_SIZE),
@@ -185,6 +196,43 @@ export default function DataTableView({ data }: DataTableViewProps) {
         </div>
       </div>
 
+      <TableQueryChip sql={sql} params={params} />
+
+      {showChartTab && (
+        <div className="flex gap-1 rounded-md border border-gray-600/80 bg-gray-900/50 p-0.5 w-fit">
+          <button
+            type="button"
+            onClick={() => setViewMode('table')}
+            className={`px-2.5 py-1 text-xs rounded transition-colors ${
+              viewMode === 'table'
+                ? 'bg-gray-700 text-gray-100'
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            {t('table.viewTable')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('chart')}
+            className={`px-2.5 py-1 text-xs rounded transition-colors ${
+              viewMode === 'chart'
+                ? 'bg-gray-700 text-gray-100'
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            {t('table.viewChart')}
+          </button>
+        </div>
+      )}
+
+      {viewMode === 'chart' && showChartTab && chartSpec.chartable ? (
+        <TableChartView
+          spec={chartSpec}
+          columns={visibleColumns}
+          rows={processedRows}
+        />
+      ) : (
+        <>
       <input
         type="search"
         value={filterText}
@@ -289,6 +337,8 @@ export default function DataTableView({ data }: DataTableViewProps) {
             </button>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );

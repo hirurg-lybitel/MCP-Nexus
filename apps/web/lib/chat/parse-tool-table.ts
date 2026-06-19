@@ -73,12 +73,30 @@ export function parseTableFromToolResult(
       label: labelForColumn(key, columnLabels),
     }));
 
+  const sql =
+    typeof record.sql === 'string' && record.sql.trim()
+      ? record.sql.trim()
+      : undefined;
+  const tableName =
+    typeof record.tableName === 'string' && record.tableName.trim()
+      ? record.tableName.trim()
+      : undefined;
+  const params =
+    record.params &&
+    typeof record.params === 'object' &&
+    !Array.isArray(record.params)
+      ? (record.params as Record<string, unknown>)
+      : undefined;
+
   return {
     title,
     columns,
     hiddenColumns:
       hiddenColumns.length > 0 ? hiddenColumns : undefined,
     rows: rowObjects,
+    sql,
+    params,
+    tableName,
     meta: {
       rowCount:
         typeof record.rowCount === 'number'

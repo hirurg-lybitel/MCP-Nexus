@@ -111,5 +111,13 @@ export async function enrichPresentQueryResult(
     payload.keyFields = keyFields;
   }
 
+  if (sql) {
+    payload.sql = sql;
+  }
+
+  if (input.params && Object.keys(input.params).length > 0) {
+    payload.params = input.params;
+  }
+
   return payload;
 }

@@ -35,8 +35,13 @@ export interface DescribeColumnInfo {
   fieldName: string;
   displayName?: string | null;
   fieldType?: string | null;
+  fieldLength?: number | null;
+  nullable?: boolean | null;
+  position?: number | null;
+  constraintType?: string | null;
   refTable?: string | null;
   refListField?: string | null;
+  refTableDisplayName?: string | null;
   sensitive?: boolean;
 }
 
@@ -221,9 +226,20 @@ function parseDescribeColumns(raw: unknown): DescribeColumnInfo[] {
       displayName:
         typeof col.displayName === 'string' ? col.displayName : null,
       fieldType: typeof col.fieldType === 'string' ? col.fieldType : null,
+      fieldLength:
+        typeof col.fieldLength === 'number' ? col.fieldLength : null,
+      nullable:
+        typeof col.nullable === 'boolean' ? col.nullable : null,
+      position: typeof col.position === 'number' ? col.position : null,
+      constraintType:
+        typeof col.constraintType === 'string' ? col.constraintType : null,
       refTable: typeof col.refTable === 'string' ? col.refTable : null,
       refListField:
         typeof col.refListField === 'string' ? col.refListField : null,
+      refTableDisplayName:
+        typeof col.refTableDisplayName === 'string'
+          ? col.refTableDisplayName
+          : null,
       sensitive: col.sensitive === true,
     }))
     .filter((c) => c.fieldName.length > 0);

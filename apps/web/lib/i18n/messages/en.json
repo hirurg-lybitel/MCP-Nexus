@@ -91,6 +91,18 @@
         "ref": "Reference",
         "sensitiveBadge": "sensitive"
       },
+      "schema": {
+        "suggestFollowUp": "Suggest follow-up",
+        "notNull": "NOT NULL",
+        "sensitiveBannerOne": "{{count}} sensitive field in this table",
+        "sensitiveBannerMany": "{{count}} sensitive fields in this table",
+        "groups": {
+          "identifiers": "Identifiers",
+          "references": "References",
+          "business": "Business fields",
+          "sensitive": "Sensitive"
+        }
+      },
       "tableList": {
         "filterPlaceholder": "Filter tables…",
         "noMatch": "No matching tables"
@@ -136,7 +148,15 @@
     "paginationRange": "{{start}}–{{end}} of {{total}}",
     "paginationPage": "Page {{page}} / {{totalPages}}",
     "paginationPrev": "Previous page",
-    "paginationNext": "Next page"
+    "paginationNext": "Next page",
+    "queryLabel": "Query",
+    "showQuery": "Show",
+    "hideQuery": "Hide",
+    "paramsLabel": "Params",
+    "scalarTitle": "Result",
+    "viewTable": "Table",
+    "viewChart": "Chart",
+    "chartUnavailable": "Chart not available for this data"
   },
   "settings": {
     "title": "Settings",

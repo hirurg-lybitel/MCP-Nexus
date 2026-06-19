@@ -29,11 +29,35 @@ function slimDescribeTableColumns(
       if (col.displayName != null && String(col.displayName).trim()) {
         slim.displayName = col.displayName;
       }
+      if (col.fieldType != null && String(col.fieldType).trim()) {
+        slim.fieldType = col.fieldType;
+      }
+      if (typeof col.fieldLength === 'number') {
+        slim.fieldLength = col.fieldLength;
+      }
+      if (typeof col.nullable === 'boolean') {
+        slim.nullable = col.nullable;
+      }
+      if (typeof col.position === 'number') {
+        slim.position = col.position;
+      }
+      if (col.constraintType != null && String(col.constraintType).trim()) {
+        slim.constraintType = col.constraintType;
+      }
       if (col.sensitive === true) {
         slim.sensitive = true;
       }
       if (col.refTable != null && String(col.refTable).trim()) {
         slim.refTable = col.refTable;
+      }
+      if (col.refListField != null && String(col.refListField).trim()) {
+        slim.refListField = col.refListField;
+      }
+      if (
+        col.refTableDisplayName != null &&
+        String(col.refTableDisplayName).trim()
+      ) {
+        slim.refTableDisplayName = col.refTableDisplayName;
       }
       return slim;
     });
