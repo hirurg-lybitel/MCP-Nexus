@@ -28,12 +28,18 @@ function tryRequestNotificationPermission(enabled: boolean): void {
 }
 
 export function useNotificationPermissionOnOpen(enabled: boolean): void {
-  const [hydrated, setHydrated] = useState(() =>
-    useNotificationSettingsStore.persist.hasHydrated()
-  );
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const unsub = useNotificationSettingsStore.persist.onFinishHydration(() => {
+    const persist = useNotificationSettingsStore.persist;
+    if (!persist) {
+      setHydrated(true);
+      return;
+    }
+
+    setHydrated(persist.hasHydrated());
+
+    const unsub = persist.onFinishHydration(() => {
       setHydrated(true);
     });
 
