@@ -33,6 +33,7 @@ import { useMcpKeyStore } from '@/stores/useMcpKeyStore';
 import Link from 'next/link';
 import { Trash, TriangleAlert } from 'lucide-react';
 import PromptArgsModal from './PromptArgsModal';
+import ConfirmDialog from './ConfirmDialog';
 import { McpPrompt } from '@/lib/mcp/client';
 import Button from './basic/Button';
 import { parseQueryPlanFromToolResult } from '@/lib/chat/parse-query-plan';
@@ -96,6 +97,7 @@ export default function GPTAssistant() {
   const [commandFilter, setCommandFilter] = useState('');
   const [selectedPromptIndex, setSelectedPromptIndex] = useState(0);
   const [showArgsModal, setShowArgsModal] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState<McpPrompt | null>(null);
 
   const { token } = useTokenStore();
@@ -665,7 +667,7 @@ export default function GPTAssistant() {
     setInput('');
   }
 
-  function handleClearHistory() {
+  function handleConfirmClearHistory() {
     setMessages([]);
   }
 
@@ -679,6 +681,17 @@ export default function GPTAssistant() {
           selectedPrompt ? getUserPromptArguments(selectedPrompt) : []
         }
         promptName={selectedPrompt?.name || ''}
+      />
+
+      <ConfirmDialog
+        isOpen={showClearConfirm}
+        onClose={() => setShowClearConfirm(false)}
+        onConfirm={handleConfirmClearHistory}
+        title={t('chat.clearHistoryConfirmTitle')}
+        message={t('chat.clearHistoryConfirmMessage')}
+        confirmLabel={t('chat.clearHistoryConfirm')}
+        cancelLabel={t('promptModal.cancel')}
+        confirmDisabled={loading}
       />
 
       <ToolsPanel tools={toolsList} />
@@ -699,7 +712,7 @@ export default function GPTAssistant() {
                 <Button
                   variant="danger"
                   size="xs"
-                  onClick={handleClearHistory}
+                  onClick={() => setShowClearConfirm(true)}
                   disabled={loading}
                   title={t('chat.clearHistory')}
                 >
