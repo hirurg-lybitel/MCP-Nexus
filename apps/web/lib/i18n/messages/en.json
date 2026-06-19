@@ -53,7 +53,49 @@
     "parameters": "Parameters",
     "noParameters": "No parameters required",
     "required": "Required",
-    "close": "Close"
+    "close": "Close",
+    "rawTranscript": "Raw transcript",
+    "firebird": {
+      "executeSql": {
+        "title": "Execute SQL",
+        "rowOne": "{{count}} row",
+        "rowMany": "{{count}} rows",
+        "sqlLabel": "SQL",
+        "columnsLabel": "Columns"
+      },
+      "searchTables": {
+        "title": "Search tables",
+        "none": "No tables found",
+        "noneForQuery": "No tables for «{{query}}»",
+        "foundOne": "{{count}} table",
+        "foundMany": "{{count}} tables",
+        "foundOneForQuery": "{{count}} table for «{{query}}»",
+        "foundManyForQuery": "{{count}} tables for «{{query}}»"
+      },
+      "listTables": {
+        "title": "List tables",
+        "none": "Catalog is empty",
+        "foundOne": "{{count}} table in catalog",
+        "foundMany": "{{count}} tables in catalog"
+      },
+      "describeTable": {
+        "title": "Describe table",
+        "unknownTable": "Unknown table",
+        "noColumns": "No columns",
+        "columnOne": "{{count}} column",
+        "columnMany": "{{count}} columns",
+        "sensitiveOne": "{{count}} sensitive",
+        "sensitiveMany": "{{count}} sensitive",
+        "field": "Field",
+        "displayName": "Display name",
+        "ref": "Reference",
+        "sensitiveBadge": "sensitive"
+      },
+      "tableList": {
+        "filterPlaceholder": "Filter tables…",
+        "noMatch": "No matching tables"
+      }
+    }
   },
   "plan": {
     "todos": "To-dos",
@@ -85,7 +127,16 @@
     "copy": "Copy",
     "copyPartial": "Copy (shown rows)",
     "copySuccess": "Copied",
-    "copyFailed": "Copy failed"
+    "copyFailed": "Copy failed",
+    "filterPlaceholder": "Filter rows…",
+    "noFilterMatch": "No rows match the filter.",
+    "showHiddenColumnsOne": "Show {{count}} hidden column",
+    "showHiddenColumnsMany": "Show {{count}} hidden columns",
+    "hideHiddenColumns": "Hide extra columns",
+    "paginationRange": "{{start}}–{{end}} of {{total}}",
+    "paginationPage": "Page {{page}} / {{totalPages}}",
+    "paginationPrev": "Previous page",
+    "paginationNext": "Next page"
   },
   "settings": {
     "title": "Settings",
@@ -110,7 +161,7 @@
     "characters": "{{current}} / {{max}} characters",
     "clear": "Clear",
     "developerTitle": "Developer",
-    "developerDescription": "When enabled, the chat shows collapsible \"Using:\" panels for each tool call (SQL input, summaries, and raw results). Tables, query plans, and assistant replies are always visible.",
+    "developerDescription": "When enabled, expanded tool panels include raw input/output JSON. Firebird activity summaries (search, schema, SQL) are always visible in chat. Tables, query plans, and assistant replies are always visible.",
     "developerMode": "Developer mode",
     "navTitle": "Navigation",
     "goToChat": "Go to Chat",

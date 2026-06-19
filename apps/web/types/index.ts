@@ -34,6 +34,8 @@ export interface TableDisplayData {
   title?: string;
   columns: TableColumn[];
   rows: Record<string, unknown>[];
+  /** Columns hidden by default; user can toggle in UI. */
+  hiddenColumns?: TableColumn[];
   meta?: {
     rowCount?: number;
     truncated?: boolean;

@@ -6,6 +6,7 @@ import {
   parseTableFromToolResult,
   shouldShowToolCallPanel,
 } from './parse-tool-table';
+import { isToolPanelVisible } from './tool-ui';
 
 describe('parseTableFromToolResult', () => {
   it('parses present_query_result rows with columnLabels', () => {
@@ -28,6 +29,8 @@ describe('parseTableFromToolResult', () => {
     assert.equal(nameCol?.label, 'Наименование');
     assert.ok(!result!.columns.some((c) => c.key === 'ID'));
     assert.equal(result!.rows.length, 2);
+    assert.ok(result!.rows[0]?.ID !== undefined);
+    assert.ok(result!.hiddenColumns?.some((c) => c.key === 'ID'));
   });
 
   it('hides RDB key columns when keyFields in payload', () => {
@@ -115,5 +118,16 @@ describe('shouldShowToolCallPanel', () => {
     assert.equal(shouldShowToolCallPanel('search_tables'), true);
     assert.equal(shouldShowToolCallPanel('describe_table'), true);
     assert.equal(shouldShowToolCallPanel('get_horoscope'), true);
+  });
+});
+
+describe('isToolPanelVisible', () => {
+  it('shows Firebird tools always', () => {
+    assert.equal(isToolPanelVisible('execute_sql', false), true);
+  });
+
+  it('requires developer mode for other tools', () => {
+    assert.equal(isToolPanelVisible('get_horoscope', false), false);
+    assert.equal(isToolPanelVisible('get_horoscope', true), true);
   });
 });

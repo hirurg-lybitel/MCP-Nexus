@@ -1,8 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ChevronDown, Zap } from 'lucide-react';
+import { isFirebirdTool } from '@/lib/chat/firebird-tools';
 import { useTranslations } from '@/lib/i18n/use-translations';
+import ExecuteSqlToolPanel from './tools/ExecuteSqlToolPanel';
+import SearchTablesToolPanel from './tools/SearchTablesToolPanel';
+import DescribeTableToolPanel from './tools/DescribeTableToolPanel';
+import ListTablesToolPanel from './tools/ListTablesToolPanel';
 
 function prettifyJson(text: string): string {
   try {
@@ -18,13 +23,31 @@ function formatToolLabel(toolName: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function hasToolError(toolResult?: string): boolean {
+  if (!toolResult?.trim()) {
+    return false;
+  }
+  try {
+    const data = JSON.parse(toolResult) as unknown;
+    return (
+      data !== null &&
+      typeof data === 'object' &&
+      !Array.isArray(data) &&
+      typeof (data as Record<string, unknown>).error === 'string'
+    );
+  } catch {
+    return false;
+  }
+}
+
 interface ToolCallPanelProps {
   toolName: string;
   toolInput?: Record<string, unknown>;
   toolResult?: string;
+  developerMode?: boolean;
 }
 
-export default function ToolCallPanel({
+function GenericToolCallPanel({
   toolName,
   toolInput,
   toolResult,
@@ -83,5 +106,49 @@ export default function ToolCallPanel({
         </div>
       )}
     </div>
+  );
+}
+
+export default function ToolCallPanel({
+  toolName,
+  toolInput,
+  toolResult,
+  developerMode = false,
+}: ToolCallPanelProps) {
+  const defaultExpanded = useMemo(
+    // () => hasToolError(toolResult), // TODO: Uncomment this when we have a way to handle tool errors
+    () => false,
+    [toolResult]
+  );
+
+  const panelProps = {
+    toolInput,
+    toolResult,
+    defaultExpanded,
+    developerMode,
+  };
+
+  if (isFirebirdTool(toolName)) {
+    switch (toolName) {
+    case 'execute_sql':
+      return <ExecuteSqlToolPanel {...panelProps} />;
+    case 'search_tables':
+      return <SearchTablesToolPanel {...panelProps} />;
+    case 'describe_table':
+      return <DescribeTableToolPanel {...panelProps} />;
+    case 'list_tables':
+      return <ListTablesToolPanel {...panelProps} />;
+    default:
+      break;
+    }
+  }
+
+  return (
+    <GenericToolCallPanel
+      toolName={toolName}
+      toolInput={toolInput}
+      toolResult={toolResult}
+      developerMode={developerMode}
+    />
   );
 }

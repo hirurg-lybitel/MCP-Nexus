@@ -53,7 +53,49 @@
     "parameters": "Параметры",
     "noParameters": "Параметры не требуются",
     "required": "Обязательно",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "rawTranscript": "Сырой транскрипт",
+    "firebird": {
+      "executeSql": {
+        "title": "Выполнение SQL",
+        "rowOne": "{{count}} строка",
+        "rowMany": "{{count}} строк",
+        "sqlLabel": "SQL",
+        "columnsLabel": "Столбцы"
+      },
+      "searchTables": {
+        "title": "Поиск таблиц",
+        "none": "Таблицы не найдены",
+        "noneForQuery": "Нет таблиц для «{{query}}»",
+        "foundOne": "{{count}} таблица",
+        "foundMany": "{{count}} таблиц",
+        "foundOneForQuery": "{{count}} таблица для «{{query}}»",
+        "foundManyForQuery": "{{count}} таблиц для «{{query}}»"
+      },
+      "listTables": {
+        "title": "Список таблиц",
+        "none": "Каталог пуст",
+        "foundOne": "{{count}} таблица в каталоге",
+        "foundMany": "{{count}} таблиц в каталоге"
+      },
+      "describeTable": {
+        "title": "Описание таблицы",
+        "unknownTable": "Неизвестная таблица",
+        "noColumns": "Нет столбцов",
+        "columnOne": "{{count}} столбец",
+        "columnMany": "{{count}} столбцов",
+        "sensitiveOne": "{{count}} чувствительный",
+        "sensitiveMany": "{{count}} чувствительных",
+        "field": "Поле",
+        "displayName": "Отображаемое имя",
+        "ref": "Ссылка",
+        "sensitiveBadge": "чувств."
+      },
+      "tableList": {
+        "filterPlaceholder": "Фильтр таблиц…",
+        "noMatch": "Нет подходящих таблиц"
+      }
+    }
   },
   "plan": {
     "todos": "Задачи",
@@ -85,7 +127,16 @@
     "copy": "Копировать",
     "copyPartial": "Копировать (показанные строки)",
     "copySuccess": "Скопировано",
-    "copyFailed": "Не удалось скопировать"
+    "copyFailed": "Не удалось скопировать",
+    "filterPlaceholder": "Фильтр строк…",
+    "noFilterMatch": "Нет строк по фильтру.",
+    "showHiddenColumnsOne": "Показать {{count}} скрытый столбец",
+    "showHiddenColumnsMany": "Показать {{count}} скрытых столбцов",
+    "hideHiddenColumns": "Скрыть доп. столбцы",
+    "paginationRange": "{{start}}–{{end}} из {{total}}",
+    "paginationPage": "Стр. {{page}} / {{totalPages}}",
+    "paginationPrev": "Предыдущая страница",
+    "paginationNext": "Следующая страница"
   },
   "settings": {
     "title": "Настройки",
@@ -110,7 +161,7 @@
     "characters": "{{current}} / {{max}} символов",
     "clear": "Очистить",
     "developerTitle": "Разработчик",
-    "developerDescription": "При включении чат показывает сворачиваемые панели «Используется:» для каждого вызова инструмента (SQL-ввод, сводки и сырые результаты). Таблицы, планы запросов и ответы ассистента всегда видны.",
+    "developerDescription": "При включении развёрнутые панели инструментов показывают сырой JSON ввода/вывода. Краткие сводки Firebird (поиск, схема, SQL) всегда видны в чате. Таблицы, планы запросов и ответы ассистента всегда видны.",
     "developerMode": "Режим разработчика",
     "navTitle": "Навигация",
     "goToChat": "Перейти в чат",

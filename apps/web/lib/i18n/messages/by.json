@@ -53,7 +53,49 @@
     "parameters": "Параметры",
     "noParameters": "Параметры не патрабуюцца",
     "required": "Абавязкова",
-    "close": "Зачыніць"
+    "close": "Зачыніць",
+    "rawTranscript": "Сыры транскрыпт",
+    "firebird": {
+      "executeSql": {
+        "title": "Выкананне SQL",
+        "rowOne": "{{count}} радок",
+        "rowMany": "{{count}} радкоў",
+        "sqlLabel": "SQL",
+        "columnsLabel": "Слупкі"
+      },
+      "searchTables": {
+        "title": "Пошук табліц",
+        "none": "Табліцы не знойдзены",
+        "noneForQuery": "Няма табліц для «{{query}}»",
+        "foundOne": "{{count}} табліца",
+        "foundMany": "{{count}} табліц",
+        "foundOneForQuery": "{{count}} табліца для «{{query}}»",
+        "foundManyForQuery": "{{count}} табліц для «{{query}}»"
+      },
+      "listTables": {
+        "title": "Спіс табліц",
+        "none": "Каталог пусты",
+        "foundOne": "{{count}} табліца ў каталогу",
+        "foundMany": "{{count}} табліц у каталогу"
+      },
+      "describeTable": {
+        "title": "Апісанне табліцы",
+        "unknownTable": "Невядомая табліца",
+        "noColumns": "Няма слупкоў",
+        "columnOne": "{{count}} слупок",
+        "columnMany": "{{count}} слупкоў",
+        "sensitiveOne": "{{count}} чувствіты",
+        "sensitiveMany": "{{count}} чувствітых",
+        "field": "Поле",
+        "displayName": "Адлюстраванае імя",
+        "ref": "Спасылка",
+        "sensitiveBadge": "чувств."
+      },
+      "tableList": {
+        "filterPlaceholder": "Фільтр табліц…",
+        "noMatch": "Няма падыходных табліц"
+      }
+    }
   },
   "plan": {
     "todos": "Задачы",
@@ -85,7 +127,16 @@
     "copy": "Капіраваць",
     "copyPartial": "Капіраваць (паказаныя радкі)",
     "copySuccess": "Скапіравана",
-    "copyFailed": "Не ўдалося скапіраваць"
+    "copyFailed": "Не ўдалося скапіраваць",
+    "filterPlaceholder": "Фільтр радкоў…",
+    "noFilterMatch": "Няма радкоў па фільтры.",
+    "showHiddenColumnsOne": "Паказаць {{count}} схаваны слупок",
+    "showHiddenColumnsMany": "Паказаць {{count}} схаваных слупкоў",
+    "hideHiddenColumns": "Схаваць дадат. слупкі",
+    "paginationRange": "{{start}}–{{end}} з {{total}}",
+    "paginationPage": "Стар. {{page}} / {{totalPages}}",
+    "paginationPrev": "Папярэдняя старонка",
+    "paginationNext": "Наступная старонка"
   },
   "settings": {
     "title": "Налады",
@@ -110,7 +161,7 @@
     "characters": "{{current}} / {{max}} сімвалаў",
     "clear": "Ачысціць",
     "developerTitle": "Распрацоўшчык",
-    "developerDescription": "Пры ўключэнні чат паказвае згортвальныя панэлі «Выкарыстоўваецца:» для кожнага выкліку інструмента (SQL-увод, зводкі і сырыя вынікі). Табліцы, планы запытаў і адказы асістэнта заўсёды бачныя.",
+    "developerDescription": "Пры ўключэнні разгорнутыя панэлі інструментаў паказваюць сыры JSON уводу/вываду. Кароткія зводкі Firebird (пошук, схема, SQL) заўсёды бачныя ў чаце. Табліцы, планы запытаў і адказы асістэнта заўсёды бачныя.",
     "developerMode": "Рэжым распрацоўшчыка",
     "navTitle": "Навігацыя",
     "goToChat": "Перайсці ў чат",

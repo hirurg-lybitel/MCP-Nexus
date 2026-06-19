@@ -6,7 +6,7 @@ import MessageItem from "./MessageItem";
 import { CHAT_CONTENT_MAX_WIDTH } from "@/constants";
 import { Message } from "@/types";
 import { shouldStripTablesAfterPresentation } from "@/lib/chat/strip-markdown-tables";
-import { isToolCallPanelMessage } from "@/lib/chat/tool-ui";
+import { isToolCallPanelMessage, isToolPanelVisible } from "@/lib/chat/tool-ui";
 import { useDeveloperModeStore } from "@/stores/useDeveloperModeStore";
 import { useTranslations } from "@/lib/i18n/use-translations";
 
@@ -22,9 +22,11 @@ export default function MessageList({ messages, loading }: MessageListProps) {
 
   const visibleMessages = useMemo(
     () =>
-      developerMode
-        ? messages
-        : messages.filter((message) => !isToolCallPanelMessage(message)),
+      messages.filter(
+        (message) =>
+          !isToolCallPanelMessage(message) ||
+          isToolPanelVisible(message.toolName!, developerMode)
+      ),
     [developerMode, messages]
   );
 

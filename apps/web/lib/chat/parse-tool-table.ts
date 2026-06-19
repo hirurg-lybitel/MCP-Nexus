@@ -62,10 +62,23 @@ export function parseTableFromToolResult(
     label: labelForColumn(key, columnLabels),
   }));
 
+  const displayKeySet = new Set(built.columns);
+  const allKeys = [
+    ...new Set(rowObjects.flatMap((row) => Object.keys(row))),
+  ].sort();
+  const hiddenColumns = allKeys
+    .filter((key) => !displayKeySet.has(key))
+    .map((key) => ({
+      key,
+      label: labelForColumn(key, columnLabels),
+    }));
+
   return {
     title,
     columns,
-    rows: built.rows,
+    hiddenColumns:
+      hiddenColumns.length > 0 ? hiddenColumns : undefined,
+    rows: rowObjects,
     meta: {
       rowCount:
         typeof record.rowCount === 'number'

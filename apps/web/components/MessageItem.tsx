@@ -14,6 +14,7 @@ import TurnUsageFooter from "./TurnUsageFooter";
 import { useLocaleStore } from "@/stores/useLocaleStore";
 import { localeToBcp47 } from "@/lib/i18n/types";
 import { useTranslations } from "@/lib/i18n/use-translations";
+import { useDeveloperModeStore } from "@/stores/useDeveloperModeStore";
 
 
 interface MessageItemProps {
@@ -29,6 +30,7 @@ export default function MessageItem({
   const isUser = message.role === "user";
   const locale = useLocaleStore((s) => s.locale);
   const { t } = useTranslations();
+  const developerMode = useDeveloperModeStore((s) => s.developerMode);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString(localeToBcp47(locale), {
@@ -52,6 +54,7 @@ export default function MessageItem({
 
   return (
     <div
+      aria-label="Message Item"
       className={`flex gap-3 min-w-0 w-full ${
         isUser ? "justify-end" : "justify-start"
       }`}
@@ -76,6 +79,7 @@ export default function MessageItem({
             toolName={message.toolName!}
             toolInput={message.toolInput}
             toolResult={message.toolResult}
+            developerMode={developerMode}
           />
         ) : message.planData ? (
           <QueryPlanView data={message.planData} />

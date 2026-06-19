@@ -35,7 +35,7 @@ function buildBaseSystemPrompt(): string {
     '- **Forbidden in final text:** markdown tables, pipe tables, repeating rows (ID: …, NAME: …), bullet lists of every row, ASCII tables.\n' +
     '- Say "см. таблицу выше" / "see the table above" instead of reprinting data.\n\n' +
     '## Tool UI\n' +
-    'Firebird MCP tools show a collapsible **Using:** panel (SQL input + summary, no row values in the chat UI). ' +
+    'Firebird MCP tools show brief activity lines in chat (search, schema, SQL summary — no row values). ' +
     'create_query_plan shows To-dos; present_query_result shows the data table only.'
   );
 }
