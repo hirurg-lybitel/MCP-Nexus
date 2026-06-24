@@ -11,6 +11,8 @@ import {
   CHAT_CONTENT_MAX_WIDTH,
   GPT_MODEL_GENERAL,
   GPT_PROXY_URL,
+  OPENAI_API_KEY,
+  OPENAI_PROJECT_KEY,
   QUERY_PLAN_MESSAGE_ID,
 } from '@/constants';
 import {
@@ -416,6 +418,8 @@ export default function GPTAssistant() {
         body: JSON.stringify({
           ...chatGPTRequest,
           security_key: token,
+          openai_api_key: OPENAI_API_KEY,
+          project: OPENAI_PROJECT_KEY,
         }),
         signal: abortController.signal,
       });
@@ -627,6 +631,8 @@ export default function GPTAssistant() {
           body: JSON.stringify({
             ...chatGPTRequest,
             security_key: token,
+            openai_api_key: OPENAI_API_KEY,
+            project: OPENAI_PROJECT_KEY,
           }),
           signal: abortController.signal,
         });

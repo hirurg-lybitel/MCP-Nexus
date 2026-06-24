@@ -56,6 +56,10 @@ MCP_PORT=4005
 NEXT_PUBLIC_MCP_PORT=4005
 NEXT_PUBLIC_OPENAI_SECURITY_KEY=replace-with-your-key
 
+# OpenAI credentials for GPT proxy (server-only — never NEXT_PUBLIC_*)
+OPENAI_API_KEY=sk-...
+OPENAI_PROJECT_KEY=proj_...
+
 # MCP access control (required in production)
 MCP_API_KEY=generate-a-long-random-secret
 
@@ -71,6 +75,8 @@ NODE_FB_DB=D:/path/to/database.fdb
 ```
 
 Set `MCP_API_KEY` to a long random secret before deploying. In production the MCP server rejects unauthenticated requests. The web UI must verify this key in **Settings**; the BFF at `/api/mcp` forwards the client `Authorization` header and does not inject the key automatically.
+
+Set `OPENAI_API_KEY` and optionally `OPENAI_PROJECT_KEY` in `.env` for chat; they are sent to the GPT proxy as `openai_api_key` and `project`. The proxy **security key** is entered per user in **Settings**.
 
 The `.env` file is in `.gitignore`. Without Firebird variables the MCP server still starts; Firebird tools return a clear configuration error.
 

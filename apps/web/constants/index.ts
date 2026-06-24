@@ -6,7 +6,9 @@ export const MCP_PORT = process.env.NEXT_PUBLIC_MCP_PORT ?? '4005';
 // export const MCP_URL = `http://localhost:${MCP_PORT}/mcp`;
 // export const MCP_URL = `api/mcp`;
 export const OPENAI_SECURITY_KEY = process.env.NEXT_PUBLIC_OPENAI_SECURITY_KEY;
-export const GPT_PROXY_URL = "https://chatgpt-proxy.gdmn.app/openai";
+export const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+export const OPENAI_PROJECT_KEY = process.env.OPENAI_PROJECT_KEY;
+export const GPT_PROXY_URL = 'https://chatgpt-proxy.gdmn.app/openai';
 
 export type GPT_MODEL = {
   model: string;
