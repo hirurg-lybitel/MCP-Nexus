@@ -1,3 +1,4 @@
+import './load-env';
 import { createServer } from 'node:http';
 import { parse } from 'node:url';
 import next from 'next';
@@ -6,8 +7,6 @@ import { startMcpServer } from './lib/mcp/server';
 import { MCP_PORT, PORT, HOST } from './constants';
 import { disposeDbServices } from '@mcp-nexus/db-firebird';
 import { logStartupDiagnostics } from './lib/log-startup-diagnostics';
-import dotenv from "dotenv";
-dotenv.config();
 
 logStartupDiagnostics();
 
