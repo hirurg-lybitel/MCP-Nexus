@@ -10,9 +10,6 @@ import { useMcpAdapter } from '@/lib/mcp/hook/useMcpAdapter';
 import {
   CHAT_CONTENT_MAX_WIDTH,
   GPT_MODEL_GENERAL,
-  GPT_PROXY_URL,
-  OPENAI_API_KEY,
-  OPENAI_PROJECT_KEY,
   QUERY_PLAN_MESSAGE_ID,
 } from '@/constants';
 import {
@@ -413,13 +410,12 @@ export default function GPTAssistant() {
         messages: conversationMessages,
       };
 
-      let response = await fetch(GPT_PROXY_URL, {
+      let response = await fetch('/api/openai', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...chatGPTRequest,
           security_key: token,
-          openai_api_key: OPENAI_API_KEY,
-          project: OPENAI_PROJECT_KEY,
         }),
         signal: abortController.signal,
       });
@@ -429,6 +425,11 @@ export default function GPTAssistant() {
 
         if (response.status === 403) {
           errorMessage = 'Authentication failed – please verify your OpenAI token.';
+          throw new Error(errorMessage);
+        }
+
+        if (response.status === 503) {
+          errorMessage = 'OpenAI is not configured on the server.';
           throw new Error(errorMessage);
         }
 
@@ -626,13 +627,12 @@ export default function GPTAssistant() {
           messages: conversationMessages,
         };
 
-        response = await fetch(GPT_PROXY_URL, {
+        response = await fetch('/api/openai', {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...chatGPTRequest,
             security_key: token,
-            openai_api_key: OPENAI_API_KEY,
-            project: OPENAI_PROJECT_KEY,
           }),
           signal: abortController.signal,
         });
