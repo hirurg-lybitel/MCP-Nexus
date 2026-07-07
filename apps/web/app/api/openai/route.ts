@@ -5,8 +5,9 @@ import {
 } from '@/lib/mcp/auth';
 import { NextResponse } from 'next/server';
 
-const RATE_LIMIT_MAX = 20;
-const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+/** Agent turns call the proxy many times (tool loop); allow burst per minute. */
+const RATE_LIMIT_MAX = 120;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
 export async function POST(request: Request) {
   const rateLimitKey = `openai-proxy:${getClientRateLimitKey(request)}`;
