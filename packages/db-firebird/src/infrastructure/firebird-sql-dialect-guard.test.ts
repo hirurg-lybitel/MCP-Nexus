@@ -36,11 +36,20 @@ describe('assertDialectCompatibleSql', () => {
     );
   });
 
-  it('rejects WITH on dialect 2.5', () => {
+  it('allows non-recursive WITH on dialect 2.5', () => {
+    assert.doesNotThrow(() =>
+      assertDialectCompatibleSql(
+        'WITH cte AS (SELECT 1 AS x FROM RDB$DATABASE) SELECT * FROM cte',
+        '2.5'
+      )
+    );
+  });
+
+  it('rejects OFFSET/FETCH on dialect 2.5', () => {
     assert.throws(
       () =>
         assertDialectCompatibleSql(
-          'WITH cte AS (SELECT 1 AS x FROM RDB$DATABASE) SELECT * FROM cte',
+          'SELECT ID FROM GD_GOOD ORDER BY ID OFFSET 10 ROWS FETCH NEXT 5 ROWS ONLY',
           '2.5'
         ),
       DialectSqlError

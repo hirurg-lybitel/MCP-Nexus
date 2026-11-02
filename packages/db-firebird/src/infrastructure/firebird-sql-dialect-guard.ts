@@ -1,8 +1,14 @@
 import type { FirebirdSqlDialect } from '../sql-dialect';
 import { DialectSqlError } from '../domain/errors';
+
+/**
+ * Firebird 2.1+ supports non-recursive CTEs (WITH). Window functions and
+ * OFFSET/FETCH appear in 3.0. Dialect '2.5' therefore allows WITH but blocks
+ * windows and RECURSIVE; dialect '3' allows all of the above.
+ */
 const DIALECT_25_MESSAGE =
-  'Window functions / CTEs are disabled for Firebird SQL dialect 2.5. ' +
-  'Use a flat SELECT FIRST … ORDER BY. Row numbers are added automatically by the chat UI — do not use ROW_NUMBER in SQL.';
+  'Window functions and WITH RECURSIVE are unavailable on Firebird 2.5. ' +
+  'Non-recursive WITH (CTE) is allowed. Prefer SELECT FIRST … ORDER BY when possible.';
 
 const WINDOW_FUNCTION_PATTERNS = [
   /\bOVER\s*\(/i,
@@ -14,9 +20,12 @@ const WINDOW_FUNCTION_PATTERNS = [
   /\bLAG\s*\(/i,
   /\bFIRST_VALUE\s*\(/i,
   /\bLAST_VALUE\s*\(/i,
+  /\bOFFSET\s+\d+/i,
+  /\bFETCH\s+(FIRST|NEXT)\b/i,
 ] as const;
 
-export function assertDialectCompatibleSql(  sql: string,
+export function assertDialectCompatibleSql(
+  sql: string,
   dialect: FirebirdSqlDialect
 ): void {
   if (dialect === '3') {
@@ -29,16 +38,8 @@ export function assertDialectCompatibleSql(  sql: string,
   }
 
   const withoutComments = stripSqlComments(trimmed);
-  const firstToken = withoutComments.split(/\s+/)[0]?.toUpperCase();
 
-  if (firstToken === 'WITH') {
-    throw new DialectSqlError(DIALECT_25_MESSAGE);
-  }
-
-  if (
-    /\bWITH\s+RECURSIVE\b/i.test(withoutComments) ||
-    /\bRECURSIVE\b/i.test(withoutComments)
-  ) {
+  if (/\bWITH\s+RECURSIVE\b/i.test(withoutComments)) {
     throw new DialectSqlError(DIALECT_25_MESSAGE);
   }
 

@@ -34,6 +34,6 @@ export function describeFirebirdSqlDialect(dialect: FirebirdSqlDialect): string[
 
   return [
     ...shared,
-    'Dialect 2.5: no WITH (CTE), no window functions, no RECURSIVE — use flat SELECT … FROM … JOIN … only.',
+    'Dialect 2.5: non-recursive WITH (CTE) is allowed; no window functions, no WITH RECURSIVE, no OFFSET/FETCH.',
   ];
 }
