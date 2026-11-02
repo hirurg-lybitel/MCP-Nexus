@@ -12,7 +12,8 @@ const candidates = [
 
 for (const path of candidates) {
   if (existsSync(path)) {
-    loadDotenv({ path, override: false });
+    // quiet: never write to stdout — MCP stdio treats any non-JSON as a protocol break
+    loadDotenv({ path, override: false, quiet: true });
     break;
   }
 }
