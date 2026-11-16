@@ -6,6 +6,10 @@ node_modules
 # Testing
 coverage
 
+# MCP audit journal (2.2)
+logs/
+*.jsonl
+
 # Next.js
 .next/
 out/

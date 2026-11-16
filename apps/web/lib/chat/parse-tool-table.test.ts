@@ -136,6 +136,19 @@ describe('parseTableFromToolResult', () => {
     );
   });
 
+  it('auto-renders accounting report tools as UI tables (BUG-12)', () => {
+    const table = parseTableFromToolResult(
+      'get_trial_balance',
+      JSON.stringify({
+        dateBegin: '2025-12-01',
+        dateEnd: '2025-12-31',
+        accounts: [{ ACCOUNT_ALIAS: '51', DEBIT: '1', CREDIT: '0' }],
+      })
+    );
+    assert.ok(table);
+    assert.equal(table!.rows.length, 1);
+  });
+
   it('ignores non-tabular tools', () => {
     assert.equal(
       parseTableFromToolResult('get_humidity', '{"message":"50%"}'),

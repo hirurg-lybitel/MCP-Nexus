@@ -5,10 +5,12 @@ const FORBIDDEN_KEYWORDS =
 
 /** Firebird-specific write/side-effect patterns inside SELECT. */
 const FORBIDDEN_PATTERNS = [
-  /\bGEN_ID\s*\(/i,
   /\bFOR\s+UPDATE\b/i,
   /\bINTO\b/i,
 ] as const;
+
+/** GEN_ID(name, 0) only reads the generator (platform CLOSEDATE). Non-zero step mutates. */
+const GEN_ID_MUTATING = /\bGEN_ID\s*\(\s*[^,]+,\s*(?!0\s*\))(-?\d+|:[a-z_][\w$]*|[a-z_][\w$]*)\s*\)/i;
 
 export function assertReadOnlySql(sql: string): void {
   const trimmed = sql.trim();
@@ -23,6 +25,10 @@ export function assertReadOnlySql(sql: string): void {
   const withoutComments = stripSqlComments(trimmed);
 
   if (FORBIDDEN_KEYWORDS.test(withoutComments)) {
+    throw new ReadOnlySqlError('Only read-only SELECT queries are allowed.');
+  }
+
+  if (GEN_ID_MUTATING.test(withoutComments)) {
     throw new ReadOnlySqlError('Only read-only SELECT queries are allowed.');
   }
 

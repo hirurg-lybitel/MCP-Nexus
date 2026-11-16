@@ -3,9 +3,14 @@ import type { TableDisplayData } from '@/types';
 import { labelForColumn, normalizeColumnLabels } from './column-labels';
 import { buildDisplayTableFromRows } from './column-picker';
 import { columnMetaForKey, normalizeColumnMetaMap } from './column-meta';
+import { parseAccountingToolTable } from './parse-accounting-table';
 import { normalizeTableKeyFields } from './table-key-fields';
 
 export { isSilentFirebirdToolUi, shouldShowToolCallPanel } from './tool-ui';
+export {
+  isAccountingTableTool,
+  parseAccountingToolTable,
+} from './parse-accounting-table';
 
 /** Host agent tool — renders the chat data table. */
 export const AGENT_PRESENT_TABLE_TOOL = AgentToolName.PresentQueryResult;
@@ -21,7 +26,7 @@ export function parseTableFromToolResult(
   resultText: string
 ): TableDisplayData | null {
   if (toolName !== AGENT_PRESENT_TABLE_TOOL) {
-    return null;
+    return parseAccountingToolTable(toolName, resultText);
   }
 
   let data: unknown;

@@ -71,8 +71,9 @@ NODE_FB_PORT=3050
 NODE_FB_DB=D:/path/to/database.fdb
 # FIREBIRD_MAX_ROWS=500
 # FIREBIRD_QUERY_TIMEOUT_MS=30000
-# FIREBIRD_SQL_DIALECT=2.5
+# FIREBIRD_SQL_DIALECT=3
 ```
+
 
 Set `MCP_API_KEY` to a long random secret before deploying. In production the MCP server rejects unauthenticated requests. The web UI must verify this key in **Settings**; the BFF at `/api/mcp` forwards the client `Authorization` header and does not inject the key automatically.
 
@@ -264,9 +265,12 @@ Database access lives in [`packages/db-firebird`](packages/db-firebird). MCP wir
 All SQL goes through a single executor ([`ReadQueryExecutor`](packages/db-firebird/src/infrastructure/read-query-executor.ts)) with defense in depth:
 
 1. **SQL text guard** ([`assertReadOnlySql`](packages/db-firebird/src/infrastructure/read-only-sql-guard.ts)) — only `SELECT` / `WITH`; blocks `;`, DML/DDL keywords, `EXECUTE`, `GEN_ID`, `FOR UPDATE`, `INTO`.
-2. **Dialect guard** ([`assertDialectCompatibleSql`](packages/db-firebird/src/infrastructure/firebird-sql-dialect-guard.ts)) — when `FIREBIRD_SQL_DIALECT=2.5` (default), blocks CTEs (`WITH`), window functions (`OVER`, `ROW_NUMBER`, …), and `RECURSIVE`. Set `FIREBIRD_SQL_DIALECT=3` on Firebird 3+ deployments to allow modern SQL. Mirror the same value in `NEXT_PUBLIC_FIREBIRD_SQL_DIALECT` so the chat system prompt matches server validation.
-3. **Firebird transaction** — every query runs in `accessMode: 'READ_ONLY'`.
-4. **Preflight on `execute_sql`** — table names validated against the schema; `SELECT *` blocked on tables with sensitive columns; row and timeout limits.
+2. **Engine gate** — on connect, `rdb$get_context('SYSTEM','ENGINE_VERSION')` must be major ≥ 5 (`FirebirdUnsupportedEngineError`). Override floor with `FIREBIRD_MIN_ENGINE_MAJOR` only for emergency local experiments.
+3. **D13** — session `SET BIND OF INT128/DECFLOAT TO LEGACY`; query rows normalize non-integer numerics to decimal strings and text BLOBs to UTF-8.
+4. **D14** — `getCompatibilityProfile()` probes UDFs used by computed fields and lists `unavailableTables` when modules are missing.
+3. **Dialect guard** ([`assertDialectCompatibleSql`](packages/db-firebird/src/infrastructure/firebird-sql-dialect-guard.ts)) — target is **Firebird 5** (`FIREBIRD_SQL_DIALECT=3` by default): CTE, `WITH RECURSIVE`, window functions, `OFFSET/FETCH` allowed. Clients on Firebird 2.5 must upgrade the database. Legacy `FIREBIRD_SQL_DIALECT=2.5` is a local override only. Mirror the value in `NEXT_PUBLIC_FIREBIRD_SQL_DIALECT` for the chat system prompt.
+4. **Firebird transaction** — every query runs in `accessMode: 'READ_ONLY'`.
+5. **Preflight on `execute_sql`** — table names validated against the schema; `SELECT *` blocked on tables with sensitive columns; row and timeout limits.
 
 There is **no** runtime switch to allow writes (`FIREBIRD_ALLOW_WRITE` is not implemented).
 

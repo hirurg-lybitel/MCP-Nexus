@@ -10,4 +10,11 @@ describe('extractTableNamesFromSql', () => {
     `);
     assert.deepEqual(tables.sort(), ['GD_GOOD', 'GD_GOODGROUP']);
   });
+
+  it('ignores FROM inside EXTRACT', () => {
+    const tables = extractTableNamesFromSql(`
+      SELECT EXTRACT(MONTH FROM e.entrydate) FROM ac_entry e
+    `);
+    assert.deepEqual(tables.sort(), ['AC_ENTRY']);
+  });
 });

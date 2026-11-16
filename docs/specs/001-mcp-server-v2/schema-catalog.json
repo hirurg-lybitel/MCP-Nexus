@@ -1,0 +1,2930 @@
+{
+  "generatedAt": "2026-11-03T00:37:51.682Z",
+  "tableCount": 976,
+  "tables": [
+    {
+      "tableName": "AC_ACCANALYTICSEXT",
+      "displayName": "AC_ACCANALYTICSEXT"
+    },
+    {
+      "tableName": "AC_ACCOUNT",
+      "displayName": "План счетов"
+    },
+    {
+      "tableName": "AC_ACCT_CONFIG",
+      "displayName": "AC_ACCT_CONFIG"
+    },
+    {
+      "tableName": "AC_ACCVALUE",
+      "displayName": "AC_ACCVALUE"
+    },
+    {
+      "tableName": "AC_AUTOENTRY",
+      "displayName": "AC_AUTOENTRY"
+    },
+    {
+      "tableName": "AC_AUTOTRANSACTION",
+      "displayName": "AC_AUTOTRANSACTION"
+    },
+    {
+      "tableName": "AC_AUTOTRRECORD",
+      "displayName": "AC_AUTOTRRECORD"
+    },
+    {
+      "tableName": "AC_COMPANYACCOUNT",
+      "displayName": "План счетов для организации"
+    },
+    {
+      "tableName": "AC_ENTRY",
+      "displayName": "Проводки"
+    },
+    {
+      "tableName": "AC_ENTRY_BALANCE",
+      "displayName": "AC_ENTRY_BALANCE"
+    },
+    {
+      "tableName": "AC_GENERALLEDGER",
+      "displayName": "AC_GENERALLEDGER"
+    },
+    {
+      "tableName": "AC_G_LEDGERACCOUNT",
+      "displayName": "AC_G_LEDGERACCOUNT"
+    },
+    {
+      "tableName": "AC_INCORRECT_RECORD",
+      "displayName": "AC_INCORRECT_RECORD"
+    },
+    {
+      "tableName": "AC_LEDGER",
+      "displayName": "Настройка журнала-ордера"
+    },
+    {
+      "tableName": "AC_LEDGER_ACCOUNTS",
+      "displayName": "AC_LEDGER_ACCOUNTS"
+    },
+    {
+      "tableName": "AC_LEDGER_ENTRIES",
+      "displayName": "AC_LEDGER_ENTRIES"
+    },
+    {
+      "tableName": "AC_OVERTURNBYANAL",
+      "displayName": "AC_OVERTURNBYANAL"
+    },
+    {
+      "tableName": "AC_QUANTITY",
+      "displayName": "Количественные показатели"
+    },
+    {
+      "tableName": "AC_QUANTITY_TRIM_TEMP",
+      "displayName": "AC_QUANTITY_TRIM_TEMP"
+    },
+    {
+      "tableName": "AC_RECORD",
+      "displayName": "Проводки (заголовок)"
+    },
+    {
+      "tableName": "AC_SCRIPT",
+      "displayName": "Функции для формирования проводок"
+    },
+    {
+      "tableName": "AC_TRANSACTION",
+      "displayName": "Типовые операции"
+    },
+    {
+      "tableName": "AC_TRENTRY",
+      "displayName": "Типовые проводки (позиция)"
+    },
+    {
+      "tableName": "AC_TRRECORD",
+      "displayName": "Типовые проводки (заголовок)"
+    },
+    {
+      "tableName": "AT_CHECK_CONSTRAINTS",
+      "displayName": "AT_CHECK_CONSTRAINTS"
+    },
+    {
+      "tableName": "AT_DATABASE",
+      "displayName": "AT_DATABASE"
+    },
+    {
+      "tableName": "AT_EXCEPTIONS",
+      "displayName": "Исключения"
+    },
+    {
+      "tableName": "AT_FIELDS",
+      "displayName": "Домены"
+    },
+    {
+      "tableName": "AT_GENERATORS",
+      "displayName": "Генераторы"
+    },
+    {
+      "tableName": "AT_INDICES",
+      "displayName": "Индексы"
+    },
+    {
+      "tableName": "AT_NAMESPACE",
+      "displayName": "AT_NAMESPACE"
+    },
+    {
+      "tableName": "AT_NAMESPACE_FILE",
+      "displayName": "AT_NAMESPACE_FILE"
+    },
+    {
+      "tableName": "AT_NAMESPACE_FILE_LINK",
+      "displayName": "AT_NAMESPACE_FILE_LINK"
+    },
+    {
+      "tableName": "AT_NAMESPACE_LINK",
+      "displayName": "AT_NAMESPACE_LINK"
+    },
+    {
+      "tableName": "AT_NAMESPACE_SYNC",
+      "displayName": "AT_NAMESPACE_SYNC"
+    },
+    {
+      "tableName": "AT_OBJECT",
+      "displayName": "AT_OBJECT"
+    },
+    {
+      "tableName": "AT_PROCEDURES",
+      "displayName": "Процедуры"
+    },
+    {
+      "tableName": "AT_RELATIONS",
+      "displayName": "Таблицы"
+    },
+    {
+      "tableName": "AT_RELATION_FIELDS",
+      "displayName": "Поля таблиц"
+    },
+    {
+      "tableName": "AT_SETTING",
+      "displayName": "Настройки"
+    },
+    {
+      "tableName": "AT_SETTINGPOS",
+      "displayName": "Позиции настроек"
+    },
+    {
+      "tableName": "AT_SETTING_STORAGE",
+      "displayName": "Позиция настроек для хранилища"
+    },
+    {
+      "tableName": "AT_TRANSACTION",
+      "displayName": "Операции  (для исполнения перед загрузкой)"
+    },
+    {
+      "tableName": "AT_TRIGGERS",
+      "displayName": "Триггеры"
+    },
+    {
+      "tableName": "BN_BANKCATALOGUE",
+      "displayName": "Картотека"
+    },
+    {
+      "tableName": "BN_BANKCATALOGUELINE",
+      "displayName": "Позиция картотеки"
+    },
+    {
+      "tableName": "BN_BANKSTATEMENT",
+      "displayName": "Банковская выписка"
+    },
+    {
+      "tableName": "BN_BANKSTATEMENTLINE",
+      "displayName": "Позиция банковской выписки"
+    },
+    {
+      "tableName": "BN_BSLINEDOCUMENT",
+      "displayName": "==="
+    },
+    {
+      "tableName": "BN_CHECKLIST",
+      "displayName": "BN_CHECKLIST"
+    },
+    {
+      "tableName": "BN_CHECKLISTLINE",
+      "displayName": "BN_CHECKLISTLINE"
+    },
+    {
+      "tableName": "BN_CURRBUYCONTRACT",
+      "displayName": "BN_CURRBUYCONTRACT"
+    },
+    {
+      "tableName": "BN_CURRCOMMISSION",
+      "displayName": "BN_CURRCOMMISSION"
+    },
+    {
+      "tableName": "BN_CURRCOMMISSSELL",
+      "displayName": "BN_CURRCOMMISSSELL"
+    },
+    {
+      "tableName": "BN_CURRCONVCONTRACT",
+      "displayName": "BN_CURRCONVCONTRACT"
+    },
+    {
+      "tableName": "BN_CURRLISTALLOCATION",
+      "displayName": "BN_CURRLISTALLOCATION"
+    },
+    {
+      "tableName": "BN_CURRSELLCONTRACT",
+      "displayName": "BN_CURRSELLCONTRACT"
+    },
+    {
+      "tableName": "BN_DEMANDPAYMENT",
+      "displayName": "BN_DEMANDPAYMENT"
+    },
+    {
+      "tableName": "BN_DESTCODE",
+      "displayName": "Назначения платежа"
+    },
+    {
+      "tableName": "BN_WORDING",
+      "displayName": "Формулировка"
+    },
+    {
+      "tableName": "BUG_BUGBASE",
+      "displayName": "Регистрация ошибок"
+    },
+    {
+      "tableName": "CTL_AUTOTARIFF",
+      "displayName": "CTL_AUTOTARIFF"
+    },
+    {
+      "tableName": "CTL_DISCOUNT",
+      "displayName": "CTL_DISCOUNT"
+    },
+    {
+      "tableName": "CTL_INVOICE",
+      "displayName": "CTL_INVOICE"
+    },
+    {
+      "tableName": "CTL_INVOICEPOS",
+      "displayName": "CTL_INVOICEPOS"
+    },
+    {
+      "tableName": "CTL_RECEIPT",
+      "displayName": "CTL_RECEIPT"
+    },
+    {
+      "tableName": "CTL_REFERENCE",
+      "displayName": "CTL_REFERENCE"
+    },
+    {
+      "tableName": "EVT_MACROSGROUP",
+      "displayName": "Группы макросов"
+    },
+    {
+      "tableName": "EVT_MACROSLIST",
+      "displayName": "Список макросов"
+    },
+    {
+      "tableName": "EVT_OBJECT",
+      "displayName": "Объекты (для макросов)"
+    },
+    {
+      "tableName": "EVT_OBJECTEVENT",
+      "displayName": "События  и методы"
+    },
+    {
+      "tableName": "FIN_VERSIONINFO",
+      "displayName": "Версия программы"
+    },
+    {
+      "tableName": "FLT_COMPONENTFILTER",
+      "displayName": "Фильтры"
+    },
+    {
+      "tableName": "FLT_LASTFILTER",
+      "displayName": "Последний фильтр"
+    },
+    {
+      "tableName": "FLT_PROCEDUREFILTER",
+      "displayName": "Процедуры для фильтров"
+    },
+    {
+      "tableName": "FLT_SAVEDFILTER",
+      "displayName": "Сохраненные фильтры"
+    },
+    {
+      "tableName": "GD_ACCESSDOCTYPE",
+      "displayName": "GD_ACCESSDOCTYPE"
+    },
+    {
+      "tableName": "GD_AUTOTASK",
+      "displayName": "GD_AUTOTASK"
+    },
+    {
+      "tableName": "GD_AUTOTASK_LOG",
+      "displayName": "GD_AUTOTASK_LOG"
+    },
+    {
+      "tableName": "GD_AVAILABLE_ID",
+      "displayName": "GD_AVAILABLE_ID"
+    },
+    {
+      "tableName": "GD_BANK",
+      "displayName": "Банк"
+    },
+    {
+      "tableName": "GD_BLOCK_OURCOMPANY",
+      "displayName": "GD_BLOCK_OURCOMPANY"
+    },
+    {
+      "tableName": "GD_CARDACCOUNT",
+      "displayName": "GD_CARDACCOUNT"
+    },
+    {
+      "tableName": "GD_CARDCOMPANY",
+      "displayName": "GD_CARDCOMPANY"
+    },
+    {
+      "tableName": "GD_CARDRELATION",
+      "displayName": "GD_CARDRELATION"
+    },
+    {
+      "tableName": "GD_CHANGEDDOC",
+      "displayName": "GD_CHANGEDDOC"
+    },
+    {
+      "tableName": "GD_COMMAND",
+      "displayName": "Исследователь"
+    },
+    {
+      "tableName": "GD_COMPACCTYPE",
+      "displayName": "Типы банковских счетов"
+    },
+    {
+      "tableName": "GD_COMPANY",
+      "displayName": "Компания"
+    },
+    {
+      "tableName": "GD_COMPANYACCOUNT",
+      "displayName": "GD_COMPANYACCOUNT"
+    },
+    {
+      "tableName": "GD_COMPANYCODE",
+      "displayName": "Коды компании"
+    },
+    {
+      "tableName": "GD_COMPANYSTORAGE",
+      "displayName": "Хранилище компании"
+    },
+    {
+      "tableName": "GD_CONST",
+      "displayName": "Константы"
+    },
+    {
+      "tableName": "GD_CONSTVALUE",
+      "displayName": "Значение константы"
+    },
+    {
+      "tableName": "GD_CONTACT",
+      "displayName": "Контакты"
+    },
+    {
+      "tableName": "GD_CONTACTLIST",
+      "displayName": "Список контактов"
+    },
+    {
+      "tableName": "GD_CONTACTPROPS",
+      "displayName": "Доп. сведения для контакта"
+    },
+    {
+      "tableName": "GD_CONTRACT",
+      "displayName": "GD_CONTRACT"
+    },
+    {
+      "tableName": "GD_CURR",
+      "displayName": "Валюты"
+    },
+    {
+      "tableName": "GD_CURRRATE",
+      "displayName": "Курсы валют"
+    },
+    {
+      "tableName": "GD_DESKTOP",
+      "displayName": "Рабочий стол"
+    },
+    {
+      "tableName": "GD_DOCREALINFO",
+      "displayName": "GD_DOCREALINFO"
+    },
+    {
+      "tableName": "GD_DOCREALIZATION",
+      "displayName": "======================"
+    },
+    {
+      "tableName": "GD_DOCREALPOS",
+      "displayName": "GD_DOCREALPOS"
+    },
+    {
+      "tableName": "GD_DOCREALPOSOPTION",
+      "displayName": "====================="
+    },
+    {
+      "tableName": "GD_DOCREALPOSREL",
+      "displayName": "GD_DOCREALPOSREL"
+    },
+    {
+      "tableName": "GD_DOCUMENT",
+      "displayName": "Документы"
+    },
+    {
+      "tableName": "GD_DOCUMENTLINK",
+      "displayName": "Связанные документы"
+    },
+    {
+      "tableName": "GD_DOCUMENTSYSTEM",
+      "displayName": "GD_DOCUMENTSYSTEM"
+    },
+    {
+      "tableName": "GD_DOCUMENTTRTYPE",
+      "displayName": "GD_DOCUMENTTRTYPE"
+    },
+    {
+      "tableName": "GD_DOCUMENTTYPE",
+      "displayName": "Типы документов"
+    },
+    {
+      "tableName": "GD_DOCUMENTTYPE_OPTION",
+      "displayName": "GD_DOCUMENTTYPE_OPTION"
+    },
+    {
+      "tableName": "GD_DT_VERIFYING_USERGROUP",
+      "displayName": "GD_DT_VERIFYING_USERGROUP"
+    },
+    {
+      "tableName": "GD_EMPLOYEE",
+      "displayName": "GD_EMPLOYEE"
+    },
+    {
+      "tableName": "GD_ENTRY",
+      "displayName": "GD_ENTRY"
+    },
+    {
+      "tableName": "GD_ENTRYANALYZEREL",
+      "displayName": "GD_ENTRYANALYZEREL"
+    },
+    {
+      "tableName": "GD_ENTRYS",
+      "displayName": "GD_ENTRYS"
+    },
+    {
+      "tableName": "GD_EXCLUDE_BLOCK_DOCUMENTTYPE",
+      "displayName": "GD_EXCLUDE_BLOCK_DOCUMENTTYPE"
+    },
+    {
+      "tableName": "GD_FILE",
+      "displayName": "Файлы"
+    },
+    {
+      "tableName": "GD_FUNCTION",
+      "displayName": "Функции"
+    },
+    {
+      "tableName": "GD_FUNCTION_LOG",
+      "displayName": "GD_FUNCTION_LOG"
+    },
+    {
+      "tableName": "GD_GLOBALSTORAGE",
+      "displayName": "Общее хранилище"
+    },
+    {
+      "tableName": "GD_GOOD",
+      "displayName": "Справочник ТМЦ"
+    },
+    {
+      "tableName": "GD_GOODBARCODE",
+      "displayName": "Штрих коды"
+    },
+    {
+      "tableName": "GD_GOODGROUP",
+      "displayName": "Группы ТМЦ"
+    },
+    {
+      "tableName": "GD_GOODPRMETAL",
+      "displayName": "Драг. металлы по товару"
+    },
+    {
+      "tableName": "GD_GOODSET",
+      "displayName": "Комплектация"
+    },
+    {
+      "tableName": "GD_GOODTAX",
+      "displayName": "Налоги-товар"
+    },
+    {
+      "tableName": "GD_GOODVALUE",
+      "displayName": "Ед.изм."
+    },
+    {
+      "tableName": "GD_HOLDING",
+      "displayName": "Холдинг"
+    },
+    {
+      "tableName": "GD_JOURNAL",
+      "displayName": "Журнал событий"
+    },
+    {
+      "tableName": "GD_LASTNUMBER",
+      "displayName": "Последний номер документа"
+    },
+    {
+      "tableName": "GD_LINK",
+      "displayName": "Прикрепление"
+    },
+    {
+      "tableName": "GD_LISTTRTYPE",
+      "displayName": "GD_LISTTRTYPE"
+    },
+    {
+      "tableName": "GD_LISTTRTYPECOND",
+      "displayName": "GD_LISTTRTYPECOND"
+    },
+    {
+      "tableName": "GD_OBJECT_DEPENDENCIES",
+      "displayName": "GD_OBJECT_DEPENDENCIES"
+    },
+    {
+      "tableName": "GD_OURCOMPANY",
+      "displayName": "Рабочие компании"
+    },
+    {
+      "tableName": "GD_PEOPLE",
+      "displayName": "Люди"
+    },
+    {
+      "tableName": "GD_PLACE",
+      "displayName": "Административно-территориальные единицы"
+    },
+    {
+      "tableName": "GD_PRECIOUSEMETAL",
+      "displayName": "Драг. металлы"
+    },
+    {
+      "tableName": "GD_PRICE",
+      "displayName": "GD_PRICE"
+    },
+    {
+      "tableName": "GD_PRICECURR",
+      "displayName": "Валюта прайс-листа"
+    },
+    {
+      "tableName": "GD_PRICEDOCREL",
+      "displayName": "GD_PRICEDOCREL"
+    },
+    {
+      "tableName": "GD_PRICEFIELDREL",
+      "displayName": "GD_PRICEFIELDREL"
+    },
+    {
+      "tableName": "GD_PRICEPOS",
+      "displayName": "Позиция прайс-листа153001831"
+    },
+    {
+      "tableName": "GD_PRICEPOSOPTION",
+      "displayName": "GD_PRICEPOSOPTION"
+    },
+    {
+      "tableName": "GD_REF_CONSTRAINTS",
+      "displayName": "GD_REF_CONSTRAINTS"
+    },
+    {
+      "tableName": "GD_REF_CONSTRAINT_DATA",
+      "displayName": "GD_REF_CONSTRAINT_DATA"
+    },
+    {
+      "tableName": "GD_RELATIONTYPEDOC",
+      "displayName": "GD_RELATIONTYPEDOC"
+    },
+    {
+      "tableName": "GD_REMOVE_CONSTRAINTS",
+      "displayName": "GD_REMOVE_CONSTRAINTS"
+    },
+    {
+      "tableName": "GD_RUID",
+      "displayName": "GD_RUID"
+    },
+    {
+      "tableName": "GD_SMTP",
+      "displayName": "GD_SMTP"
+    },
+    {
+      "tableName": "GD_SQL_HISTORY",
+      "displayName": "GD_SQL_HISTORY"
+    },
+    {
+      "tableName": "GD_SQL_LOG",
+      "displayName": "GD_SQL_LOG"
+    },
+    {
+      "tableName": "GD_SQL_STATEMENT",
+      "displayName": "GD_SQL_STATEMENT"
+    },
+    {
+      "tableName": "GD_STORAGE_DATA",
+      "displayName": "GD_STORAGE_DATA"
+    },
+    {
+      "tableName": "GD_SUBSYSTEM",
+      "displayName": "Подсистемы"
+    },
+    {
+      "tableName": "GD_TAX",
+      "displayName": "Налоги"
+    },
+    {
+      "tableName": "GD_TAXACTUAL",
+      "displayName": "Настройка отчетов (бух)"
+    },
+    {
+      "tableName": "GD_TAXDESIGNDATE",
+      "displayName": "Бухгалтерский отчет"
+    },
+    {
+      "tableName": "GD_TAXFUNCTION",
+      "displayName": "Функции отчетов (бух)"
+    },
+    {
+      "tableName": "GD_TAXNAME",
+      "displayName": "Отчеты (бухгалтерия)"
+    },
+    {
+      "tableName": "GD_TAXRESULT",
+      "displayName": "Позиция бух отчета"
+    },
+    {
+      "tableName": "GD_TAXTYPE",
+      "displayName": "Тип расчета"
+    },
+    {
+      "tableName": "GD_TNVD",
+      "displayName": "Справочник ТНВЭД"
+    },
+    {
+      "tableName": "GD_USER",
+      "displayName": "GD_USER"
+    },
+    {
+      "tableName": "GD_USERCOMPANY",
+      "displayName": "Компания для пользователя"
+    },
+    {
+      "tableName": "GD_USERGROUP",
+      "displayName": "Группы пользователей"
+    },
+    {
+      "tableName": "GD_USERSTORAGE",
+      "displayName": "Хранилище для пользователей"
+    },
+    {
+      "tableName": "GD_VALUE",
+      "displayName": "Единица изм."
+    },
+    {
+      "tableName": "GD_WEBLOG",
+      "displayName": "GD_WEBLOG"
+    },
+    {
+      "tableName": "GD_WEBLOGDATA",
+      "displayName": "GD_WEBLOGDATA"
+    },
+    {
+      "tableName": "INV_BALANCE",
+      "displayName": "Остатки ТМЦ"
+    },
+    {
+      "tableName": "INV_BALANCEOPTION",
+      "displayName": "INV_BALANCEOPTION"
+    },
+    {
+      "tableName": "INV_CARD",
+      "displayName": "Карточки по товару"
+    },
+    {
+      "tableName": "INV_MOVEMENT",
+      "displayName": "Движение ТМЦ"
+    },
+    {
+      "tableName": "INV_PRICE",
+      "displayName": "Прайс-лист"
+    },
+    {
+      "tableName": "INV_PRICELINE",
+      "displayName": "Позиция товарного прайс-листа"
+    },
+    {
+      "tableName": "MSG_ACCOUNT",
+      "displayName": "Учетные записи для Inet"
+    },
+    {
+      "tableName": "MSG_ATTACHMENT",
+      "displayName": "Прикрепления"
+    },
+    {
+      "tableName": "MSG_BOX",
+      "displayName": "Группы сообщений"
+    },
+    {
+      "tableName": "MSG_MESSAGE",
+      "displayName": "Сообщения"
+    },
+    {
+      "tableName": "MSG_MESSAGERULES",
+      "displayName": "Правила сообщений"
+    },
+    {
+      "tableName": "MSG_TARGET",
+      "displayName": "Кому адресовано сообщение"
+    },
+    {
+      "tableName": "MY_NEW_TABLE",
+      "displayName": "MY_NEW_TABLE"
+    },
+    {
+      "tableName": "PR_KEY",
+      "displayName": "PR_KEY"
+    },
+    {
+      "tableName": "PR_REGNUMBER",
+      "displayName": "PR_REGNUMBER"
+    },
+    {
+      "tableName": "RPL_DATABASE",
+      "displayName": "RPL_DATABASE"
+    },
+    {
+      "tableName": "RPL_RECORD",
+      "displayName": "RPL_RECORD"
+    },
+    {
+      "tableName": "RP_ADDITIONALFUNCTION",
+      "displayName": "Изпользуемые функции"
+    },
+    {
+      "tableName": "RP_REGISTRY",
+      "displayName": "RP_REGISTRY"
+    },
+    {
+      "tableName": "RP_REPORTDEFAULTSERVER",
+      "displayName": "Сервер по умолчанию"
+    },
+    {
+      "tableName": "RP_REPORTGROUP",
+      "displayName": "Группа отчетов"
+    },
+    {
+      "tableName": "RP_REPORTLIST",
+      "displayName": "Список отчетов"
+    },
+    {
+      "tableName": "RP_REPORTRESULT",
+      "displayName": "Результаты отчетов"
+    },
+    {
+      "tableName": "RP_REPORTSERVER",
+      "displayName": "Сервер отчетов"
+    },
+    {
+      "tableName": "RP_REPORTTEMPLATE",
+      "displayName": "Шаблоны отчетов"
+    },
+    {
+      "tableName": "ST_SETTINGSTATE",
+      "displayName": "Состояние настройки"
+    },
+    {
+      "tableName": "T",
+      "displayName": "T"
+    },
+    {
+      "tableName": "T1",
+      "displayName": "T1"
+    },
+    {
+      "tableName": "T2",
+      "displayName": "T2"
+    },
+    {
+      "tableName": "TEMP",
+      "displayName": "TEMP"
+    },
+    {
+      "tableName": "TEST_ROUND",
+      "displayName": "TEST_ROUND"
+    },
+    {
+      "tableName": "TEST_USERS",
+      "displayName": "TEST_USERS"
+    },
+    {
+      "tableName": "TFLOAT",
+      "displayName": "TFLOAT"
+    },
+    {
+      "tableName": "TMP_ENTRY",
+      "displayName": "TMP_ENTRY"
+    },
+    {
+      "tableName": "TTTT",
+      "displayName": "TTTT"
+    },
+    {
+      "tableName": "USR$ACC_CONFSETTLE",
+      "displayName": "Подтверждение расчетов"
+    },
+    {
+      "tableName": "USR$ACC_CONFSETTLE_ACC",
+      "displayName": "Подтверждение расчетов (счета)"
+    },
+    {
+      "tableName": "USR$ACC_DELIVERY",
+      "displayName": "Профили разноски по счетам"
+    },
+    {
+      "tableName": "USR$ACC_EXPENSES",
+      "displayName": "Статьи затрат"
+    },
+    {
+      "tableName": "USR$ACC_REG16OPTION",
+      "displayName": "Настройка 16 ведомости"
+    },
+    {
+      "tableName": "USR$ACC_TAXPOSDATE",
+      "displayName": "Показатель на дату"
+    },
+    {
+      "tableName": "USR$ACC_TAXPOSITION",
+      "displayName": "Справочник показателей"
+    },
+    {
+      "tableName": "USR$ACC_TAXPOSVALUE",
+      "displayName": "Составляющие показателя"
+    },
+    {
+      "tableName": "USR$ADDPAYBOOK",
+      "displayName": "Справочник надбавок"
+    },
+    {
+      "tableName": "USR$BG_ACT_CONTRAC",
+      "displayName": "Акт выполненных работ"
+    },
+    {
+      "tableName": "USR$BG_BISNESS_PROC",
+      "displayName": "Бизнес-процессы"
+    },
+    {
+      "tableName": "USR$BG_CONTRACT",
+      "displayName": "Договор1024308643"
+    },
+    {
+      "tableName": "USR$BG_CONTRACTJOB",
+      "displayName": "Заказы"
+    },
+    {
+      "tableName": "USR$BG_CONTRACTLINE",
+      "displayName": "Договор(позиция)"
+    },
+    {
+      "tableName": "USR$BG_CONTRACTTYPE",
+      "displayName": "Тип договора1024308666"
+    },
+    {
+      "tableName": "USR$BG_CONTRACT_REPORT",
+      "displayName": "БГ.Договора (печатные формы)"
+    },
+    {
+      "tableName": "USR$BG_CONTRACT_STAGE_NAME",
+      "displayName": "Название этапа"
+    },
+    {
+      "tableName": "USR$BG_CONTRACT_WORK",
+      "displayName": "Работы по договорам"
+    },
+    {
+      "tableName": "USR$BG_DIRECTIONS",
+      "displayName": "БГ. Направления реализации"
+    },
+    {
+      "tableName": "USR$BG_JOBWORK",
+      "displayName": "БГ.Работы по заказам"
+    },
+    {
+      "tableName": "USR$BG_OPERLINE",
+      "displayName": "Оперативка (Архив)(позиция)"
+    },
+    {
+      "tableName": "USR$BG_REQUESTOW",
+      "displayName": "Заяка. Одно окно"
+    },
+    {
+      "tableName": "USR$BG_REQUESTOWLINE",
+      "displayName": "Заяка. Одно окно(позиция)"
+    },
+    {
+      "tableName": "USR$BNF_ACTPERIODICITY",
+      "displayName": "Периодичность выставления акта"
+    },
+    {
+      "tableName": "USR$BNF_ACTS",
+      "displayName": "02. Акт выполненных работ"
+    },
+    {
+      "tableName": "USR$BNF_ACTSLINE",
+      "displayName": "02. Акт выполненных работ(позиция)"
+    },
+    {
+      "tableName": "USR$BNF_CONTRACT",
+      "displayName": "01. Договор на оказываемые услуги"
+    },
+    {
+      "tableName": "USR$BNF_CONTRACTLINE",
+      "displayName": "01. Договор на оказываемые услуги(позиция)"
+    },
+    {
+      "tableName": "USR$BNF_COSTTYPE",
+      "displayName": "Тип отпускной цены"
+    },
+    {
+      "tableName": "USR$BNF_MONTHTYPE",
+      "displayName": "Тип месяца"
+    },
+    {
+      "tableName": "USR$BNF_STATES",
+      "displayName": "Состояния договоров\\актов"
+    },
+    {
+      "tableName": "USR$BN_ACCEPT",
+      "displayName": "Акцепт"
+    },
+    {
+      "tableName": "USR$BN_ACCEPTTYPE",
+      "displayName": "Тип акцепта"
+    },
+    {
+      "tableName": "USR$BN_ACCMAKE",
+      "displayName": "04. Заявление на акцепт"
+    },
+    {
+      "tableName": "USR$BN_ACCMAKELINE",
+      "displayName": "04. Заявление на акцепт(позиция)"
+    },
+    {
+      "tableName": "USR$BN_BANKREPDATA",
+      "displayName": "Отчетные данные"
+    },
+    {
+      "tableName": "USR$BN_BILL",
+      "displayName": "Счет-фактура154577235"
+    },
+    {
+      "tableName": "USR$BN_BILLLINE",
+      "displayName": "Счет-фактура(позиция)154577238"
+    },
+    {
+      "tableName": "USR$BN_BILLNDS",
+      "displayName": "Счет-фактура по НДС"
+    },
+    {
+      "tableName": "USR$BN_BILLNDSLINE",
+      "displayName": "Счет-фактура по НДС(позиция)"
+    },
+    {
+      "tableName": "USR$BN_BLANKTRIP",
+      "displayName": "Командировочное удостоверение"
+    },
+    {
+      "tableName": "USR$BN_BTRIPMONEY",
+      "displayName": "Авансовый отчет"
+    },
+    {
+      "tableName": "USR$BN_BTRIPMONEYLINE",
+      "displayName": "Расчет аванса"
+    },
+    {
+      "tableName": "USR$BN_BUYCURR",
+      "displayName": "Заявка на покупку валюты"
+    },
+    {
+      "tableName": "USR$BN_CASHBOOK",
+      "displayName": "Кассовая книга"
+    },
+    {
+      "tableName": "USR$BN_CASHBOOKLINE",
+      "displayName": "Кассовая книга(позиция)"
+    },
+    {
+      "tableName": "USR$BN_CASHDEPOSIT",
+      "displayName": "05. Объявление на взнос наличными"
+    },
+    {
+      "tableName": "USR$BN_CASHDEPOSITLINE",
+      "displayName": "05. Объявление на взнос наличными(позиция)"
+    },
+    {
+      "tableName": "USR$BN_CASHKIND",
+      "displayName": "Вид кассы(для кассовой книги)"
+    },
+    {
+      "tableName": "USR$BN_CASHPROCEDURE",
+      "displayName": "Операция для кассы"
+    },
+    {
+      "tableName": "USR$BN_CASHREGISTER",
+      "displayName": "Кассовый аппарат"
+    },
+    {
+      "tableName": "USR$BN_CASHREPORT",
+      "displayName": "Кассовый отчет"
+    },
+    {
+      "tableName": "USR$BN_CASHREPORTLINE",
+      "displayName": "Кассовый отчет(позиция)"
+    },
+    {
+      "tableName": "USR$BN_CHANGECURR",
+      "displayName": "Заявка на конвертацию валюты"
+    },
+    {
+      "tableName": "USR$BN_CODEDEST",
+      "displayName": "Коды назначений платежа"
+    },
+    {
+      "tableName": "USR$BN_COLLECT",
+      "displayName": "Инкассовое распоряжение"
+    },
+    {
+      "tableName": "USR$BN_COMMISS",
+      "displayName": "Поручение на продажу валюты"
+    },
+    {
+      "tableName": "USR$BN_COMMISSLINE",
+      "displayName": "Поручение на продажу валюты(позиция)"
+    },
+    {
+      "tableName": "USR$BN_COSTS",
+      "displayName": "Расходы"
+    },
+    {
+      "tableName": "USR$BN_DATABTRIP",
+      "displayName": "Справочник оплаты расходов при командировке"
+    },
+    {
+      "tableName": "USR$BN_DATABTRIPLINE",
+      "displayName": "Оплата расходов(позиция)"
+    },
+    {
+      "tableName": "USR$BN_DEFINITION",
+      "displayName": "Уточнение платежа"
+    },
+    {
+      "tableName": "USR$BN_DEMAND",
+      "displayName": "02. Платёжное требование"
+    },
+    {
+      "tableName": "USR$BN_DEMANDDEFIN",
+      "displayName": "Уточнение платежа для требований"
+    },
+    {
+      "tableName": "USR$BN_DOCUM",
+      "displayName": "Документ для аванса"
+    },
+    {
+      "tableName": "USR$BN_DOCUMENTTYPE",
+      "displayName": "Документы в выписку"
+    },
+    {
+      "tableName": "USR$BN_DOCUM_NEW",
+      "displayName": "Документ для аванса (нов.)"
+    },
+    {
+      "tableName": "USR$BN_ECLASSIFICATOR",
+      "displayName": "Справочник кодов экономической деятельности"
+    },
+    {
+      "tableName": "USR$BN_INCOMECURR",
+      "displayName": "Заявление на выдачу валюты"
+    },
+    {
+      "tableName": "USR$BN_INCOMECURRLINE",
+      "displayName": "Заявление на выдачу валюты(позиция)"
+    },
+    {
+      "tableName": "USR$BN_KINDACC",
+      "displayName": "Вид акцепта"
+    },
+    {
+      "tableName": "USR$BN_KINDCASHBOOK",
+      "displayName": "Вид кассовой книги"
+    },
+    {
+      "tableName": "USR$BN_LISTDEM",
+      "displayName": "03. Реестр п/требований"
+    },
+    {
+      "tableName": "USR$BN_LISTDEMLINE",
+      "displayName": "03. Реестр п/требований(позиция)"
+    },
+    {
+      "tableName": "USR$BN_MONEYFOR",
+      "displayName": "Назначение аванса"
+    },
+    {
+      "tableName": "USR$BN_NOTICE",
+      "displayName": "Извещение"
+    },
+    {
+      "tableName": "USR$BN_NOTICELINE",
+      "displayName": "Извещение(позиция)"
+    },
+    {
+      "tableName": "USR$BN_ORDERBTRIP",
+      "displayName": "Приказ на командировки"
+    },
+    {
+      "tableName": "USR$BN_ORDERBTRIPLINE",
+      "displayName": "Приказ на командировки(позиция)"
+    },
+    {
+      "tableName": "USR$BN_ORDERTRIPSUBLINE",
+      "displayName": "Маршруты для приказа на командировки"
+    },
+    {
+      "tableName": "USR$BN_PAYMENT",
+      "displayName": "01. Платёжное поручение"
+    },
+    {
+      "tableName": "USR$BN_PAYMENTPURPOSECODEISO",
+      "displayName": "Коды назначения платежа (ISO)"
+    },
+    {
+      "tableName": "USR$BN_PAYMENTPURPOSECODERBISO",
+      "displayName": "Коды назначения платежа в РБ (ISO)"
+    },
+    {
+      "tableName": "USR$BN_PLATINFO",
+      "displayName": "Информация по платежке для бюджета"
+    },
+    {
+      "tableName": "USR$BN_REFERENCEDOCUMENTTYPEISO",
+      "displayName": "Типы ссылочных документов (ISO)"
+    },
+    {
+      "tableName": "USR$BN_SALECURR",
+      "displayName": "Заявка на продажу валюты"
+    },
+    {
+      "tableName": "USR$BN_SALECURRLINE",
+      "displayName": "Заявка на продажу валюты(позиция)"
+    },
+    {
+      "tableName": "USR$BN_SHARECURR",
+      "displayName": "Реестр распределения валюты"
+    },
+    {
+      "tableName": "USR$BN_SHARECURRLINE",
+      "displayName": "Реестр распределения валюты(позиция)"
+    },
+    {
+      "tableName": "USR$BN_TAXPAYMENTPERIODISO",
+      "displayName": "Периоды уплаты налогов (ISO)"
+    },
+    {
+      "tableName": "USR$BN_TRANSFER",
+      "displayName": "Bank Transfer Request"
+    },
+    {
+      "tableName": "USR$BN_TTN",
+      "displayName": "Товарно-транспортная накладная"
+    },
+    {
+      "tableName": "USR$BN_TTNLINE",
+      "displayName": "Товарно-транспортная накладная(позиция)"
+    },
+    {
+      "tableName": "USR$BN_URGENCY",
+      "displayName": "Срочность"
+    },
+    {
+      "tableName": "USR$BN_WHATPAID",
+      "displayName": "Виды оплаты"
+    },
+    {
+      "tableName": "USR$BUYINGBOOKCONF",
+      "displayName": "Конфигурации книги покупок"
+    },
+    {
+      "tableName": "USR$BUYINGBOOKENTRYS",
+      "displayName": "Проводки книги покупок"
+    },
+    {
+      "tableName": "USR$BUYSOFT",
+      "displayName": "Приобретенный софт"
+    },
+    {
+      "tableName": "USR$CATEGORY",
+      "displayName": "Категории"
+    },
+    {
+      "tableName": "USR$CC_GROUPS",
+      "displayName": "Группы"
+    },
+    {
+      "tableName": "USR$CC_SUBGROUP",
+      "displayName": "Подгруппы"
+    },
+    {
+      "tableName": "USR$CHECKREGISTER",
+      "displayName": "09.Реестр чеков"
+    },
+    {
+      "tableName": "USR$CHECKREGISTERLINE",
+      "displayName": "09.Реестр чеков(позиция)"
+    },
+    {
+      "tableName": "USR$COMMISSION",
+      "displayName": "Справочник членов комиссии"
+    },
+    {
+      "tableName": "USR$COMMISSIONLINE",
+      "displayName": "Справочник членов комиссии(позиция)"
+    },
+    {
+      "tableName": "USR$CRM_ACCOUNT",
+      "displayName": "Учетные записи"
+    },
+    {
+      "tableName": "USR$CRM_COMPETINGPRODUCT",
+      "displayName": "Конкурирующий продукт"
+    },
+    {
+      "tableName": "USR$CRM_CONFIRMATIONS",
+      "displayName": "USR$CRM_CONFIRMATIONS"
+    },
+    {
+      "tableName": "USR$CRM_CONTACT",
+      "displayName": "CRM. Контакты"
+    },
+    {
+      "tableName": "USR$CRM_CONTACT_LABELS",
+      "displayName": "Различные лейблы для контактов"
+    },
+    {
+      "tableName": "USR$CRM_CONTACT_MEDIA",
+      "displayName": "CRM. Вид связи"
+    },
+    {
+      "tableName": "USR$CRM_CONTACT_TYPE",
+      "displayName": "CRM. Тип контакта"
+    },
+    {
+      "tableName": "USR$CRM_CUSTOMER",
+      "displayName": "CRM.Акты по клиентам"
+    },
+    {
+      "tableName": "USR$CRM_CUSTOMERS_FEEDBACK",
+      "displayName": "Клиенты. Обратная связь"
+    },
+    {
+      "tableName": "USR$CRM_CUSTOMER_LABELS",
+      "displayName": "Различные лейблы для клиентов"
+    },
+    {
+      "tableName": "USR$CRM_DB_VERSION",
+      "displayName": "Версии бд"
+    },
+    {
+      "tableName": "USR$CRM_DEALS",
+      "displayName": "Сделки"
+    },
+    {
+      "tableName": "USR$CRM_DEALS_CLIENT_STORY",
+      "displayName": "Сделки. История обращений клиента"
+    },
+    {
+      "tableName": "USR$CRM_DEALS_CLIENT_STORY_TYPE",
+      "displayName": "Сделки. История обращений клиента. Типы"
+    },
+    {
+      "tableName": "USR$CRM_DEALS_FILES",
+      "displayName": "USR$CRM_DEALS_FILES"
+    },
+    {
+      "tableName": "USR$CRM_DEALS_SOURCE",
+      "displayName": "Источник данных для сделки"
+    },
+    {
+      "tableName": "USR$CRM_DEAL_FEEDBACK",
+      "displayName": "USR$CRM_DEAL_FEEDBACK"
+    },
+    {
+      "tableName": "USR$CRM_DENY_REASONS",
+      "displayName": "Отказы"
+    },
+    {
+      "tableName": "USR$CRM_DEPARTMENT",
+      "displayName": "Отделы"
+    },
+    {
+      "tableName": "USR$CRM_DIAGRAMS_SETTINGS",
+      "displayName": "Настройки диаграмм"
+    },
+    {
+      "tableName": "USR$CRM_EMAILS",
+      "displayName": "Emails"
+    },
+    {
+      "tableName": "USR$CRM_EMPLOYEE_UNAVAILABILITY",
+      "displayName": "Недоступность сотрудника"
+    },
+    {
+      "tableName": "USR$CRM_FAQS",
+      "displayName": "Часто задаваемые вопросы"
+    },
+    {
+      "tableName": "USR$CRM_FEEDBACK_COMPETENCE",
+      "displayName": "Компетентность персонала"
+    },
+    {
+      "tableName": "USR$CRM_FEEDBACK_RATING",
+      "displayName": "Оценка удовлетворённости"
+    },
+    {
+      "tableName": "USR$CRM_FEEDBACK_RESULT",
+      "displayName": "Обратная связь"
+    },
+    {
+      "tableName": "USR$CRM_FEEDBACK_SATISFACTION",
+      "displayName": "Удовлетворенность полученной информацией"
+    },
+    {
+      "tableName": "USR$CRM_FILES",
+      "displayName": "CRM.Файлы"
+    },
+    {
+      "tableName": "USR$CRM_FILTERS",
+      "displayName": "USR$CRM_FILTERS"
+    },
+    {
+      "tableName": "USR$CRM_INFOSOURCE",
+      "displayName": "CRM. Источник информации"
+    },
+    {
+      "tableName": "USR$CRM_KANBAN_CARDS",
+      "displayName": "Канбан. Карточки"
+    },
+    {
+      "tableName": "USR$CRM_KANBAN_CARD_HISTORY",
+      "displayName": "Канбан. Карточки. История"
+    },
+    {
+      "tableName": "USR$CRM_KANBAN_CARD_STATUS",
+      "displayName": "Канбан. Статусы карт"
+    },
+    {
+      "tableName": "USR$CRM_KANBAN_CARD_TASKS",
+      "displayName": "Канбан. Карточки. Задачи"
+    },
+    {
+      "tableName": "USR$CRM_KANBAN_CARD_TASKS_TYPES",
+      "displayName": "Канбан. Карточки. Задачи. Типы"
+    },
+    {
+      "tableName": "USR$CRM_KANBAN_COLUMNS",
+      "displayName": "Канбан. Колонки"
+    },
+    {
+      "tableName": "USR$CRM_KANBAN_FILTERS_DEADLINE",
+      "displayName": "Фильтры сделок по сроку"
+    },
+    {
+      "tableName": "USR$CRM_KANBAN_TASK_SOURCES",
+      "displayName": "Источники задач"
+    },
+    {
+      "tableName": "USR$CRM_KANBAN_TEMPLATE",
+      "displayName": "Канбан. Шаблоны"
+    },
+    {
+      "tableName": "USR$CRM_KANBAN_TEMPLATE_LINE",
+      "displayName": "Канбан. Шаблоны. Позиции"
+    },
+    {
+      "tableName": "USR$CRM_LABELS",
+      "displayName": "Метки"
+    },
+    {
+      "tableName": "USR$CRM_LASTUSEDFILTER_DEADLINE",
+      "displayName": "Последний использованный фильтр юзера"
+    },
+    {
+      "tableName": "USR$CRM_MARKETING_MAILING",
+      "displayName": "Email рассылка"
+    },
+    {
+      "tableName": "USR$CRM_MARKETING_MAILING_FILES",
+      "displayName": "Email рассылка. Вложения"
+    },
+    {
+      "tableName": "USR$CRM_MARKETING_MAILING_LINE",
+      "displayName": "Email рассылка.Позиции"
+    },
+    {
+      "tableName": "USR$CRM_MARKETING_MAILING_RES",
+      "displayName": "Email рассылка.Результаты"
+    },
+    {
+      "tableName": "USR$CRM_MARKETING_SEGMENTS",
+      "displayName": "Сегменты"
+    },
+    {
+      "tableName": "USR$CRM_MARKETING_SEGMENTS_CUST",
+      "displayName": "Сегменты. Клиенты"
+    },
+    {
+      "tableName": "USR$CRM_MARKETING_SEGMENTS_LINE",
+      "displayName": "Сегменты. Позиции"
+    },
+    {
+      "tableName": "USR$CRM_MARKETING_TEMPLATES",
+      "displayName": "Email шаблоны"
+    },
+    {
+      "tableName": "USR$CRM_MESSENGERS",
+      "displayName": "Мессенджеры"
+    },
+    {
+      "tableName": "USR$CRM_MIGRATIONS",
+      "displayName": "USR$CRM_MIGRATIONS"
+    },
+    {
+      "tableName": "USR$CRM_NOTIFICATIONS",
+      "displayName": "Уведомления"
+    },
+    {
+      "tableName": "USR$CRM_PERMISSIONS_ACTIONS",
+      "displayName": "Менеджмент прав. Действия"
+    },
+    {
+      "tableName": "USR$CRM_PERMISSIONS_CROSS",
+      "displayName": "Менеджмент прав. Действия групп"
+    },
+    {
+      "tableName": "USR$CRM_PERMISSIONS_UG_LINES",
+      "displayName": "Менеджмент прав. Группы пользователей. Позиции"
+    },
+    {
+      "tableName": "USR$CRM_PERMISSIONS_USERGROUPS",
+      "displayName": "Менеджмент прав. Группы пользователей"
+    },
+    {
+      "tableName": "USR$CRM_PHONES",
+      "displayName": "Телефоны"
+    },
+    {
+      "tableName": "USR$CRM_PROFILE_SETTINGS",
+      "displayName": "Настройки профиля"
+    },
+    {
+      "tableName": "USR$CRM_SYSTEM_LABELS_SETTINGS",
+      "displayName": "Настройки системных меток"
+    },
+    {
+      "tableName": "USR$CRM_SYSTEM_SETTINGS",
+      "displayName": "Настройки системы"
+    },
+    {
+      "tableName": "USR$CRM_TICKET",
+      "displayName": "Тикеты"
+    },
+    {
+      "tableName": "USR$CRM_TICKETFILE",
+      "displayName": "Файлы сообщения в тикете"
+    },
+    {
+      "tableName": "USR$CRM_TICKETREC",
+      "displayName": "Сообщения тикета"
+    },
+    {
+      "tableName": "USR$CRM_TICKETREC_READ",
+      "displayName": "Прочитанные сообщения заявки"
+    },
+    {
+      "tableName": "USR$CRM_TICKET_HISTORY",
+      "displayName": "История тикета"
+    },
+    {
+      "tableName": "USR$CRM_TICKET_IMPORTANCE",
+      "displayName": "Важность заявки"
+    },
+    {
+      "tableName": "USR$CRM_TICKET_LABELS",
+      "displayName": "Метки тикета"
+    },
+    {
+      "tableName": "USR$CRM_TICKET_LABELS_HISTORY",
+      "displayName": "История меток тикета"
+    },
+    {
+      "tableName": "USR$CRM_TICKET_PARTICIPANTS",
+      "displayName": "Участники тикета"
+    },
+    {
+      "tableName": "USR$CRM_TICKET_PERFORMERS",
+      "displayName": "Исполнители тикетов"
+    },
+    {
+      "tableName": "USR$CRM_TICKET_STATE",
+      "displayName": "Статус тикета"
+    },
+    {
+      "tableName": "USR$CRM_TIMETRACKER",
+      "displayName": "Учёт рабочего времени"
+    },
+    {
+      "tableName": "USR$CRM_TIMETRACKER_PROJECTS",
+      "displayName": "Учёт времени.Проекты"
+    },
+    {
+      "tableName": "USR$CRM_TIMETRACKER_TASKS",
+      "displayName": "Учёт времени.Задачи"
+    },
+    {
+      "tableName": "USR$CRM_TIMETRACKER_TYPES",
+      "displayName": "Типы работ"
+    },
+    {
+      "tableName": "USR$CRM_TIMETRACK_FAVORITE",
+      "displayName": "Избранные типы работ"
+    },
+    {
+      "tableName": "USR$CRM_TIMET_PROJECTS_FAVORITE",
+      "displayName": "Избранные проекты"
+    },
+    {
+      "tableName": "USR$CRM_TIMET_TASKS_FAVORITE",
+      "displayName": "Избранные задачи"
+    },
+    {
+      "tableName": "USR$CRM_TT_PROJECTS_EMPLOYEES",
+      "displayName": "Сотрудники прикрепленные к проекту"
+    },
+    {
+      "tableName": "USR$CRM_TT_PROJECT_TYPE",
+      "displayName": "Учёт времени.Типы проектов"
+    },
+    {
+      "tableName": "USR$CRM_T_CUSTOMER_VISIBLE_EMPL",
+      "displayName": "Видимые клиенту сотрудники"
+    },
+    {
+      "tableName": "USR$CRM_T_LABELS",
+      "displayName": "Метки тикетов"
+    },
+    {
+      "tableName": "USR$CRM_T_NOTIFICATIONS",
+      "displayName": "USR$CRM_T_NOTIFICATIONS"
+    },
+    {
+      "tableName": "USR$CRM_T_PARTICIPANTS_HISTORY",
+      "displayName": "История изменения участников"
+    },
+    {
+      "tableName": "USR$CRM_T_PERFORMERS_HISTORY",
+      "displayName": "История исполнителей тикета"
+    },
+    {
+      "tableName": "USR$CRM_T_USER_FILTERS",
+      "displayName": "Фильтры пользователя тикет системы"
+    },
+    {
+      "tableName": "USR$CRM_T_USER_PROFILE_SETTINGS",
+      "displayName": "Настройки профиля пользователя тикет системы"
+    },
+    {
+      "tableName": "USR$CRM_UPDATES",
+      "displayName": "Обновления"
+    },
+    {
+      "tableName": "USR$CRM_USER",
+      "displayName": "Пользователи тикет системы"
+    },
+    {
+      "tableName": "USR$CRM_USERSDEPOT",
+      "displayName": "СРМ.Пользователи и подразделения"
+    },
+    {
+      "tableName": "USR$CRM_USER_FAVORITE_CONTACTS",
+      "displayName": "USR$CRM_USER_FAVORITE_CONTACTS"
+    },
+    {
+      "tableName": "USR$CROSS100",
+      "displayName": "USR$CROSS100"
+    },
+    {
+      "tableName": "USR$CROSS1040_764164518",
+      "displayName": "USR$CROSS1040_764164518"
+    },
+    {
+      "tableName": "USR$CROSS1044_764164518",
+      "displayName": "USR$CROSS1044_764164518"
+    },
+    {
+      "tableName": "USR$CROSS1242_1980093301",
+      "displayName": "USR$CROSS1242_1980093301"
+    },
+    {
+      "tableName": "USR$CROSS12_116146580",
+      "displayName": "USR$CROSS12_116146580"
+    },
+    {
+      "tableName": "USR$CROSS13_116146580",
+      "displayName": "USR$CROSS13_116146580"
+    },
+    {
+      "tableName": "USR$CROSS15",
+      "displayName": "USR$CROSS15"
+    },
+    {
+      "tableName": "USR$CROSS16",
+      "displayName": "USR$CROSS16"
+    },
+    {
+      "tableName": "USR$CROSS17",
+      "displayName": "Источник информации для сообщений"
+    },
+    {
+      "tableName": "USR$CROSS179_256548741",
+      "displayName": "USR$CROSS179_256548741"
+    },
+    {
+      "tableName": "USR$CROSS18",
+      "displayName": "USR$CROSS18"
+    },
+    {
+      "tableName": "USR$CROSS19_116146580",
+      "displayName": "USR$CROSS19_116146580"
+    },
+    {
+      "tableName": "USR$CROSS20_116146580",
+      "displayName": "USR$CROSS20_116146580"
+    },
+    {
+      "tableName": "USR$CROSS2208_856800574",
+      "displayName": "USR$CROSS2208_856800574"
+    },
+    {
+      "tableName": "USR$CROSS2210_942242512",
+      "displayName": "USR$CROSS2210_942242512"
+    },
+    {
+      "tableName": "USR$CROSS25",
+      "displayName": "USR$CROSS25"
+    },
+    {
+      "tableName": "USR$CROSS290_124484738",
+      "displayName": "USR$CROSS290_124484738"
+    },
+    {
+      "tableName": "USR$CROSS439_248315812",
+      "displayName": "USR$CROSS439_248315812"
+    },
+    {
+      "tableName": "USR$CROSS440_248315812",
+      "displayName": "USR$CROSS440_248315812"
+    },
+    {
+      "tableName": "USR$CROSS441_248315812",
+      "displayName": "USR$CROSS441_248315812"
+    },
+    {
+      "tableName": "USR$CROSS442_248315812",
+      "displayName": "USR$CROSS442_248315812"
+    },
+    {
+      "tableName": "USR$CROSS443_248315812",
+      "displayName": "USR$CROSS443_248315812"
+    },
+    {
+      "tableName": "USR$CROSS444_248315812",
+      "displayName": "USR$CROSS444_248315812"
+    },
+    {
+      "tableName": "USR$CROSS445_248315812",
+      "displayName": "USR$CROSS445_248315812"
+    },
+    {
+      "tableName": "USR$CROSS446_248315812",
+      "displayName": "USR$CROSS446_248315812"
+    },
+    {
+      "tableName": "USR$CROSS49",
+      "displayName": "USR$CROSS49"
+    },
+    {
+      "tableName": "USR$CROSS50",
+      "displayName": "USR$CROSS50"
+    },
+    {
+      "tableName": "USR$CROSS582_329519436",
+      "displayName": "Расчеты с покупателем"
+    },
+    {
+      "tableName": "USR$CROSS583_329519436",
+      "displayName": "Отгрузка в отпускных ценах"
+    },
+    {
+      "tableName": "USR$CROSS584_329519436",
+      "displayName": "Отгрузка в учетных ценах"
+    },
+    {
+      "tableName": "USR$CURR_PAYMENT",
+      "displayName": "Валютное платежное поручение"
+    },
+    {
+      "tableName": "USR$DALEXTEST",
+      "displayName": "Таблица для теста переноса настроек"
+    },
+    {
+      "tableName": "USR$ECONOMICS",
+      "displayName": "Данные об экономическом состоянии компании"
+    },
+    {
+      "tableName": "USR$EVAT_ACC",
+      "displayName": "Счета для ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_ADDINFO",
+      "displayName": "Доп. инфо по ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_BLANK",
+      "displayName": "Код типа бланка"
+    },
+    {
+      "tableName": "USR$EVAT_CUSTWITHOUTEVAT",
+      "displayName": "Клиенты без ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_DOCUMENTTYPE",
+      "displayName": "Вид документа ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_DOC_INFO",
+      "displayName": "Данные ЭСЧФ по документу"
+    },
+    {
+      "tableName": "USR$EVAT_ENTRY",
+      "displayName": "Проводки по ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_ERRORLOG",
+      "displayName": "Лог ошибок ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_GOODSLOG",
+      "displayName": "Лог товаров ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_INBOX",
+      "displayName": "Входящие ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_INBOXLINE",
+      "displayName": "Входящие ЭСЧФ(позиция)"
+    },
+    {
+      "tableName": "USR$EVAT_LINECOMMENT",
+      "displayName": "Комментарии для ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_LOG",
+      "displayName": "Лог ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_LOGLINE",
+      "displayName": "Лог ЭСЧФ(позиция)"
+    },
+    {
+      "tableName": "USR$EVAT_MDELIVERY",
+      "displayName": "6. Ручная разноска ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_ROSTER_ADDINFO",
+      "displayName": "Дополнительные данные"
+    },
+    {
+      "tableName": "USR$EVAT_SELLER_RECIPIENT",
+      "displayName": "Статус поставщика/покупателя"
+    },
+    {
+      "tableName": "USR$EVAT_STATUS",
+      "displayName": "Статус ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_TEMP_DELIVERY",
+      "displayName": "Временная разноска"
+    },
+    {
+      "tableName": "USR$EVAT_TYPE",
+      "displayName": "Тип ЭСЧФ"
+    },
+    {
+      "tableName": "USR$EVAT_UNITS",
+      "displayName": "Единицы измерения (ЭСЧФ)"
+    },
+    {
+      "tableName": "USR$F1_FORECAST",
+      "displayName": "Прогноз"
+    },
+    {
+      "tableName": "USR$F1_REALITY",
+      "displayName": "Результаты"
+    },
+    {
+      "tableName": "USR$FA_ACTNEW",
+      "displayName": "ОС. Акт ввода в эксплуатацию"
+    },
+    {
+      "tableName": "USR$FA_ACTNEWLINE",
+      "displayName": "ОС. Акт ввода в эксплуатацию(позиция)"
+    },
+    {
+      "tableName": "USR$FA_AMORT",
+      "displayName": "ОС. Начисление амортизации"
+    },
+    {
+      "tableName": "USR$FA_AMORTLINE",
+      "displayName": "ОС. Начисление амортизации(позиция)"
+    },
+    {
+      "tableName": "USR$FA_BRANCH",
+      "displayName": "ОС. Отрасль народного хозяйства"
+    },
+    {
+      "tableName": "USR$FA_CHANGEPROP",
+      "displayName": "ОС. Изменение свойств"
+    },
+    {
+      "tableName": "USR$FA_CHANGEPROPLINE",
+      "displayName": "ОС. Изменение свойств (позиция)"
+    },
+    {
+      "tableName": "USR$FA_COMPLECT",
+      "displayName": "ОС Комплектация"
+    },
+    {
+      "tableName": "USR$FA_COMPLECTLINE",
+      "displayName": "ОС Комплектация(позиция)"
+    },
+    {
+      "tableName": "USR$FA_CONSERVATION",
+      "displayName": "ОС. Консервация"
+    },
+    {
+      "tableName": "USR$FA_CONSERVATIONLINE",
+      "displayName": "ОС. Консервация(позиция)"
+    },
+    {
+      "tableName": "USR$FA_DESTINATION",
+      "displayName": "ОС. Назначение"
+    },
+    {
+      "tableName": "USR$FA_FINSOURCE",
+      "displayName": "ОС. Источник финансирования"
+    },
+    {
+      "tableName": "USR$FA_GROUP",
+      "displayName": "ОС. Группы"
+    },
+    {
+      "tableName": "USR$FA_INVCARD",
+      "displayName": "ОС. Инвентарная карточка"
+    },
+    {
+      "tableName": "USR$FA_LOCATION",
+      "displayName": "ОС. Местонахождение"
+    },
+    {
+      "tableName": "USR$FA_METHOD",
+      "displayName": "ОС. Метод расчета амортизации"
+    },
+    {
+      "tableName": "USR$FA_MOVEMENT",
+      "displayName": "ОС. Допоступление/Списание затрат"
+    },
+    {
+      "tableName": "USR$FA_MOVEMENTLINE",
+      "displayName": "ОС. Допоступление/Списание затрат (позиция)"
+    },
+    {
+      "tableName": "USR$FA_OKED",
+      "displayName": "ОС. ОКЭД"
+    },
+    {
+      "tableName": "USR$FA_OPTIONS",
+      "displayName": "ОС. Параметры"
+    },
+    {
+      "tableName": "USR$FA_OWNING",
+      "displayName": "ОС. Принадлежность"
+    },
+    {
+      "tableName": "USR$FA_PRODUCTIVITY",
+      "displayName": "ОС. Выработка за период"
+    },
+    {
+      "tableName": "USR$FA_REAPP",
+      "displayName": "ОС. Переоценка"
+    },
+    {
+      "tableName": "USR$FA_REAPPLINE",
+      "displayName": "ОС. Переоценка(позиция)"
+    },
+    {
+      "tableName": "USR$FA_REAPP_B",
+      "displayName": "ОС.Справочник переоценок"
+    },
+    {
+      "tableName": "USR$FA_REAPP_BLINE",
+      "displayName": "ОС. Справочник переоценок(позиция)"
+    },
+    {
+      "tableName": "USR$FA_REMONT",
+      "displayName": "ОС. Ремонт"
+    },
+    {
+      "tableName": "USR$FA_REMONTLINE",
+      "displayName": "ОС. Ремонт(позиция)"
+    },
+    {
+      "tableName": "USR$FA_REMONTTYPE",
+      "displayName": "ОС.Тип ремонта"
+    },
+    {
+      "tableName": "USR$FA_REPAIR",
+      "displayName": "ОС. Ремонт основных средств"
+    },
+    {
+      "tableName": "USR$FA_REPAIRLINE",
+      "displayName": "ОС. Ремонт основных средств(позиция)"
+    },
+    {
+      "tableName": "USR$FA_RPCIPHER",
+      "displayName": "Шифры переоценки"
+    },
+    {
+      "tableName": "USR$FA_RPCOEF",
+      "displayName": "Коэффициенты"
+    },
+    {
+      "tableName": "USR$FA_RPDATE",
+      "displayName": "Переоценка спр."
+    },
+    {
+      "tableName": "USR$FA_RPGROUP",
+      "displayName": "Группы переоценки"
+    },
+    {
+      "tableName": "USR$FA_SCHEDULE_SEASONALITY",
+      "displayName": "ОС. График использования сезонных ОС"
+    },
+    {
+      "tableName": "USR$FA_SCHEDULE_SEASONALITYLINE",
+      "displayName": "ОС. График использования сезонных ОС(позиция)"
+    },
+    {
+      "tableName": "USR$FA_TYPE",
+      "displayName": "ОС. Вид основного средства"
+    },
+    {
+      "tableName": "USR$FA_USAGE",
+      "displayName": "ОС. Использование"
+    }
+  ],
+  "documentTypes": [
+    {
+      "ID": 922911881,
+      "NAME": " Подтверждение расчетов",
+      "HEADERRELKEY": 922911879,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$ACC_CONFSETTLE",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 830841801,
+      "NAME": "* ОС. График лизинговых платежей (базовый)",
+      "HEADERRELKEY": 830841407,
+      "LINERELKEY": 830841203,
+      "HEADER_TABLE": "USR$LEASEPAYPLAN",
+      "LINE_TABLE": "USR$LEASEPAYPLANLINE"
+    },
+    {
+      "ID": 154758289,
+      "NAME": "01. Договор на услуги",
+      "HEADERRELKEY": 154758192,
+      "LINERELKEY": 154758251,
+      "HEADER_TABLE": "USR$BNF_CONTRACT",
+      "LINE_TABLE": "USR$BNF_CONTRACTLINE"
+    },
+    {
+      "ID": 153575743,
+      "NAME": "01. Накладная на получение материалов, ОС, МБП",
+      "HEADERRELKEY": 153575730,
+      "LINERELKEY": 153575733,
+      "HEADER_TABLE": "USR$INV_ADDWBILL",
+      "LINE_TABLE": "USR$INV_ADDWBILLLINE"
+    },
+    {
+      "ID": 154759144,
+      "NAME": "01. Накладная на получение товара",
+      "HEADERRELKEY": 153575730,
+      "LINERELKEY": 153575733,
+      "HEADER_TABLE": "USR$INV_ADDWBILL",
+      "LINE_TABLE": "USR$INV_ADDWBILLLINE"
+    },
+    {
+      "ID": 154741358,
+      "NAME": "01. Начальное формирование",
+      "HEADERRELKEY": 154741309,
+      "LINERELKEY": 154741322,
+      "HEADER_TABLE": "USR$WG_INITINCOME",
+      "LINE_TABLE": "USR$WG_INITINCOMELINE"
+    },
+    {
+      "ID": 154741173,
+      "NAME": "01. Начисление по окладу",
+      "HEADERRELKEY": 154740895,
+      "LINERELKEY": 154741051,
+      "HEADER_TABLE": "USR$WG_SALARYCALC",
+      "LINE_TABLE": "USR$WG_SALARYCALCLINE"
+    },
+    {
+      "ID": 154738126,
+      "NAME": "01. Приказ о приеме на работу",
+      "HEADERRELKEY": 154737511,
+      "LINERELKEY": 154737333,
+      "HEADER_TABLE": "USR$WG_MOVEMENT",
+      "LINE_TABLE": "USR$WG_MOVEMENTLINE"
+    },
+    {
+      "ID": 154517043,
+      "NAME": "01. Расчеты за услуги оказанные",
+      "HEADERRELKEY": 154517038,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$MOG_SERVICE",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154759268,
+      "NAME": "01.Акт выпуска готовой продукции и списания сырья",
+      "HEADERRELKEY": 154759253,
+      "LINERELKEY": 154759257,
+      "HEADER_TABLE": "USR$INV_PRODUCT",
+      "LINE_TABLE": "USR$INV_PRODUCTLINE"
+    },
+    {
+      "ID": 154758332,
+      "NAME": "02. Акт выполненных работ",
+      "HEADERRELKEY": 154758291,
+      "LINERELKEY": 154758312,
+      "HEADER_TABLE": "USR$BNF_ACTS",
+      "LINE_TABLE": "USR$BNF_ACTSLINE"
+    },
+    {
+      "ID": 154759225,
+      "NAME": "02. Внутреннее перемещение товаров",
+      "HEADERRELKEY": 153575756,
+      "LINERELKEY": 153575759,
+      "HEADER_TABLE": "USR$INV_INVMOVE",
+      "LINE_TABLE": "USR$INV_INVMOVELINE"
+    },
+    {
+      "ID": 153575769,
+      "NAME": "02. Внутренние перемещения материалов, МБП",
+      "HEADERRELKEY": 153575756,
+      "LINERELKEY": 153575759,
+      "HEADER_TABLE": "USR$INV_INVMOVE",
+      "LINE_TABLE": "USR$INV_INVMOVELINE"
+    },
+    {
+      "ID": 154516997,
+      "NAME": "02. Входящая счет-фактура по НДС",
+      "HEADERRELKEY": 154516987,
+      "LINERELKEY": 154516990,
+      "HEADER_TABLE": "USR$MOG_INBILLVAT",
+      "LINE_TABLE": "USR$MOG_INBILLVATLINE"
+    },
+    {
+      "ID": 154741405,
+      "NAME": "02. Налогообложение",
+      "HEADERRELKEY": 154741389,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$WG_TAXATION",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154741232,
+      "NAME": "02. Начисление за повременную работу",
+      "HEADERRELKEY": 154741204,
+      "LINERELKEY": 154741211,
+      "HEADER_TABLE": "USR$WG_TIMEWORK",
+      "LINE_TABLE": "USR$WG_TIMEWORKLINE"
+    },
+    {
+      "ID": 154738129,
+      "NAME": "02. Приказ о переводе",
+      "HEADERRELKEY": 154737511,
+      "LINERELKEY": 154737333,
+      "HEADER_TABLE": "USR$WG_MOVEMENT",
+      "LINE_TABLE": "USR$WG_MOVEMENTLINE"
+    },
+    {
+      "ID": 154738135,
+      "NAME": "02а. Изменение условий работы",
+      "HEADERRELKEY": 154737511,
+      "LINERELKEY": 154737333,
+      "HEADER_TABLE": "USR$WG_MOVEMENT",
+      "LINE_TABLE": "USR$WG_MOVEMENTLINE"
+    },
+    {
+      "ID": 154738132,
+      "NAME": "02а. Совмещение",
+      "HEADERRELKEY": 154737511,
+      "LINERELKEY": 154737333,
+      "HEADER_TABLE": "USR$WG_MOVEMENT",
+      "LINE_TABLE": "USR$WG_MOVEMENTLINE"
+    },
+    {
+      "ID": 258120660,
+      "NAME": "02б. Приказ о временном переводе",
+      "HEADERRELKEY": 154737511,
+      "LINERELKEY": 154737333,
+      "HEADER_TABLE": "USR$WG_MOVEMENT",
+      "LINE_TABLE": "USR$WG_MOVEMENTLINE"
+    },
+    {
+      "ID": 154709234,
+      "NAME": "03. Акт переработки",
+      "HEADERRELKEY": 154709200,
+      "LINERELKEY": 154709210,
+      "HEADER_TABLE": "USR$INV_ACTWORK",
+      "LINE_TABLE": "USR$INV_ACTWORKLINE"
+    },
+    {
+      "ID": 838424471,
+      "NAME": "03. Изменение командировки",
+      "HEADERRELKEY": 154566802,
+      "LINERELKEY": 154566805,
+      "HEADER_TABLE": "USR$BN_ORDERBTRIP",
+      "LINE_TABLE": "USR$BN_ORDERBTRIPLINE"
+    },
+    {
+      "ID": 154741176,
+      "NAME": "03. Начисление за сдельно выполненную работу",
+      "HEADERRELKEY": 154740820,
+      "LINERELKEY": 154740850,
+      "HEADER_TABLE": "USR$WG_PIECEWORK",
+      "LINE_TABLE": "USR$WG_PIECEWORKLINE"
+    },
+    {
+      "ID": 154759203,
+      "NAME": "03. Отпуск товара на сторону (оптовая торговля)",
+      "HEADERRELKEY": 153575830,
+      "LINERELKEY": 153575833,
+      "HEADER_TABLE": "USR$INV_SELLBILL",
+      "LINE_TABLE": "USR$INV_SELLBILLLINE"
+    },
+    {
+      "ID": 154759248,
+      "NAME": "03. Отпуск товара на сторону с розничной торговли",
+      "HEADERRELKEY": 153575830,
+      "LINERELKEY": 153575833,
+      "HEADER_TABLE": "USR$INV_SELLBILL",
+      "LINE_TABLE": "USR$INV_SELLBILLLINE"
+    },
+    {
+      "ID": 154741201,
+      "NAME": "03. Пособия на детей",
+      "HEADERRELKEY": 154740565,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$WG_CHILDAID",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154738138,
+      "NAME": "03. Приказ о предоставлении отпуска",
+      "HEADERRELKEY": 154737503,
+      "LINERELKEY": 154738027,
+      "HEADER_TABLE": "USR$WG_LEAVEDOC",
+      "LINE_TABLE": "USR$WG_LEAVEDOCLINE"
+    },
+    {
+      "ID": 154757296,
+      "NAME": "03. Расчеты по расходам будущих периодов",
+      "HEADERRELKEY": 154517038,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$MOG_SERVICE",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154738306,
+      "NAME": "03а. Социальный отпуск",
+      "HEADERRELKEY": 154737503,
+      "LINERELKEY": 154738027,
+      "HEADER_TABLE": "USR$WG_LEAVEDOC",
+      "LINE_TABLE": "USR$WG_LEAVEDOCLINE"
+    },
+    {
+      "ID": 154799470,
+      "NAME": "04. Алименты",
+      "HEADERRELKEY": 154799403,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$WG_ALIMONY",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154741179,
+      "NAME": "04. Бригадный наряд",
+      "HEADERRELKEY": 154741126,
+      "LINERELKEY": 154741149,
+      "HEADER_TABLE": "USR$WG_BRIGADEORDER",
+      "LINE_TABLE": "USR$WG_BRIGADEORDERLINE"
+    },
+    {
+      "ID": 838424531,
+      "NAME": "04. Отмена командировки",
+      "HEADERRELKEY": 154566802,
+      "LINERELKEY": 154566805,
+      "HEADER_TABLE": "USR$BN_ORDERBTRIP",
+      "LINE_TABLE": "USR$BN_ORDERBTRIPLINE"
+    },
+    {
+      "ID": 153575843,
+      "NAME": "04. Отпуск материалов покупателям",
+      "HEADERRELKEY": 153575830,
+      "LINERELKEY": 153575833,
+      "HEADER_TABLE": "USR$INV_SELLBILL",
+      "LINE_TABLE": "USR$INV_SELLBILLLINE"
+    },
+    {
+      "ID": 154738141,
+      "NAME": "04. Приказ об увольнении",
+      "HEADERRELKEY": 154737511,
+      "LINERELKEY": 154737333,
+      "HEADER_TABLE": "USR$WG_MOVEMENT",
+      "LINE_TABLE": "USR$WG_MOVEMENTLINE"
+    },
+    {
+      "ID": 153576800,
+      "NAME": "04. Счета-фактуры (оптовая торговля)",
+      "HEADERRELKEY": 153576787,
+      "LINERELKEY": 153576790,
+      "HEADER_TABLE": "USR$INV_BILL",
+      "LINE_TABLE": "USR$INV_BILLLINE"
+    },
+    {
+      "ID": 154759251,
+      "NAME": "04. Счета-фактуры из розничной торговли",
+      "HEADERRELKEY": 153576787,
+      "LINERELKEY": 153576790,
+      "HEADER_TABLE": "USR$INV_BILL",
+      "LINE_TABLE": "USR$INV_BILLLINE"
+    },
+    {
+      "ID": 153576815,
+      "NAME": "05. Возврат товара от покупателей",
+      "HEADERRELKEY": 153576802,
+      "LINERELKEY": 153576805,
+      "HEADER_TABLE": "USR$INV_RETCUST",
+      "LINE_TABLE": "USR$INV_RETCUSTLINE"
+    },
+    {
+      "ID": 154983260,
+      "NAME": "05. Затраты на основные средства",
+      "HEADERRELKEY": 154983236,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$INV_OUTLAYS",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154741182,
+      "NAME": "05. Начисление отпусков",
+      "HEADERRELKEY": 154740905,
+      "LINERELKEY": 154740926,
+      "HEADER_TABLE": "USR$WG_VACATION",
+      "LINE_TABLE": "USR$WG_VACATIONLINE"
+    },
+    {
+      "ID": 154741308,
+      "NAME": "05. Необлагаемые суммы",
+      "HEADERRELKEY": 154741292,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$WG_INCTAXDEDUCTION",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154738153,
+      "NAME": "05. Приказ о поощрении",
+      "HEADERRELKEY": 154737609,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$WG_REWARDDOC",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 153575799,
+      "NAME": "06. Возврат материалов поставщику",
+      "HEADERRELKEY": 153575786,
+      "LINERELKEY": 153575789,
+      "HEADER_TABLE": "USR$INV_RETPROV",
+      "LINE_TABLE": "USR$INV_RETPROVLINE"
+    },
+    {
+      "ID": 154759199,
+      "NAME": "06. Выдача в торговые подразделения",
+      "HEADERRELKEY": 154759093,
+      "LINERELKEY": 154759105,
+      "HEADER_TABLE": "USR$INV_TOTRADE",
+      "LINE_TABLE": "USR$INV_TOTRADELINE"
+    },
+    {
+      "ID": 154741197,
+      "NAME": "06. Назначение доплаты/удержания",
+      "HEADERRELKEY": 154740738,
+      "LINERELKEY": 154740745,
+      "HEADER_TABLE": "USR$WG_SETPAYMENT",
+      "LINE_TABLE": "USR$WG_SETPAYMENTLINE"
+    },
+    {
+      "ID": 154741185,
+      "NAME": "06. Начисление больничных",
+      "HEADERRELKEY": 154741032,
+      "LINERELKEY": 154741015,
+      "HEADER_TABLE": "USR$WG_SICKLIST",
+      "LINE_TABLE": "USR$WG_SICKLISTLINE"
+    },
+    {
+      "ID": 154738150,
+      "NAME": "06. Приказ о вынесении дисц. взыскания",
+      "HEADERRELKEY": 154737687,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$WG_PENALTYDOC",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154759139,
+      "NAME": "06а. Возврат с торговых подразделений",
+      "HEADERRELKEY": 154759093,
+      "LINERELKEY": 154759105,
+      "HEADER_TABLE": "USR$INV_TOTRADE",
+      "LINE_TABLE": "USR$INV_TOTRADELINE"
+    },
+    {
+      "ID": 154759222,
+      "NAME": "07. Возврат товаров поставщику",
+      "HEADERRELKEY": 153575786,
+      "LINERELKEY": 153575789,
+      "HEADER_TABLE": "USR$INV_RETPROV",
+      "LINE_TABLE": "USR$INV_RETPROVLINE"
+    },
+    {
+      "ID": 154741470,
+      "NAME": "07. За выслугу лет",
+      "HEADERRELKEY": 154741442,
+      "LINERELKEY": 154741455,
+      "HEADER_TABLE": "USR$WG_SENCALC",
+      "LINE_TABLE": "USR$WG_SENCALCLINE"
+    },
+    {
+      "ID": 154840162,
+      "NAME": "07. Приказ на отзыв из отпуска",
+      "HEADERRELKEY": 154840140,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$WG_LEAVESTOPDOC",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 153575784,
+      "NAME": "07. Списание материалов",
+      "HEADERRELKEY": 153575771,
+      "LINERELKEY": 153575774,
+      "HEADER_TABLE": "USR$INV_SPEND",
+      "LINE_TABLE": "USR$INV_SPENDLINE"
+    },
+    {
+      "ID": 154741495,
+      "NAME": "07. Суммы для списания",
+      "HEADERRELKEY": 154741474,
+      "LINERELKEY": 154741482,
+      "HEADER_TABLE": "USR$WG_WRITEOFF",
+      "LINE_TABLE": "USR$WG_WRITEOFFLINE"
+    },
+    {
+      "ID": 154868437,
+      "NAME": "08. Доход от ценных бумаг",
+      "HEADERRELKEY": 154868404,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$WG_INCTAXSECURITIES",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154799401,
+      "NAME": "08. Начисление доплаты за период",
+      "HEADERRELKEY": 154799366,
+      "LINERELKEY": 154799386,
+      "HEADER_TABLE": "USR$WG_ADDPAYBYPERIOD",
+      "LINE_TABLE": "USR$WG_ADDPAYBYPERIODLINE"
+    },
+    {
+      "ID": 153575828,
+      "NAME": "08. Переоценка материалов",
+      "HEADERRELKEY": 153575815,
+      "LINERELKEY": 153575818,
+      "HEADER_TABLE": "USR$INV_NEWCOST",
+      "LINE_TABLE": "USR$INV_NEWCOSTLINE"
+    },
+    {
+      "ID": 155055309,
+      "NAME": "08. Приказ о работе в праздничные дни",
+      "HEADERRELKEY": 155055289,
+      "LINERELKEY": 155055295,
+      "HEADER_TABLE": "USR$WG_HOLIDAYWORK",
+      "LINE_TABLE": "USR$WG_HOLIDAYWORKLINE"
+    },
+    {
+      "ID": 348000577,
+      "NAME": "08. Сведения об уплате косвенных налогов",
+      "HEADERRELKEY": 348000139,
+      "LINERELKEY": 348000142,
+      "HEADER_TABLE": "USR$INV_IMPORTREG",
+      "LINE_TABLE": "USR$INV_IMPORTREGLINE"
+    },
+    {
+      "ID": 154759242,
+      "NAME": "08. Списание товаров",
+      "HEADERRELKEY": 153575771,
+      "LINERELKEY": 153575774,
+      "HEADER_TABLE": "USR$INV_SPEND",
+      "LINE_TABLE": "USR$INV_SPENDLINE"
+    },
+    {
+      "ID": 157695909,
+      "NAME": "09. Доходы для которых установлены иные ставки налога",
+      "HEADERRELKEY": 157695881,
+      "LINERELKEY": 157695891,
+      "HEADER_TABLE": "USR$WG_INCTAXOTHERPAY",
+      "LINE_TABLE": "USR$WG_INCTAXOTHERPAYLINE"
+    },
+    {
+      "ID": 154868434,
+      "NAME": "09. Доходы, для которых установлены иные ставки налога",
+      "HEADERRELKEY": 154868417,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$WG_INCTAXOTHER",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 153575813,
+      "NAME": "09. Инвентаризация материалов",
+      "HEADERRELKEY": 153575801,
+      "LINERELKEY": 153575804,
+      "HEADER_TABLE": "USR$INV_INVENT",
+      "LINE_TABLE": "USR$INV_INVENTLINE"
+    },
+    {
+      "ID": 155052138,
+      "NAME": "09. Индивидуальный наряд",
+      "HEADERRELKEY": 155052103,
+      "LINERELKEY": 155052118,
+      "HEADER_TABLE": "USR$WG_PERSONALORDER",
+      "LINE_TABLE": "USR$WG_PERSONALORDERLINE"
+    },
+    {
+      "ID": 154759232,
+      "NAME": "09. Переоценка товаров",
+      "HEADERRELKEY": 153575815,
+      "LINERELKEY": 153575818,
+      "HEADER_TABLE": "USR$INV_NEWCOST",
+      "LINE_TABLE": "USR$INV_NEWCOSTLINE"
+    },
+    {
+      "ID": 156906769,
+      "NAME": "09. Приказ о предоставлении детского дня",
+      "HEADERRELKEY": 156906740,
+      "LINERELKEY": 156906748,
+      "HEADER_TABLE": "USR$WG_KINDDAY",
+      "LINE_TABLE": "USR$WG_KINDDAYLINE"
+    },
+    {
+      "ID": 348000534,
+      "NAME": "09. Учет входящего НДС",
+      "HEADERRELKEY": 348000139,
+      "LINERELKEY": 348000142,
+      "HEADER_TABLE": "USR$INV_IMPORTREG",
+      "LINE_TABLE": "USR$INV_IMPORTREGLINE"
+    },
+    {
+      "ID": 348000116,
+      "NAME": "1. Исходящие ЭСЧФ",
+      "HEADERRELKEY": 348000075,
+      "LINERELKEY": 348000070,
+      "HEADER_TABLE": "USR$EVAT_LOG",
+      "LINE_TABLE": "USR$EVAT_LOGLINE"
+    },
+    {
+      "ID": 355817285,
+      "NAME": "1. Процент премии (подразделения)",
+      "HEADERRELKEY": 355817253,
+      "LINERELKEY": 355817269,
+      "HEADER_TABLE": "USR$WG_BON_DEP",
+      "LINE_TABLE": "USR$WG_BON_DEPLINE"
+    },
+    {
+      "ID": 760951802,
+      "NAME": "1.1. Сохраненный ЭСЧФ",
+      "HEADERRELKEY": 348000301,
+      "LINERELKEY": 348000304,
+      "HEADER_TABLE": "USR$EVAT_INBOX",
+      "LINE_TABLE": "USR$EVAT_INBOXLINE"
+    },
+    {
+      "ID": 154741194,
+      "NAME": "10. Возврат задолженности",
+      "HEADERRELKEY": 154741009,
+      "LINERELKEY": 154740996,
+      "HEADER_TABLE": "USR$WG_SINKDEBT",
+      "LINE_TABLE": "USR$WG_SINKDEBTLINE"
+    },
+    {
+      "ID": 154759237,
+      "NAME": "10. Инвентаризация товаров",
+      "HEADERRELKEY": 153575801,
+      "LINERELKEY": 153575804,
+      "HEADER_TABLE": "USR$INV_INVENT",
+      "LINE_TABLE": "USR$INV_INVENTLINE"
+    },
+    {
+      "ID": 154710027,
+      "NAME": "10. Отпуск  на доработку (переработку)",
+      "HEADERRELKEY": 153575830,
+      "LINERELKEY": 153575833,
+      "HEADER_TABLE": "USR$INV_SELLBILL",
+      "LINE_TABLE": "USR$INV_SELLBILLLINE"
+    },
+    {
+      "ID": 157684497,
+      "NAME": "10. Приказ о продлении контракта",
+      "HEADERRELKEY": 157684488,
+      "LINERELKEY": 157683296,
+      "HEADER_TABLE": "USR$WG_AGREEMENTLONG",
+      "LINE_TABLE": "USR$WG_AGREEMENTLONGLINE"
+    },
+    {
+      "ID": 154710072,
+      "NAME": "11. Возврат с доработки (переработки)",
+      "HEADERRELKEY": 154710028,
+      "LINERELKEY": 154710039,
+      "HEADER_TABLE": "USR$INV_PROCESSING",
+      "LINE_TABLE": "USR$INV_PROCESSINGLINE"
+    },
+    {
+      "ID": 258120685,
+      "NAME": "11. Приказ о переводе на лёгкий труд",
+      "HEADERRELKEY": 258120662,
+      "LINERELKEY": 258120668,
+      "HEADER_TABLE": "USR$WG_LIGHTWORK",
+      "LINE_TABLE": "USR$WG_LIGHTWORKLINE"
+    },
+    {
+      "ID": 154759192,
+      "NAME": "11. Реализация товаров в розницу",
+      "HEADERRELKEY": 154759148,
+      "LINERELKEY": 154759160,
+      "HEADER_TABLE": "USR$INV_RETAIL",
+      "LINE_TABLE": "USR$INV_RETAILLINE"
+    },
+    {
+      "ID": 156914130,
+      "NAME": "11. Штрафы",
+      "HEADERRELKEY": 154799403,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$WG_ALIMONY",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154983421,
+      "NAME": "12. Комплектация ТМЦ",
+      "HEADERRELKEY": 154983383,
+      "LINERELKEY": 154983358,
+      "HEADER_TABLE": "USR$INV_COMP",
+      "LINE_TABLE": "USR$INV_COMPLINE"
+    },
+    {
+      "ID": 157696303,
+      "NAME": "12. Начисление по-среднему",
+      "HEADERRELKEY": 157695948,
+      "LINERELKEY": 157695957,
+      "HEADER_TABLE": "USR$WG_AVGADDPAY",
+      "LINE_TABLE": "USR$WG_AVGADDPAYLINE"
+    },
+    {
+      "ID": 258261334,
+      "NAME": "12. Приказ о продлении отпуска",
+      "HEADERRELKEY": 258261298,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$WG_LEAVEEXTDOC",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154761322,
+      "NAME": "12. Реализация товаров комиссионером",
+      "HEADERRELKEY": 154761288,
+      "LINERELKEY": 154761297,
+      "HEADER_TABLE": "USR$INV_REALCOMMIS",
+      "LINE_TABLE": "USR$INV_REALCOMMISLINE"
+    },
+    {
+      "ID": 154983450,
+      "NAME": "12.Возврат сырья от переработчика",
+      "HEADERRELKEY": 153576802,
+      "LINERELKEY": 153576805,
+      "HEADER_TABLE": "USR$INV_RETCUST",
+      "LINE_TABLE": "USR$INV_RETCUSTLINE"
+    },
+    {
+      "ID": 258141118,
+      "NAME": "13. Начисление командировочных",
+      "HEADERRELKEY": 258141088,
+      "LINERELKEY": 258141097,
+      "HEADER_TABLE": "USR$WG_TRIPCALC",
+      "LINE_TABLE": "USR$WG_TRIPCALCLINE"
+    },
+    {
+      "ID": 154983418,
+      "NAME": "13. Разукомплектация ТМЦ",
+      "HEADERRELKEY": 154983345,
+      "LINERELKEY": 154983321,
+      "HEADER_TABLE": "USR$INV_DECOMP",
+      "LINE_TABLE": "USR$INV_DECOMPLINE"
+    },
+    {
+      "ID": 154983446,
+      "NAME": "14. Пересчет цен прихода",
+      "HEADERRELKEY": 154983423,
+      "LINERELKEY": 154983430,
+      "HEADER_TABLE": "USR$INV_PRREC",
+      "LINE_TABLE": "USR$INV_PRRECLINE"
+    },
+    {
+      "ID": 423606489,
+      "NAME": "15. Начисление пособий на детей",
+      "HEADERRELKEY": 423606479,
+      "LINERELKEY": 423606481,
+      "HEADER_TABLE": "USR$WG_CHILDAID_CHARGE",
+      "LINE_TABLE": "USR$WG_CHILDAID_CHARGELINE"
+    },
+    {
+      "ID": 348000309,
+      "NAME": "2. Входящие ЭСЧФ",
+      "HEADERRELKEY": 348000301,
+      "LINERELKEY": 348000304,
+      "HEADER_TABLE": "USR$EVAT_INBOX",
+      "LINE_TABLE": "USR$EVAT_INBOXLINE"
+    },
+    {
+      "ID": 355828139,
+      "NAME": "2. Процент повышения \\ понижения",
+      "HEADERRELKEY": 355828107,
+      "LINERELKEY": 355828114,
+      "HEADER_TABLE": "USR$WG_BON_EMPL",
+      "LINE_TABLE": "USR$WG_BON_EMPLLINE"
+    },
+    {
+      "ID": 355830179,
+      "NAME": "3. Расчет премии",
+      "HEADERRELKEY": 355830039,
+      "LINERELKEY": 355830153,
+      "HEADER_TABLE": "USR$WG_BON_CALC",
+      "LINE_TABLE": "USR$WG_BON_CALCLINE"
+    },
+    {
+      "ID": 760951378,
+      "NAME": "3.2 Предварительная разноска",
+      "HEADERRELKEY": 760950348,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$EVAT_TEMP_DELIVERY",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 348002126,
+      "NAME": "6. Ручная разноска ЭСЧФ",
+      "HEADERRELKEY": 348002007,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$EVAT_MDELIVERY",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154741188,
+      "NAME": "99. Итоговое начисление",
+      "HEADERRELKEY": 154740943,
+      "LINERELKEY": 154740876,
+      "HEADER_TABLE": "USR$WG_TOTAL",
+      "LINE_TABLE": "USR$WG_TOTALLINE"
+    },
+    {
+      "ID": 154514859,
+      "NAME": "Bank Transfer Request",
+      "HEADERRELKEY": 154514856,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$BN_TRANSFER",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 257945469,
+      "NAME": "Income",
+      "HEADERRELKEY": 257945470,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$INCM_INCOME",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 257978441,
+      "NAME": "Income.IP",
+      "HEADERRELKEY": 257978442,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$INCM_IP",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 331713883,
+      "NAME": "rrrr",
+      "HEADERRELKEY": null,
+      "LINERELKEY": null,
+      "HEADER_TABLE": null,
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 154444697,
+      "NAME": "Авансовый отчет",
+      "HEADERRELKEY": 154444678,
+      "LINERELKEY": 154444685,
+      "HEADER_TABLE": "USR$BN_BTRIPMONEY",
+      "LINE_TABLE": "USR$BN_BTRIPMONEYLINE"
+    },
+    {
+      "ID": 849040,
+      "NAME": "Акт (протокол) изъятия",
+      "HEADERRELKEY": null,
+      "LINERELKEY": null,
+      "HEADER_TABLE": null,
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 949740691,
+      "NAME": "Акт выполненных работ",
+      "HEADERRELKEY": 949740578,
+      "LINERELKEY": null,
+      "HEADER_TABLE": "USR$BG_ACT_CONTRAC",
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 849010,
+      "NAME": "Акт описи и оценки",
+      "HEADERRELKEY": null,
+      "LINERELKEY": null,
+      "HEADER_TABLE": null,
+      "LINE_TABLE": null
+    },
+    {
+      "ID": 849020,
+      "NAME": "Акт передачи иммущества",
+      "HEADERRELKEY": null,
+      "LINERELKEY": null,
+      "HEADER_TABLE": null,
+      "LINE_TABLE": null
+    }
+  ],
+  "acEntryUsrAnalytics": [
+    {
+      "FIELDNAME": "USR$BANK_ACCOUNT",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Банковский счет"
+    },
+    {
+      "FIELDNAME": "USR$BG_DCONTRACTJOBKEY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Заказ Номер"
+    },
+    {
+      "FIELDNAME": "USR$FA_GROUPKEY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Шифр"
+    },
+    {
+      "FIELDNAME": "USR$FA_INVCARDKEY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Инвентарный номер"
+    },
+    {
+      "FIELDNAME": "USR$FA_TYPEKEY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Вид основных средств"
+    },
+    {
+      "FIELDNAME": "USR$GOLD_TYPECONTRACT",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Тип договора"
+    },
+    {
+      "FIELDNAME": "USR$GROUP_TMC",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Группа ТМЦ"
+    },
+    {
+      "FIELDNAME": "USR$GS_CONTRACT",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Договор"
+    },
+    {
+      "FIELDNAME": "USR$GS_CUSTOMER",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Клиент"
+    },
+    {
+      "FIELDNAME": "USR$GS_DEPARTMENT",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Подразделение (Сотрудник)"
+    },
+    {
+      "FIELDNAME": "USR$GS_DOCUMENT",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Документ"
+    },
+    {
+      "FIELDNAME": "USR$GS_ECONOMICACTIVITY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Вид деятельности"
+    },
+    {
+      "FIELDNAME": "USR$GS_EMPLOYEE",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Сотрудник"
+    },
+    {
+      "FIELDNAME": "USR$GS_EXPENSES",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Статьи затрат"
+    },
+    {
+      "FIELDNAME": "USR$GS_GOOD",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Товар"
+    },
+    {
+      "FIELDNAME": "USR$GS_GOODKEY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Основные и нематериальные"
+    },
+    {
+      "FIELDNAME": "USR$GS_KINDPROFITKEY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Виды прибылей(убытков)"
+    },
+    {
+      "FIELDNAME": "USR$GS_KINDWAGEKEY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Виды выплат"
+    },
+    {
+      "FIELDNAME": "USR$GS_SERVICE",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Услуга"
+    },
+    {
+      "FIELDNAME": "USR$PM_PROJECTKEY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "УП.Проект"
+    },
+    {
+      "FIELDNAME": "USR$TERMINPAY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Срок оплаты"
+    },
+    {
+      "FIELDNAME": "USR$TEST1",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "TEST1"
+    },
+    {
+      "FIELDNAME": "USR$VATTYPE_KEY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Тип НДС"
+    },
+    {
+      "FIELDNAME": "USR$WG_FEETYPEKEY",
+      "RELATIONNAME": "AC_ENTRY",
+      "LNAME": "Вид начисления"
+    }
+  ]
+}

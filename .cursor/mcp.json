@@ -1,24 +1,27 @@
 {
-    "mcpServers": {
-      "next-devtools": {
-        "command": "npx",
-        "args": ["-y", "next-devtools-mcp@latest"]
-      },
-      "nextjs-mcp": {
-        "url": "http://localhost:3003/_next/mcp",
-        "type": "http"
-      },
-      "local-mcp": {
-        "url": "http://localhost:4005/mcp",
-        "type": "http",
-        "headers": {
-          "Authorization": "Bearer ${env:MCP_API_KEY}"
-        }
-      },
-      "local-mcp-std": {
-        "command": "npx",
-        "args": ["-y", "mcp-remote", "http://localhost:4005/mcp"]
+  "mcpServers": {
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    },
+    "mcp-nexus": {
+      "command": "node",
+      "args": [
+        "D:/Git/MCP-Nexus-v2/apps/mcp-server/node_modules/tsx/dist/cli.mjs",
+        "D:/Git/MCP-Nexus-v2/apps/mcp-server/src/index.ts",
+        "stdio"
+      ],
+      "cwd": "D:/Git/MCP-Nexus-v2",
+      "envFile": "D:/Git/MCP-Nexus-v2/.env",
+      "env": {
+        "NODE_FB_HOST": "localhost",
+        "NODE_FB_PORT": "3055",
+        "NODE_FB_DB": "D:\\Soft\\gedemin\\Databases\\BG_NEW_FB5.FDB",
+        "FIREBIRD_SQL_DIALECT": "3",
+        "FIREBIRD_MIN_ENGINE_MAJOR": "5",
+        "FIREBIRD_QUERY_TIMEOUT_MS": "180000",
+        "FIREBIRD_MAX_ROWS": "5000"
       }
     }
   }
-  
+}

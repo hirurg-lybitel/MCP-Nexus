@@ -17,6 +17,8 @@ import { ReadQueryExecutor } from './infrastructure/read-query-executor';
 import { SchemaReader } from './infrastructure/schema-reader';
 import { PatternSensitiveFieldClassifier } from './infrastructure/sensitivity/pattern-sensitive-field-classifier';
 import { CachingTableSchemaRegistry } from './infrastructure/sensitivity/caching-table-schema-registry';
+import { CompatibilityProfileService } from './infrastructure/compatibility-profile';
+import type { CompatibilityProfile } from './infrastructure/compatibility-profile';
 
 export type { IFirebirdConfig, FirebirdSqlDialect } from './config/firebird-config';
 export {
@@ -35,7 +37,13 @@ export {
   SensitiveColumnError,
   UnknownTablesError,
   DialectSqlError,
+  FirebirdUnsupportedEngineError,
 } from './domain/errors';
+export {
+  parseFirebirdEngineMajor,
+  assertMinFirebirdEngineMajor,
+  DEFAULT_MIN_FIREBIRD_ENGINE_MAJOR,
+} from './infrastructure/firebird-engine-version';
 export type { FieldDescriptor } from './domain/sensitivity/field-descriptor';
 export type {
   SensitivitySignal,
@@ -59,7 +67,11 @@ export { assertReadOnlySql } from './infrastructure/read-only-sql-guard';
 export {
   assertDialectCompatibleSql,
 } from './infrastructure/firebird-sql-dialect-guard';
-export { extractTableNamesFromSql } from './infrastructure/sql-table-names';
+export {
+  extractCteNamesFromSql,
+  extractTableNamesFromSql,
+  maskSqlFunctionsWithFrom,
+} from './infrastructure/sql-table-names';
 export {
   isSensitiveColumn,
   redactSensitiveRows,
@@ -75,6 +87,8 @@ export type {
   FirebirdNativeProbeResult,
   LibfbclientDiskReport,
 } from './startup-diagnostics';
+export type { CompatibilityProfile, UnavailableTable } from './infrastructure/compatibility-profile';
+export { CompatibilityProfileService } from './infrastructure/compatibility-profile';
 
 export interface DbServices {
   executeSql: ExecuteSqlUseCase;
@@ -88,6 +102,8 @@ export interface DbServices {
   validateSqlSensitive: ValidateSqlSensitiveUseCase;
   getTableFieldConstraints: GetTableFieldConstraintsUseCase;
   schemaRegistry: CachingTableSchemaRegistry;
+  /** D14: engine + UDF computed-field availability (lazy, cached). */
+  getCompatibilityProfile: (forceRefresh?: boolean) => Promise<CompatibilityProfile>;
   dispose: () => Promise<void>;
 }
 
@@ -100,6 +116,10 @@ export function createDbServices(config: IFirebirdConfig): DbServices {
   const schemaRegistry = new CachingTableSchemaRegistry(
     schemaReader,
     classifier
+  );
+  const compatibility = new CompatibilityProfileService(
+    connection,
+    readExecutor
   );
 
   const executeSql = new ExecuteSqlUseCase(readExecutor);
@@ -122,6 +142,8 @@ export function createDbServices(config: IFirebirdConfig): DbServices {
     validateSqlSensitive,
     getTableFieldConstraints: new GetTableFieldConstraintsUseCase(schemaReader),
     schemaRegistry,
+    getCompatibilityProfile: (forceRefresh) =>
+      compatibility.getProfile(forceRefresh),
     dispose: () => connection.dispose(),
   };
 }

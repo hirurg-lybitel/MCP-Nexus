@@ -1,12 +1,20 @@
+import { loadFirebirdConfig } from '@mcp-nexus/db-firebird';
 import { createMcpExpressApp } from '@modelcontextprotocol/express';
 import { toNodeHandler } from '@modelcontextprotocol/node';
 import { createMcpHandler } from '@modelcontextprotocol/server';
-import { requireMcpAuth, getMcpApiKey, isMcpAuthRequired } from './auth.js';
+import {
+  getDefaultAuthLimiter,
+  getMcpApiKey,
+  requireMcpAuth,
+} from './auth.js';
 import { createServer } from './create-server.js';
+import { checkWorkerLogin } from './startup.js';
 
 export function startHttpServer(port: number, host = '127.0.0.1'): void {
-  if (isMcpAuthRequired() && !getMcpApiKey()) {
-    console.error('MCP_API_KEY is not set; HTTP endpoints will return 503.');
+  if (!getMcpApiKey()) {
+    throw new Error(
+      'HTTP mode requires MCP_API_KEY (Authorization: Bearer <key>).'
+    );
   }
 
   const handler = createMcpHandler(createServer, {
@@ -15,8 +23,9 @@ export function startHttpServer(port: number, host = '127.0.0.1'): void {
   });
   const node = toNodeHandler(handler);
   const app = createMcpExpressApp({ host });
+  const limiter = getDefaultAuthLimiter();
 
-  app.use('/mcp', requireMcpAuth);
+  app.use('/mcp', (req, res, next) => requireMcpAuth(req, res, next, limiter));
   app.all('/mcp', (req, res) => {
     void node(req, res, req.body);
   });
@@ -25,8 +34,28 @@ export function startHttpServer(port: number, host = '127.0.0.1'): void {
     res.json({ ok: true, name: 'mcp-nexus', transport: 'http' });
   });
 
+  app.get('/ready', (_req, res) => {
+    void (async () => {
+      const fb = loadFirebirdConfig();
+      const worker = await checkWorkerLogin();
+      const ready = Boolean(fb) && Boolean(getMcpApiKey());
+      res.status(ready ? 200 : 503).json({
+        ok: ready,
+        firebird: Boolean(fb),
+        mcpApiKey: Boolean(getMcpApiKey()),
+        worker: {
+          configured: worker.configured,
+          reachable: worker.reachable,
+          loginOk: worker.ok,
+          // message is safe (no password)
+          message: worker.message,
+        },
+      });
+    })();
+  });
+
   const server = app.listen(port, host, () => {
-    console.log(`MCP HTTP listening on http://${host}:${port}/mcp`);
+    console.error(`MCP HTTP listening on http://${host}:${port}/mcp`);
   });
 
   const shutdown = async () => {

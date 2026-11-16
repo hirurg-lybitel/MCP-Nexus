@@ -133,6 +133,7 @@ export default function ToolCallPanel({
 
   if (isFirebirdTool(toolName)) {
     switch (toolName) {
+    case 'run_sql':
     case 'execute_sql':
       return <ExecuteSqlToolPanel {...panelProps} />;
     case 'search_tables':

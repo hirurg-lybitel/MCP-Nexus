@@ -4,7 +4,13 @@ import { parse } from 'node:url';
 import next from 'next';
 import { writePresentQueryResultHttp } from './lib/agent/present-query-result-http';
 import { startMcpServer } from './lib/mcp/server';
-import { MCP_PORT, PORT, HOST } from './constants';
+import {
+  MCP_PORT,
+  MCP_UPSTREAM_URL,
+  PORT,
+  HOST,
+  WEB_EMBEDDED_MCP,
+} from './constants';
 import { disposeDbServices } from '@mcp-nexus/db-firebird';
 import { logStartupDiagnostics } from './lib/log-startup-diagnostics';
 
@@ -29,7 +35,16 @@ const hostname = HOST || 'localhost';
 const app = next({ dev, hostname, port, customServer: true  });
 const handle = app.getRequestHandler();
 
-startMcpServer(mcpPort);
+if (WEB_EMBEDDED_MCP) {
+  console.warn(
+    `[web] WEB_EMBEDDED_MCP=1 — starting legacy in-process MCP on :${mcpPort} (not the v2 pure-client mode)`
+  );
+  startMcpServer(mcpPort);
+} else {
+  console.log(
+    `[web] MCP pure client (2.10): BFF → ${MCP_UPSTREAM_URL} (start apps/mcp-server separately)`
+  );
+}
 
 app.prepare().then(() => {
   createServer(async (req, res) => {

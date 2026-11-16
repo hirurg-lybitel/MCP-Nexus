@@ -43,3 +43,10 @@ export class DialectSqlError extends Error {
     this.name = 'DialectSqlError';
   }
 }
+
+export class FirebirdUnsupportedEngineError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'FirebirdUnsupportedEngineError';
+  }
+}

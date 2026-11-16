@@ -18,6 +18,7 @@ import type {
   ReadQueryOptions,
 } from '../ports/IReadQueryExecutor';
 import type { IFirebirdConnection } from '../ports/IFirebirdConnection';
+import { normalizeRowValues } from './normalize-query-value.js';
 
 export class ReadQueryExecutor implements IReadQueryExecutor {
   constructor(
@@ -65,19 +66,23 @@ export class ReadQueryExecutor implements IReadQueryExecutor {
       const resultSet = await attachment.executeQuery(transaction, sql, values);
 
       try {
-        const rows = (await resultSet.fetchAsObject()) as Record<string, unknown>[];
-        if (!applyRowLimit) {
-          return {
-            rows: redactSensitiveRows(rows, this.classifier),
-            rowCount: rows.length,
-            truncated: false,
-          };
-        }
-        const limited = rows.slice(0, this.config.maxRows);
+        const rawRows = (await resultSet.fetchAsObject()) as Record<
+          string,
+          unknown
+        >[];
+        const sliced = applyRowLimit
+          ? rawRows.slice(0, this.config.maxRows)
+          : rawRows;
+        const normalized = await normalizeRowValues(
+          sliced,
+          attachment,
+          transaction
+        );
+        const rows = redactSensitiveRows(normalized, this.classifier);
         return {
-          rows: redactSensitiveRows(limited, this.classifier),
-          rowCount: limited.length,
-          truncated: rows.length > this.config.maxRows,
+          rows,
+          rowCount: rows.length,
+          truncated: applyRowLimit && rawRows.length > this.config.maxRows,
         };
       } finally {
         await resultSet.close();

@@ -2,13 +2,14 @@ import type { FirebirdSqlDialect } from '../sql-dialect';
 import { DialectSqlError } from '../domain/errors';
 
 /**
- * Firebird 2.1+ supports non-recursive CTEs (WITH). Window functions and
- * OFFSET/FETCH appear in 3.0. Dialect '2.5' therefore allows WITH but blocks
- * windows and RECURSIVE; dialect '3' allows all of the above.
+ * Target runtime is Firebird 5 (profile '3'): no SQL feature stripping.
+ * Profile '2.5' is a legacy override for unit tests / emergency local use only —
+ * client databases on 2.5 must be upgraded to Firebird 5 (D2 / D20).
  */
 const DIALECT_25_MESSAGE =
-  'Window functions and WITH RECURSIVE are unavailable on Firebird 2.5. ' +
-  'Non-recursive WITH (CTE) is allowed. Prefer SELECT FIRST … ORDER BY when possible.';
+  'This SQL needs Firebird 5 (window functions, WITH RECURSIVE, or OFFSET/FETCH). ' +
+  'Client databases on Firebird 2.5 must be upgraded. ' +
+  'Non-recursive WITH (CTE) is allowed even on the legacy 2.5 profile.';
 
 const WINDOW_FUNCTION_PATTERNS = [
   /\bOVER\s*\(/i,

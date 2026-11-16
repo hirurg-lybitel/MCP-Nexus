@@ -2,9 +2,19 @@ import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completion
 
 export const HOST = process.env.HOST ?? process.env.HOSTNAME ?? 'localhost';
 export const PORT = process.env.PORT ?? '4004';
-export const MCP_PORT = process.env.NEXT_PUBLIC_MCP_PORT ?? '4005';
-// export const MCP_URL = `http://localhost:${MCP_PORT}/mcp`;
-// export const MCP_URL = `api/mcp`;
+/** Upstream MCP v2 HTTP port (apps/mcp-server). BFF proxies here. */
+export const MCP_PORT = process.env.MCP_PORT ?? process.env.NEXT_PUBLIC_MCP_PORT ?? '4005';
+/** Full upstream MCP URL for the web BFF (2.10 pure client). */
+export const MCP_UPSTREAM_URL =
+  process.env.MCP_UPSTREAM_URL?.trim() ||
+  `http://127.0.0.1:${MCP_PORT}/mcp`;
+/**
+ * Legacy: start the in-process Firebird MCP inside apps/web.
+ * Default off — chat uses apps/mcp-server only (D5 / 2.10).
+ */
+export const WEB_EMBEDDED_MCP =
+  process.env.WEB_EMBEDDED_MCP === '1' ||
+  process.env.WEB_EMBEDDED_MCP === 'true';
 export const OPENAI_SECURITY_KEY = process.env.NEXT_PUBLIC_OPENAI_SECURITY_KEY;
 export const GPT_PROXY_URL = 'https://chatgpt-proxy.gdmn.app/openai';
 
@@ -34,3 +44,15 @@ export const CHAT_CONTENT_MAX_WIDTH = 'max-w-4xl';
 
 /** Max characters for user-provided domain context appended to the chat system prompt. */
 export const MAX_DOMAIN_CONTEXT_CHARS = 8000;
+
+/**
+ * Per-tool MCP call timeout (ms). SDK default is 60s; Gedemin worker reports
+ * often need 120–180s (BUG-05). Override with MCP_TOOL_CALL_TIMEOUT_MS.
+ */
+export const MCP_TOOL_CALL_TIMEOUT_MS = (() => {
+  const raw = Number.parseInt(
+    process.env.MCP_TOOL_CALL_TIMEOUT_MS ?? '180000',
+    10
+  );
+  return Number.isFinite(raw) && raw > 0 ? raw : 180_000;
+})();

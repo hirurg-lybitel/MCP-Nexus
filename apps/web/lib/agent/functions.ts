@@ -56,9 +56,9 @@ export const AgentFunctions: Array<ChatCompletionFunctionTool> = [
           sqlStrategy: {
             type: 'string',
             description:
-              'How you will query (joins, aggregates, SELECT FIRST limit). ' +
-              'Use flat SELECT … JOIN … for dialect 2.5 — no WITH, no window functions. ' +
-              'Do not add row-number columns; the UI prepends № automatically.',
+              'How you will query (joins, aggregates, SELECT FIRST / OFFSET FETCH). ' +
+              'Firebird 5: WITH / windows / RECURSIVE allowed when useful; do not use LIMIT. ' +
+              'Do not add row-number columns unless needed — the UI may prepend № automatically.',
           },
           notes: { type: 'string' },
         },
@@ -71,17 +71,18 @@ export const AgentFunctions: Array<ChatCompletionFunctionTool> = [
     function: {
       name: AgentToolName.PresentQueryResult,
       description:
-        '**Present rows in chat UI (host).** Call once after Firebird **execute_sql** with the **same sql** (and params if used). ' +
-        'Do not copy row values — the server re-runs the query for the UI. ' +
-        'Pass tableName for AT_RELATION_FIELDS labels; use columnLabels for computed SQL aliases. ' +
-        'The UI adds a № row-number column automatically — do not include ROW_NUMBER in SQL.',
+        '**Present rows in chat UI (host).** Two modes: (1) after **execute_sql** / **run_sql** pass the **same sql** (and params) — server re-runs for the UI; ' +
+        '(2) pass **rows** (object array) + title when showing a curated table from an accounting tool. ' +
+        'Accounting tools often auto-render their own UI table — use this for a filtered subset only. ' +
+        'Pass tableName for AT_RELATION_FIELDS labels; use columnLabels for aliases. ' +
+        'The UI adds a № column — do not include ROW_NUMBER in SQL.',
       parameters: {
         type: 'object',
         properties: {
           sql: {
             type: 'string',
             description:
-              'Final read-only SELECT/WITH — same SQL passed to execute_sql',
+              'Final read-only SELECT/WITH — same SQL passed to execute_sql / run_sql',
           },
           params: {
             type: 'object',
@@ -98,7 +99,8 @@ export const AgentFunctions: Array<ChatCompletionFunctionTool> = [
           },
           rows: {
             type: 'array',
-            description: 'Deprecated — use sql instead',
+            description:
+              'Row objects for UI table when not using sql (accounting curated subset)',
             items: { type: 'object' },
           },
           columnLabels: {
@@ -109,11 +111,11 @@ export const AgentFunctions: Array<ChatCompletionFunctionTool> = [
           },
           rowCount: {
             type: 'number',
-            description: 'Deprecated when using sql — taken from query result',
+            description: 'Optional when using rows; taken from query when using sql',
           },
           truncated: {
             type: 'boolean',
-            description: 'Deprecated when using sql — taken from query result',
+            description: 'Optional when using rows; taken from query when using sql',
           },
         },
       },

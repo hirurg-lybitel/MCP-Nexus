@@ -10,9 +10,13 @@ const inputSchema = z.object({
 });
 
 const outputSchema = z.object({
-  rows: z.array(z.record(z.string(), z.unknown())),
-  rowCount: z.number(),
-  truncated: z.boolean(),
+  rows: z.array(z.record(z.string(), z.unknown())).optional(),
+  rowCount: z.number().optional(),
+  truncated: z.boolean().optional(),
+  dataCutoff: z.string().nullable().optional(),
+  // Present when isError — SDK validates structuredContent against this schema
+  error: z.string().optional(),
+  code: z.string().optional(),
 });
 
 export function registerRunSqlTool(server: McpServer): void {

@@ -29,9 +29,15 @@ importers:
 
   apps/mcp-server:
     dependencies:
+      '@mcp-nexus/accounting-sql':
+        specifier: workspace:*
+        version: link:../../packages/accounting-sql
       '@mcp-nexus/db-firebird':
         specifier: workspace:*
         version: link:../../packages/db-firebird
+      '@mcp-nexus/report-worker':
+        specifier: workspace:*
+        version: link:../../packages/report-worker
       '@modelcontextprotocol/express':
         specifier: ^2.0.2
         version: 2.0.2(@modelcontextprotocol/server@2.4.0)(express@5.2.1)
@@ -152,6 +158,18 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  packages/accounting-sql:
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.1
+        version: 25.9.1
+      tsx:
+        specifier: ^4.22.4
+        version: 4.22.4
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/db-firebird:
     dependencies:
       node-firebird-driver-native:
@@ -170,6 +188,22 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+
+  packages/report-worker:
+    dependencies:
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.1
+        version: 25.9.1
+      tsx:
+        specifier: ^4.22.4
+        version: 4.22.4
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
 
 packages:
 

@@ -11,6 +11,7 @@ export const useMcpAdapter = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [tools, setTools] = useState<Array<McpTool>>([]);
   const [prompts, setPrompts] = useState<Array<McpPrompt>>([]);
+  const [instructions, setInstructions] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState<boolean | null>(null);
   const clientRef = useRef<McpClientAdapter | null>(null);
@@ -28,6 +29,7 @@ export const useMcpAdapter = () => {
     setIsConnected(false);
     setTools([]);
     setPrompts([]);
+    setInstructions(null);
     await active.disconnect().catch(() => undefined);
   }, []);
 
@@ -48,11 +50,34 @@ export const useMcpAdapter = () => {
       await newClient.connect();
 
       const toolsResult = await newClient.listTools();
+      // Empty / unsupported prompts must not surface as Next.js Console McpError (-32601).
       const promptsResult = await newClient.listPrompts();
+
+      let serverInstructions = newClient.getInstructions() ?? null;
+      if (!serverInstructions) {
+        try {
+          const headers: HeadersInit = {};
+          if (authToken) {
+            headers.Authorization = `Bearer ${authToken}`;
+          }
+          const instrRes = await fetch('/api/mcp/instructions', { headers });
+          if (instrRes.ok) {
+            const body = (await instrRes.json()) as {
+              instructions?: string;
+            };
+            if (body.instructions?.trim()) {
+              serverInstructions = body.instructions;
+            }
+          }
+        } catch (instrError) {
+          console.warn('MCP instructions fetch failed:', instrError);
+        }
+      }
 
       clientRef.current = newClient;
       setClient(newClient);
       setIsConnected(true);
+      setInstructions(serverInstructions);
       setTools(
         toolsResult.tools.map((tool) => ({
           name: tool.name,
@@ -62,7 +87,7 @@ export const useMcpAdapter = () => {
         }))
       );
       setPrompts(
-        promptsResult.prompts.map((prompt) => ({
+        (promptsResult.prompts ?? []).map((prompt) => ({
           name: prompt.name,
           description: prompt.description,
           arguments: prompt.arguments,
@@ -156,6 +181,7 @@ export const useMcpAdapter = () => {
     error,
     tools,
     prompts,
+    instructions,
     callTool,
     getPrompt,
   };

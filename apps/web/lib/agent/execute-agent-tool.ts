@@ -52,7 +52,7 @@ async function executePresentQueryResult(
 
   if (!sql && !hasRows) {
     return toolErrorJson(
-      'sql is required (pass the same SQL as execute_sql)',
+      'Either sql (same as execute_sql/run_sql) or rows is required',
       'INVALID_PRESENT'
     );
   }

@@ -5,6 +5,7 @@ import type {
   ListPromptsResult,
   GetPromptResult,
 } from '@modelcontextprotocol/sdk/types.js';
+import { MCP_TOOL_CALL_TIMEOUT_MS } from '@/constants';
 
 export type { 
   Tool as McpTool, 
@@ -151,6 +152,37 @@ export class McpClientAdapter {
   }
 
   /**
+   * Server instructions from MCP initialize (D5 / 2.10).
+   */
+  getInstructions(): string | undefined {
+    if (!this.client) return undefined;
+    const client = this.client as unknown as {
+      getInstructions?: () => string | undefined;
+      instructions?: string;
+      _serverInstructions?: string;
+    };
+    if (typeof client.getInstructions === 'function') {
+      const value = client.getInstructions();
+      return value?.trim() ? value : undefined;
+    }
+    const fallback = client.instructions ?? client._serverInstructions;
+    return typeof fallback === 'string' && fallback.trim()
+      ? fallback
+      : undefined;
+  }
+
+  /** True when the server advertised the prompts capability on initialize. */
+  supportsPrompts(): boolean {
+    if (!this.client) return false;
+    const caps = (
+      this.client as unknown as {
+        getServerCapabilities?: () => { prompts?: unknown } | undefined;
+      }
+    ).getServerCapabilities?.();
+    return caps?.prompts != null;
+  }
+
+  /**
    * List available tools
    */
   async listTools(): Promise<ListToolsResult> {
@@ -184,6 +216,10 @@ export class McpClientAdapter {
       throw new Error('Not connected to server.');
     }
 
+    if (!this.supportsPrompts()) {
+      return { prompts: [] };
+    }
+
     try {
       const result = await this.client.listPrompts();
       return result;
@@ -192,14 +228,18 @@ export class McpClientAdapter {
       if (this.isDisconnecting) {
         throw error;
       }
-      
-      // Check if it's a connection closed error - don't log these as they're expected during cleanup
+
       const errorMessage = error instanceof Error ? error.message : String(error);
-      if (errorMessage.includes('Connection closed') || 
-          errorMessage.includes('MCP error -32000')) {
-        throw error; // Re-throw but don't log
+      // v2 without prompts handlers → Method not found; treat as empty catalog
+      if (
+        errorMessage.includes('Connection closed') ||
+        errorMessage.includes('MCP error -32000') ||
+        errorMessage.includes('MCP error -32601') ||
+        errorMessage.includes('Method not found')
+      ) {
+        return { prompts: [] };
       }
-      
+
       console.error('Error listing prompts:', error);
       throw error;
     }
@@ -244,10 +284,14 @@ export class McpClientAdapter {
     }
 
     try {
-      const result = await this.client.callTool({
-        name,
-        arguments: args
-      });
+      const result = await this.client.callTool(
+        {
+          name,
+          arguments: args,
+        },
+        undefined,
+        { timeout: MCP_TOOL_CALL_TIMEOUT_MS }
+      );
       return result;
     } catch (error) {
       console.error(`Error calling tool ${name}:`, error);

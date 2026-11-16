@@ -1,5 +1,6 @@
 import { AgentToolName } from '@/lib/agent/tool-names';
 import { isFirebirdTool } from './firebird-tools';
+import { isAccountingTableTool } from './parse-accounting-table';
 
 /** Host tools with dedicated UI blocks — no duplicate "Using:" panel. */
 const HIDDEN_TOOL_CALL_PANEL = new Set<string>([
@@ -27,8 +28,13 @@ export function isToolPanelVisible(
   if (!shouldShowToolCallPanel(toolName)) {
     return false;
   }
+  // Firebird discovery tools keep a brief panel in normal mode.
   if (isFirebirdTool(toolName)) {
-    return developerMode; // TODO: Maybe it should be true for all tools in the future
+    return true;
+  }
+  // Accounting reports auto-render DataTableView; raw panels stay in developer mode.
+  if (isAccountingTableTool(toolName)) {
+    return developerMode;
   }
   return developerMode;
 }

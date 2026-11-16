@@ -1,0 +1,457 @@
+%YAML 1.1
+---
+StructureVersion: "1.0"
+Properties:
+  RUID: 900000001_900000001
+  Name: "MCP.Worker.API"
+  Caption: "MCP Worker API"
+  Version: "1.0.0.1"
+  Optional: False
+  Internal: True
+  MD5: 00000000000000000000000000000000
+Objects:
+  -
+    Properties:
+      Class: "TgdcFunction"
+      RUID: 900000010_900000001
+      AlwaysOverwrite: True
+      DontRemove: False
+      IncludeSiblings: False
+      HeadObject: 900000030_900000001
+    Fields:
+      NAME: "mcp_JsonEscape"
+      COMMENT: "Escape string for ASCII JSON"
+      EVENT: ~
+      FUNCTIONTYPE: ~
+      GROUPNAME: ~
+      INHERITEDRULE: 0
+      LANGUAGE: "VBScript"
+      LOCALNAME: ~
+      MODIFYDATE: ~
+      MODULE: "UNKNOWN"
+      MODULECODE: "1010001_17 APPLICATION"
+      OBJECTNAME: "APPLICATION"
+      OWNERNAME: ~
+      PUBLICFUNCTION: 1
+      SHORTCUT: ~
+      USEDEBUGINFO: 0
+      EDITIONDATE: 2026-11-03T00:00:00+03:00
+      DISPLAYSCRIPT: |
+        MCP_JSONESCAPE
+
+      ENTEREDPARAMS: !!binary >
+        U0xQUlBSU1QDAAAAVFhUAwAAAFRYVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AABGTlNURkxQUg==
+      SCRIPT: |
+        Option Explicit
+        Function mcp_JsonEscape(ByVal s)
+          Dim t
+          t = CStr(s)
+          t = Replace(t, "\", "\\")
+          t = Replace(t, """", "\""")
+          t = Replace(t, vbCr, "\r")
+          t = Replace(t, vbLf, "\n")
+          t = Replace(t, vbTab, "\t")
+          mcp_JsonEscape = t
+        End Function
+
+  -
+    Properties:
+      Class: "TgdcFunction"
+      RUID: 900000020_900000001
+      AlwaysOverwrite: True
+      DontRemove: False
+      IncludeSiblings: False
+      HeadObject: 900000030_900000001
+    Fields:
+      NAME: "mcp_trial_balance"
+      COMMENT: "HTTP handler /mcp/trial_balance via TgdvAcctCirculationList"
+      EVENT: ~
+      FUNCTIONTYPE: ~
+      GROUPNAME: ~
+      INHERITEDRULE: 0
+      LANGUAGE: "VBScript"
+      LOCALNAME: ~
+      MODIFYDATE: ~
+      MODULE: "UNKNOWN"
+      MODULECODE: "1010001_17 APPLICATION"
+      OBJECTNAME: "APPLICATION"
+      OWNERNAME: ~
+      PUBLICFUNCTION: 1
+      SHORTCUT: ~
+      USEDEBUGINFO: 0
+      EDITIONDATE: 2026-11-03T00:00:00+03:00
+      DISPLAYSCRIPT: |
+        MCP_TRIAL_BALANCE
+
+      ENTEREDPARAMS: !!binary >
+        U0xQUlBSU1QJAAAAQ09NUE9ORU5UCQAAAENPTVBPTkVOVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AABGTlNUUFJTVAYAAABQQVJBTVMGAAAAUEFSQU1TAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEZO
+        U1RQUlNUCgAAAFJFU1BPTlNFTk8KAAAAUkVTUE9OU0VOTwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AABGTlNUUFJTVAsAAABDT05URU5UVEVYVAsAAABDT05URU5UVEVYVAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAABGTlNUUFJTVAoAAABGT1JNUEFSQU1TCgAAAEZPUk1QQVJBTVMAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAARk5TVEZMUFI=
+      SCRIPT: |
+        '#include mcp_JsonEscape
+        Option Explicit
+        Function mcp_Num(ByVal v)
+          Dim s
+          If IsNull(v) Then
+            mcp_Num = "0"
+            Exit Function
+          End If
+          s = CStr(v)
+          s = Replace(s, " ", "")
+          s = Replace(s, ",", ".")
+          If s = "" Then s = "0"
+          mcp_Num = s
+        End Function
+
+        Function mcp_ParseIsoDate(ByVal s)
+          Dim p
+          p = Split(Trim(CStr(s)), "-")
+          If UBound(p) < 2 Then
+            Err.Raise 1001, , "Invalid date, expected YYYY-MM-DD"
+          End If
+          mcp_ParseIsoDate = DateSerial(CInt(p(0)), CInt(p(1)), CInt(p(2)))
+        End Function
+
+        Function mcp_Param(Params, ByVal key, ByVal defaultValue)
+          Dim v
+          On Error Resume Next
+          v = Params.Values(key)
+          If Err.Number <> 0 Then
+            Err.Clear
+            v = ""
+          End If
+          On Error GoTo 0
+          If Trim(CStr(v)) = "" Then
+            mcp_Param = defaultValue
+          Else
+            mcp_Param = v
+          End If
+        End Function
+
+        Function mcp_trial_balance(Component, Params, ByRef ResponseNo, ByRef ContentText, FormParams)
+          Dim token, expected, companyKey, dateBegin, dateEnd, accountKey
+          Dim includeInternal, allHolding, Creator, CL, json, first, aliasName, idVal
+          Dim ncuBeginDebit, ncuBeginCredit, ncuDebit, ncuCredit, ncuEndDebit, ncuEndCredit
+          Dim d1, d2, stepName, errMsg
+
+          ResponseNo = 200
+          expected = "{{MCP_WORKER_TOKEN}}"
+          token = CStr(mcp_Param(Params, "token", ""))
+          If token <> expected Then
+            ResponseNo = 401
+            ContentText.Value = "Content-Type: application/json" & vbCrLf & _
+              "{""ok"":false,""error"":""UNAUTHORIZED""}"
+            Exit Function
+          End If
+
+          companyKey = CLng(mcp_Param(Params, "companyKey", "0"))
+          dateBegin = Trim(CStr(mcp_Param(Params, "dateBegin", "")))
+          dateEnd = Trim(CStr(mcp_Param(Params, "dateEnd", "")))
+          accountKey = Trim(CStr(mcp_Param(Params, "accountKey", "")))
+          includeInternal = (CStr(mcp_Param(Params, "includeInternal", "0")) = "1")
+          allHolding = (CStr(mcp_Param(Params, "allHoldingCompanies", "0")) = "1")
+
+          If companyKey <= 0 Or dateBegin = "" Or dateEnd = "" Then
+            ResponseNo = 400
+            ContentText.Value = "Content-Type: application/json" & vbCrLf & _
+              "{""ok"":false,""error"":""MISSING_PARAMS""}"
+            Exit Function
+          End If
+
+          stepName = "parse_dates"
+          d1 = mcp_ParseIsoDate(dateBegin)
+          d2 = mcp_ParseIsoDate(dateEnd)
+
+          On Error Resume Next
+          stepName = "create"
+          Set Creator = New TCreator
+          Set CL = Creator.GetObject(nil, "TgdvAcctCirculationList", "")
+          If Err.Number <> 0 Or CL Is Nothing Then
+            errMsg = Err.Description
+            ResponseNo = 500
+            ContentText.Value = "Content-Type: application/json" & vbCrLf & _
+              "{""ok"":false,""error"":""CREATE_FAILED"",""step"":""" & stepName & _
+              """,""message"":""" & mcp_JsonEscape(errMsg) & """}"
+            Exit Function
+          End If
+
+          Err.Clear
+          stepName = "bind_db"
+          Set CL.Database = gdcBaseManager.Database
+          Set CL.ReadTransaction = gdcBaseManager.ReadTransaction
+          If Err.Number <> 0 Then
+            errMsg = Err.Description
+            ResponseNo = 500
+            ContentText.Value = "Content-Type: application/json" & vbCrLf & _
+              "{""ok"":false,""error"":""BIND_FAILED"",""step"":""" & stepName & _
+              """,""message"":""" & mcp_JsonEscape(errMsg) & """}"
+            Set CL = Nothing
+            Exit Function
+          End If
+
+          Err.Clear
+          stepName = "params"
+          CL.CompanyKey = companyKey
+          CL.DateBegin = d1
+          CL.DateEnd = d2
+          CL.AllHolding = allHolding
+          CL.IncludeInternalMovement = includeInternal
+          ' Keep chart root in Accounts[0] for UseEntryBalance LB/RB;
+          ' FillSubAccounts would replace it with leaf accounts.
+          CL.WithSubAccounts = False
+          Call CL.ShowInNcu(True, 4, 1)
+          If Err.Number <> 0 Then
+            errMsg = Err.Description
+            ResponseNo = 500
+            ContentText.Value = "Content-Type: application/json" & vbCrLf & _
+              "{""ok"":false,""error"":""PARAM_FAILED"",""step"":""" & stepName & _
+              """,""message"":""" & mcp_JsonEscape(errMsg) & """}"
+            Set CL = Nothing
+            Exit Function
+          End If
+
+          Err.Clear
+          stepName = "add_account"
+          If accountKey <> "" And accountKey <> "0" Then
+            Call CL.AddAccount(CLng(accountKey))
+          Else
+            Dim qChart, chartKey
+            Set qChart = Creator.GetObject(nil, "TIBSQL", "")
+            Set qChart.Transaction = gdcBaseManager.ReadTransaction
+            qChart.SQL.Text = "SELECT FIRST 1 accountkey FROM ac_companyaccount WHERE companykey = :ck ORDER BY accountkey"
+            qChart.ParamByName("ck").AsInteger = companyKey
+            qChart.ExecQuery
+            If qChart.Eof Then
+              ResponseNo = 500
+              ContentText.Value = "Content-Type: application/json" & vbCrLf & _
+                "{""ok"":false,""error"":""NO_CHART"",""step"":""" & stepName & """}"
+              Set qChart = Nothing
+              Set CL = Nothing
+              Exit Function
+            End If
+            chartKey = qChart.Fields(0).AsInteger
+            qChart.Close
+            Set qChart = Nothing
+            Call CL.AddAccount(chartKey)
+          End If
+          If Err.Number <> 0 Then
+            errMsg = Err.Description
+            ResponseNo = 500
+            ContentText.Value = "Content-Type: application/json" & vbCrLf & _
+              "{""ok"":false,""error"":""ADD_ACCOUNT_FAILED"",""step"":""" & stepName & _
+              """,""message"":""" & mcp_JsonEscape(errMsg) & """}"
+            Set CL = Nothing
+            Exit Function
+          End If
+
+          Err.Clear
+          stepName = "build"
+          Call CL.BuildReport
+          If Err.Number <> 0 Then
+            errMsg = Err.Description
+            ResponseNo = 500
+            ContentText.Value = "Content-Type: application/json" & vbCrLf & _
+              "{""ok"":false,""error"":""BUILD_FAILED"",""step"":""" & stepName & _
+              """,""message"":""" & mcp_JsonEscape(errMsg) & """}"
+            Set CL = Nothing
+            Exit Function
+          End If
+
+          Dim emptySql
+          emptySql = ""
+          On Error Resume Next
+          emptySql = CStr(CL.SelectSQL.Text)
+          On Error GoTo 0
+          If InStr(1, emptySql, "RDB$CHARACTER_SET_NAME = '_'", 1) > 0 Then
+            ResponseNo = 500
+            ContentText.Value = "Content-Type: application/json" & vbCrLf & _
+              "{""ok"":false,""error"":""REPORT_TOO_LARGE"",""code"":""D12""," & _
+              """message"":""Worker substituted an empty report (SQL too large). Narrow accounts/period.""}"
+            Set CL = Nothing
+            Exit Function
+          End If
+
+          Err.Clear
+          stepName = "serialize"
+          json = "{""ok"":true,""source"":""tgdv_acct_circulation_list"",""companyKey"":" & companyKey & _
+            ",""dateBegin"":""" & dateBegin & """,""dateEnd"":""" & dateEnd & """" & _
+            ",""includeInternal"":" & LCase(CStr(includeInternal)) & _
+            ",""allHoldingCompanies"":" & LCase(CStr(allHolding)) & _
+            ",""rows"":["
+          first = True
+          If Not CL.IsEmpty Then
+            CL.First
+            Do While Not CL.Eof
+              aliasName = CStr(CL.FieldByName("ALIAS").AsString)
+              idVal = mcp_Num(CL.FieldByName("ID").AsString)
+              ncuBeginDebit = mcp_Num(CL.FieldByName("NCU_BEGIN_DEBIT").AsString)
+              ncuBeginCredit = mcp_Num(CL.FieldByName("NCU_BEGIN_CREDIT").AsString)
+              ncuDebit = mcp_Num(CL.FieldByName("NCU_DEBIT").AsString)
+              ncuCredit = mcp_Num(CL.FieldByName("NCU_CREDIT").AsString)
+              ncuEndDebit = mcp_Num(CL.FieldByName("NCU_END_DEBIT").AsString)
+              ncuEndCredit = mcp_Num(CL.FieldByName("NCU_END_CREDIT").AsString)
+              If Err.Number <> 0 Then
+                errMsg = Err.Description
+                ResponseNo = 500
+                ContentText.Value = "Content-Type: application/json" & vbCrLf & _
+                  "{""ok"":false,""error"":""SERIALIZE_FAILED"",""step"":""" & stepName & _
+                  """,""message"":""" & mcp_JsonEscape(errMsg) & """}"
+                Set CL = Nothing
+                Exit Function
+              End If
+
+              If Not first Then json = json & ","
+              first = False
+              json = json & "{""accountKey"":" & idVal & _
+                ",""alias"":""" & mcp_JsonEscape(aliasName) & """" & _
+                ",""ncuBeginDebit"":" & ncuBeginDebit & _
+                ",""ncuBeginCredit"":" & ncuBeginCredit & _
+                ",""ncuDebit"":" & ncuDebit & _
+                ",""ncuCredit"":" & ncuCredit & _
+                ",""ncuEndDebit"":" & ncuEndDebit & _
+                ",""ncuEndCredit"":" & ncuEndCredit & "}"
+              CL.Next
+            Loop
+          End If
+          json = json & "]}"
+
+          ContentText.Value = "Content-Type: application/json" & vbCrLf & json
+          Set CL = Nothing
+          On Error GoTo 0
+        End Function
+
+  -
+    Properties:
+      Class: "TgdcFunction"
+      RUID: 900000030_900000001
+      AlwaysOverwrite: True
+      DontRemove: False
+      IncludeSiblings: False
+    Fields:
+      NAME: "mcp_web_handlers"
+      COMMENT: "Registers MCP worker HTTP handlers on login"
+      EVENT: ~
+      FUNCTIONTYPE: ~
+      GROUPNAME: ~
+      INHERITEDRULE: 0
+      LANGUAGE: "VBScript"
+      LOCALNAME: ~
+      MODIFYDATE: ~
+      MODULE: "GLOBALOBJECT"
+      MODULECODE: "1010001_17 APPLICATION"
+      OBJECTNAME: "APPLICATION"
+      OWNERNAME: ~
+      PUBLICFUNCTION: 1
+      SHORTCUT: ~
+      USEDEBUGINFO: 0
+      EDITIONDATE: 2026-11-03T00:00:00+03:00
+      DISPLAYSCRIPT: |
+        MCP_WEB_HANDLERS_INITIALIZE
+        MCP_WEB_HANDLERS_TERMINATE
+
+      ENTEREDPARAMS: ~
+      SCRIPT: |
+        '#include mcp_JsonEscape
+        '#include mcp_trial_balance
+        '#include mcp_account_card
+        '#include mcp_account_review
+        '#include mcp_journal_order
+        '#include mcp_run_report_config
+        Option Explicit
+        Public mcp_web_handlers
+
+        Sub mcp_web_handlers_Initialize
+          Set mcp_web_handlers = Nothing
+          Call WebServerControl.RegisterOnGetEvent(nil, "/mcp/trial_balance", "mcp_trial_balance")
+          Call WebServerControl.RegisterOnGetEvent(nil, "/mcp/account_card", "mcp_account_card")
+          Call WebServerControl.RegisterOnGetEvent(nil, "/mcp/account_review", "mcp_account_review")
+          Call WebServerControl.RegisterOnGetEvent(nil, "/mcp/journal_order", "mcp_journal_order")
+          Call WebServerControl.RegisterOnGetEvent(nil, "/mcp/run_report_config", "mcp_run_report_config")
+        End Sub
+
+        Sub mcp_web_handlers_Terminate
+          Set mcp_web_handlers = Nothing
+        End Sub
+
+    Set:
+      -
+        Table: "RP_ADDITIONALFUNCTION"
+        Items:
+          -
+            ADDFUNCTIONKEY: "900000010_900000001 mcp_JsonEscape"
+          -
+            ADDFUNCTIONKEY: "900000020_900000001 mcp_trial_balance"
+          -
+            ADDFUNCTIONKEY: "900000060_900000001 mcp_account_card"
+          -
+            ADDFUNCTIONKEY: "900000070_900000001 mcp_account_review"
+          -
+            ADDFUNCTIONKEY: "900000080_900000001 mcp_journal_order"
+          -
+            ADDFUNCTIONKEY: "900000090_900000001 mcp_run_report_config"
+
+  -
+    Properties:
+      Class: "TgdcMacros"
+      RUID: 900000040_900000001
+      AlwaysOverwrite: True
+      DontRemove: False
+      IncludeSiblings: False
+    Fields:
+      OBJECTNAME: "APPLICATION"
+      MACROSGROUPKEY: "1020001_17 Глобальные макросы"
+      FUNCTIONKEY: "900000050_900000001 mcp_RegisterHandlers"
+      NAME: "mcp_RegisterHandlers"
+      SERVERKEY: ~
+      ISLOCALEXECUTE: 0
+      ISREBUILD: 0
+      EXECUTEDATE: ~
+      SHORTCUT: 0
+      EDITIONDATE: 2026-11-03T00:00:00+03:00
+      DISPLAYINMENU: 0
+      RUNONLOGIN: 1
+
+  -
+    Properties:
+      Class: "TgdcFunction"
+      RUID: 900000050_900000001
+      AlwaysOverwrite: True
+      DontRemove: False
+      IncludeSiblings: False
+      HeadObject: 900000040_900000001
+    Fields:
+      OBJECTNAME: "APPLICATION"
+      MODULE: "MACROS"
+      LANGUAGE: "VBScript"
+      NAME: "mcp_RegisterHandlers"
+      COMMENT: "Fallback registration if GLOBALOBJECT init order differs"
+      SCRIPT: |
+        Option Explicit
+        Sub mcp_RegisterHandlers
+          Call WebServerControl.RegisterOnGetEvent(nil, "/mcp/trial_balance", "mcp_trial_balance")
+          Call WebServerControl.RegisterOnGetEvent(nil, "/mcp/account_card", "mcp_account_card")
+          Call WebServerControl.RegisterOnGetEvent(nil, "/mcp/account_review", "mcp_account_review")
+          Call WebServerControl.RegisterOnGetEvent(nil, "/mcp/journal_order", "mcp_journal_order")
+          Call WebServerControl.RegisterOnGetEvent(nil, "/mcp/run_report_config", "mcp_run_report_config")
+        End Sub
+
+      DISPLAYSCRIPT: |
+        MCP_REGISTERHANDLERS
+
+      MODIFYDATE: ~
+      OWNERNAME: ~
+      FUNCTIONTYPE: ~
+      EVENT: ~
+      LOCALNAME: ~
+      PUBLICFUNCTION: 1
+      SHORTCUT: ~
+      GROUPNAME: ~
+      MODULECODE: "1010001_17 APPLICATION"
+      ENTEREDPARAMS: ~
+      INHERITEDRULE: 0
+      USEDEBUGINFO: 0
+      EDITIONDATE: 2026-11-03T00:00:00+03:00

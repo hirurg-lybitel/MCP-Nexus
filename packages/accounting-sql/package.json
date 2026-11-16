@@ -1,0 +1,21 @@
+{
+  "name": "@mcp-nexus/accounting-sql",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CTE templates for Gedemin accounting on Firebird 5 (v_accounts, v_entries, v_documents)",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "test": "tsx --test src/**/*.test.ts",
+    "smoke:cte": "tsx scripts/smoke-cte.mjs"
+  },
+
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  }
+}

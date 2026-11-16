@@ -1,4 +1,4 @@
-import { MCP_PORT } from '@/constants';
+import { MCP_UPSTREAM_URL } from '@/constants';
 import {
   checkRateLimit,
   copyMcpForwardHeaders,
@@ -7,7 +7,7 @@ import {
 } from '@/lib/mcp/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-const MCP_UPSTREAM = `http://127.0.0.1:${process.env.MCP_PORT ?? MCP_PORT}/mcp`;
+const MCP_UPSTREAM = MCP_UPSTREAM_URL;
 const RATE_LIMIT_MAX = 100;
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 

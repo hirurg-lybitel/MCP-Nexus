@@ -1,0 +1,113 @@
+{
+  "ms": 1059,
+  "rowCount": 391,
+  "sample": [
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "57.3",
+      "NCU_DEBIT": "2338.39",
+      "NCU_CREDIT": 0
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "60.04",
+      "NCU_DEBIT": 0,
+      "NCU_CREDIT": "3656.77"
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "60.1",
+      "NCU_DEBIT": 0,
+      "NCU_CREDIT": "53034.89"
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "60.5",
+      "NCU_DEBIT": 0,
+      "NCU_CREDIT": "49349.89"
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "62.4-1",
+      "NCU_DEBIT": "17779.14",
+      "NCU_CREDIT": 0
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "62.4-2",
+      "NCU_DEBIT": "18329.31",
+      "NCU_CREDIT": 0
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "62.4-4",
+      "NCU_DEBIT": "233.37",
+      "NCU_CREDIT": 0
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "62.4-5",
+      "NCU_DEBIT": "8985.11",
+      "NCU_CREDIT": 0
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "62.4-6",
+      "NCU_DEBIT": "10592.69",
+      "NCU_CREDIT": 0
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "62.4-7",
+      "NCU_DEBIT": "-886.73",
+      "NCU_CREDIT": 0
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "62.4-8",
+      "NCU_DEBIT": "-499.2",
+      "NCU_CREDIT": 0
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "62.4-9",
+      "NCU_DEBIT": "8122.73",
+      "NCU_CREDIT": 0
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "62.410",
+      "NCU_DEBIT": 500,
+      "NCU_CREDIT": 0
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "62.413",
+      "NCU_DEBIT": "7981.09",
+      "NCU_CREDIT": 0
+    },
+    {
+      "ENTRYDATE": "2025-12-01",
+      "ALIAS": "51",
+      "CORR_ALIAS": "71.1",
+      "NCU_DEBIT": 0,
+      "NCU_CREDIT": "212.46"
+    }
+  ],
+  "debitSum": 2932211.5300000003,
+  "creditSum": 3250514.9299999983
+}

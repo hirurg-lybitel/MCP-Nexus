@@ -44,8 +44,8 @@ export function registerFirebirdTools(server: McpServer): void {
   const sqlDialect = parseFirebirdSqlDialect();
   const executeSqlDialectNote =
     sqlDialect === '3'
-      ? 'Dialect 3: WITH and window functions allowed. '
-      : 'Dialect 2.5: SELECT only — no WITH/CTE, no window functions (ROW_NUMBER, OVER). UI adds row numbers automatically. ';
+      ? 'Firebird 5 SQL: WITH / WITH RECURSIVE, window functions (OVER), OFFSET/FETCH allowed. Do not use LIMIT. '
+      : 'Legacy dialect 2.5 override (not for clients): non-recursive WITH only; no windows, no RECURSIVE, no OFFSET/FETCH. ';
 
   server.registerTool(
     'search_tables',
@@ -138,7 +138,7 @@ export function registerFirebirdTools(server: McpServer): void {
         'Execute a read-only SQL query (SELECT or WITH). Never use SELECT * — list only columns needed for the question. ' +
         'Sensitive columns (PASSW, PASSWORD, TOKEN, …) are blocked or redacted server-side. ' +
         'Optional named params as :NAME in params. Result is for the model only (not shown in chat). ' +
-        'After the final query, call the host tool **present_query_result** with the same **sql** (and tableName) — do not copy row values (MCP-Nexus web agent only).',
+        'After the final query, call the host tool **present_query_result** with the same **sql** (and tableName), or pass **rows** for a curated table. Always name key totals in the final answer (MCP-Nexus web agent only).',
       inputSchema: {
         sql: z.string().describe('Read-only SQL (SELECT or WITH only)'),
         params: z

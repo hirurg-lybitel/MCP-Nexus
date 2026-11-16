@@ -122,6 +122,7 @@ export default function GPTAssistant() {
     mcpKeyVerified,
     callTool,
     getPrompt,
+    instructions: mcpInstructions,
     error: mcpError,
   } = useMcpAdapter();
 
@@ -390,7 +391,14 @@ export default function GPTAssistant() {
       }
 
       const conversationMessages: Array<ChatCompletionMessageParam> = [
-        { role: 'system', content: buildSystemPrompt(domainContext, locale) },
+        {
+          role: 'system',
+          content: buildSystemPrompt({
+            userContext: domainContext,
+            locale,
+            serverInstructions: mcpInstructions,
+          }),
+        },
         ...messages
           .filter((msg) => !msg.isUiMessage)
           .map((msg) => ({

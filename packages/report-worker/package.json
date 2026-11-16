@@ -4,9 +4,17 @@
   "private": true,
   "type": "module",
   "description": "Client and namespace for the Gedemin report worker (HTTP on 127.0.0.1)",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "type-check": "tsc --noEmit",
-    "test": "tsx --test src/**/*.test.ts"
+    "test": "tsx --test src/**/*.test.ts",
+    "install-namespace": "node ./scripts/install-namespace.mjs",
+    "uninstall-namespace": "node ./scripts/uninstall-namespace.mjs",
+    "start-worker": "node ./scripts/start-worker.mjs",
+    "supervise-worker": "tsx ./scripts/supervise-worker.mjs",
+    "supervise-pool": "tsx ./scripts/supervise-pool.mjs"
   },
   "dependencies": {
     "zod": "^4.4.3"

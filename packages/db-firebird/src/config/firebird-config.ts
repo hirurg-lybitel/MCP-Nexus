@@ -2,6 +2,7 @@ import {
   parseFirebirdSqlDialect,
   type FirebirdSqlDialect,
 } from '../sql-dialect';
+import { DEFAULT_MIN_FIREBIRD_ENGINE_MAJOR } from './firebird-engine-policy.js';
 
 export type { FirebirdSqlDialect } from '../sql-dialect';
 export { parseFirebirdSqlDialect } from '../sql-dialect';
@@ -15,6 +16,8 @@ export interface IFirebirdConfig {
   maxRows: number;
   queryTimeoutMs: number;
   sqlDialect: FirebirdSqlDialect;
+  /** Minimum Firebird major version (default 5). */
+  minEngineMajor: number;
 }
 
 export function buildConnectionString(config: Pick<IFirebirdConfig, 'host' | 'port' | 'database'>): string {
@@ -39,6 +42,10 @@ export function loadFirebirdConfig(env: NodeJS.ProcessEnv = process.env): IFireb
 
   const maxRows = Number.parseInt(env.FIREBIRD_MAX_ROWS ?? '500', 10);
   const queryTimeoutMs = Number.parseInt(env.FIREBIRD_QUERY_TIMEOUT_MS ?? '30000', 10);
+  const minEngineRaw = Number.parseInt(
+    env.FIREBIRD_MIN_ENGINE_MAJOR ?? String(DEFAULT_MIN_FIREBIRD_ENGINE_MAJOR),
+    10
+  );
 
   return {
     host,
@@ -49,5 +56,9 @@ export function loadFirebirdConfig(env: NodeJS.ProcessEnv = process.env): IFireb
     maxRows: Number.isFinite(maxRows) && maxRows > 0 ? maxRows : 500,
     queryTimeoutMs: Number.isFinite(queryTimeoutMs) && queryTimeoutMs > 0 ? queryTimeoutMs : 30_000,
     sqlDialect: parseFirebirdSqlDialect(env),
+    minEngineMajor:
+      Number.isFinite(minEngineRaw) && minEngineRaw > 0
+        ? minEngineRaw
+        : DEFAULT_MIN_FIREBIRD_ENGINE_MAJOR,
   };
 }

@@ -1,5 +1,7 @@
 export const FIREBIRD_TOOL_NAMES = [
   'execute_sql',
+  /** MCP v2 name (same shape as execute_sql for UI panels). */
+  'run_sql',
   'search_tables',
   'describe_table',
   'list_tables',

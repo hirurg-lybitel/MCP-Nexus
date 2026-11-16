@@ -14,7 +14,9 @@
     "test": "tsx --test src/**/*.test.ts"
   },
   "dependencies": {
+    "@mcp-nexus/accounting-sql": "workspace:*",
     "@mcp-nexus/db-firebird": "workspace:*",
+    "@mcp-nexus/report-worker": "workspace:*",
     "@modelcontextprotocol/express": "^2.0.2",
     "@modelcontextprotocol/node": "^2.1.2",
     "@modelcontextprotocol/server": "^2.4.0",

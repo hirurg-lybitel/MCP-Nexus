@@ -52,8 +52,17 @@ describe('assertReadOnlySql', () => {
     rejects('   ');
   });
 
-  it('rejects GEN_ID', () => {
+  it('rejects mutating GEN_ID (non-zero step)', () => {
     rejects('SELECT GEN_ID(MY_GEN, 1) FROM RDB$DATABASE');
+    rejects('SELECT GEN_ID(gd_g_entry_balance_date, :step) FROM RDB$DATABASE');
+  });
+
+  it('allows GEN_ID(..., 0) read of generator value', () => {
+    assert.doesNotThrow(() =>
+      assertReadOnlySql(
+        "SELECT CAST(DATE '1858-11-17' + GEN_ID(gd_g_entry_balance_date, 0) AS DATE) AS closedate FROM ac_account"
+      )
+    );
   });
 
   it('rejects FOR UPDATE', () => {

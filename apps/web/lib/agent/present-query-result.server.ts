@@ -32,9 +32,6 @@ export async function enrichPresentQueryResult(
     rowCount = result.rowCount;
     truncated = result.truncated;
   } else if (Array.isArray(input.rows)) {
-    console.warn(
-      'present_query_result: rows is deprecated — pass sql (and optional params) instead.'
-    );
     rowObjects = input.rows.filter(
       (r) => r && typeof r === 'object' && !Array.isArray(r)
     );
