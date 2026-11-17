@@ -67,3 +67,17 @@ HTTP: URL `http://127.0.0.1:4005/mcp`, заголовок `Authorization: Bearer
 Учёт: `get_chart_of_accounts`, `get_trial_balance`, `get_balance` / `get_account_saldo`, `get_account_card`, `get_account_analysis`, `get_journal_order`.  
 Конфиги: `list_report_configs`, `run_report_config`.  
 Документы: `get_documents`, `get_document`. SQL: `run_sql` (только чтение).
+
+## Docker (stack on WORKING)
+
+Firebird stays on another LAN host. Gedemin runs on the Windows Docker host (:9080). Two containers: this MCP server and `apps/web` as BFF client.
+
+```bash
+# from repo root — copy .env.stack.example to .env and fill secrets
+pnpm docker:stack:up
+# MCP: http://127.0.0.1:4005/ready
+# UI:  http://127.0.0.1:4004
+pnpm docker:stack:down
+```
+
+Compose file: `docker-compose.stack.yaml`. Worker URL from the server container: `GEDEMIN_WORKER_URL=http://host.docker.internal:9080`.

@@ -31,7 +31,11 @@ COPY apps/web ./apps/web
 COPY packages/db-firebird ./packages/db-firebird
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 
+# Build db-firebird dist; remove only @mcp-nexus/db-firebird* path aliases so Next uses package exports.
+# Keep @/* for the web app.
 RUN pnpm install --frozen-lockfile \
+    && pnpm --filter @mcp-nexus/db-firebird build \
+    && node -e "const fs=require('fs');const p='apps/web/tsconfig.json';const j=JSON.parse(fs.readFileSync(p,'utf8'));const paths=j.compilerOptions&&j.compilerOptions.paths;if(paths){for(const k of Object.keys(paths)){if(k.startsWith('@mcp-nexus/db-firebird'))delete paths[k];}}fs.writeFileSync(p,JSON.stringify(j,null,2));" \
     && pnpm turbo run build --filter=web... \
     && pnpm --filter web deploy --prod --legacy ./out \
     && cp -rL /app/apps/web/.next /app/out/.next \

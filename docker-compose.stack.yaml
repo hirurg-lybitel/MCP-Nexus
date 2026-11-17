@@ -1,0 +1,56 @@
+# MCP Nexus stack on WORKING (Docker Desktop)
+# - Firebird: external LAN (NODE_FB_*)
+# - Gedemin: on the Windows host :9080 (host.docker.internal)
+# - mcp-server + web: this compose
+services:
+  mcp-server:
+    container_name: mcp-nexus-server
+    build:
+      context: .
+      dockerfile: apps/mcp-server/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${MCP_PORT:-4005}:4005"
+    env_file:
+      - .env
+    environment:
+      TZ: Europe/Minsk
+      NODE_ENV: production
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "4005"
+      # Interpolated from --env-file (overrides env_file). WORKING: LAN IP. Local: stack-up remaps localhost→host.docker.internal.
+      NODE_FB_HOST: ${NODE_FB_HOST}
+      GEDEMIN_WORKER_URL: ${GEDEMIN_WORKER_URL:-http://host.docker.internal:9080}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - mcp_net
+
+  web:
+    container_name: mcp-nexus-web
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_MCP_PORT: ${NEXT_PUBLIC_MCP_PORT:-4005}
+    restart: unless-stopped
+    ports:
+      - "${PORT:-4004}:4004"
+    env_file:
+      - .env
+    environment:
+      TZ: Europe/Minsk
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "4004"
+      WEB_EMBEDDED_MCP: "0"
+      MCP_UPSTREAM_URL: http://mcp-server:4005/mcp
+      MCP_PORT: "4005"
+    depends_on:
+      - mcp-server
+    networks:
+      - mcp_net
+
+networks:
+  mcp_net:
+    driver: bridge

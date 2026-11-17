@@ -28,7 +28,7 @@ export function resolveWorkerUrls(
       .filter(Boolean);
     if (urls.length < 1 || urls.length > 4) {
       throw new Error(
-        'GEDEMIN_WORKER_URLS must list 1–4 comma-separated http://127.0.0.1:port URLs'
+        'GEDEMIN_WORKER_URLS must list 1–4 comma-separated http://host:port URLs (127.0.0.1 or host.docker.internal for Docker)'
       );
     }
     return urls;
@@ -61,8 +61,9 @@ export function loadReportWorkerConfig(
   env: NodeJS.ProcessEnv = process.env
 ): ReportWorkerConfig | null {
   const user = env.GEDEMIN_WORKER_USER?.trim();
+  // Empty password is valid for some Gedemin installs (e.g. local Administrator).
   const password = env.GEDEMIN_WORKER_PASSWORD ?? '';
-  if (!user || !password) {
+  if (!user) {
     return null;
   }
 

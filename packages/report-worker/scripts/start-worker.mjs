@@ -37,8 +37,8 @@ if (!existsSync(exe)) {
   console.error('gedemin.exe not found:', exe);
   process.exit(1);
 }
-if (!user || !password) {
-  console.error('GEDEMIN_WORKER_USER / GEDEMIN_WORKER_PASSWORD missing in .env');
+if (!user) {
+  console.error('GEDEMIN_WORKER_USER missing in .env');
   process.exit(1);
 }
 if (!sn) {

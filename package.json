@@ -22,6 +22,10 @@
     "docker:prod:pull": "docker compose -f docker-compose.prod.yaml pull",
     "docker:prod:up": "docker compose -f docker-compose.prod.yaml --env-file .env up -d",
     "docker:prod:down": "docker compose -f docker-compose.prod.yaml down",
+    "docker:stack:up": "docker compose -f docker-compose.stack.yaml --env-file .env up -d --build",
+    "docker:stack:down": "docker compose -f docker-compose.stack.yaml down",
+    "docker:mcp:up": "docker compose -f docker-compose.mcp.yaml --env-file .env up -d --build",
+    "docker:mcp:down": "docker compose -f docker-compose.mcp.yaml down",
     "firebird:smoke": "pnpm --filter @mcp-nexus/db-firebird smoke",
     "firebird:build-native": "pnpm rebuild node-firebird-native-api"
   },
