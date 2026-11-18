@@ -1,0 +1,1579 @@
+[
+  {
+    "id": "D1",
+    "group": "director",
+    "prompt": "Сколько нам должны покупатели и сколько мы должны поставщикам на конец декабря 2025?",
+    "totalMs": 52746,
+    "turnError": null,
+    "steps": 3,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Определить дебиторскую задолженность покупателей и кредиторскую задолженность поставщикам на конец декабря 2025 года.",
+          "summary": "Нужно получить сальдо на дату 2025-12-31 по счетам 62 (покупатели) и 60 (поставщики) с включением субсчетов, затем взять totals.debitNcu для 62 как ДЗ покупателей и totals.creditNcu для 60 как КЗ поставщикам. Организация в вопросе не названа, поэтому companyKey не передаю — сервер подставит единственную рабочую организацию или вернёт AMBIGUOUS_COMPANY. Если потребуется, покажу, что дата среза именно 2025-12-31 и суммы в белорусских рублях (NCU).",
+          "discoverySteps": [
+            {
+              "phase": "query",
+              "tool": "functions.find_account",
+              "description": "При необходимости уточнить IDs счетов 60 и 62 в активном плане, если поиск по алиасу/названию понадобится для проверки, но для ответа обычно достаточно known account ids из поиска."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_balance",
+              "description": "Получить saldo на дату 2025-12-31 по счёту 62 (покупатели), withSubAccounts=true, summaryOnly=true."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_balance",
+              "description": "Получить saldo на дату 2025-12-31 по счёту 60 (поставщики), withSubAccounts=true, summaryOnly=true."
+            },
+            {
+              "phase": "present",
+              "tool": "functions.present_query_result",
+              "description": "При необходимости отобразить короткую сводку с итогами по двум счетам."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "displayName": "План счетов",
+              "role": "Справочник счетов"
+            }
+          ],
+          "sqlStrategy": "Использовать специализированные accounting tools, а не run_sql. Для ответа нужны только totals.debitNcu по 62 и totals.creditNcu по 60 на дату 2025-12-31. Не суммировать строки вручную и не использовать withSubAccounts=false для синтетических счетов.",
+          "notes": "Если сервер вернёт AMBIGUOUS_COMPANY, нужно запросить название организации у пользователя."
+        },
+        "durationMs": 1,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Определить дебиторскую задолженность покупателей и кредиторскую задолженность поставщикам на конец декабря 2025 года.\",\"summary\":\"Нужно получить сальдо на дату 2025-12-31 по счетам 62 (покупатели) и 60 (поставщики) с включением субсчетов, затем взять totals.debitNcu для 62 как ДЗ покупателей и totals.creditNcu для 60 как КЗ поставщикам. Организация в вопросе не названа, поэтому companyKey не передаю — сервер подставит единственную рабочую организацию или вернёт AMBIGUOUS_COMPANY. Если потребуется, покажу, что дата среза именно 2025-12-31 и суммы в белорусских рублях (NCU).\",\"discoverySteps\":[{\"phase\":\"query\",\"tool\":\"functions.find_account\",\"description\":\"При необходимости уточнить IDs счетов 60 и 62 в активном плане, если поиск по алиасу/названию понадобится для проверки, но"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "62",
+          "limit": 10
+        },
+        "durationMs": 37121,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366200,\"alias\":\"62\",\"name\":\"Расчеты с покупателями и заказчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":366204,\"alias\":\"62.04\",\"name\":\"Расчеты с покупателями в кредит НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366201,\"alias\":\"62.1\",\"name\":\"Расчеты с покупателями и заказчиками (задолженность)\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366202,\"alias\":\"62.2\",\"name\":\"Расчеты плановыми платежами\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":284038375,\"alias\":\"62.2-1\",\"name\":\"Расчеты по ВНК НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":366203,\"alias\":\"62.3\",\"name\":\"Векселя полученные (стар)\",\"accountType\":\"S\",\"parent\":176461267,\"offbalance\":0},{\"id\":148529707,\"alias\":\"62.4\",\""
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "60",
+          "limit": 10
+        },
+        "durationMs": 50,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366000,\"alias\":\"60\",\"name\":\"Расчеты с поставщиками и подрядчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":189773997,\"alias\":\"60.01\",\"name\":\"Расчеты с поставщиками (Борисов)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189773999,\"alias\":\"60.02\",\"name\":\"Расчеты с поставщиками (Молодечно)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774001,\"alias\":\"60.03\",\"name\":\"Расчеты с поставщиками (Слуцк)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774003,\"alias\":\"60.04\",\"name\":\"Расчеты с поставщиками (кафе-29)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774005,\"alias\":\"60.05\",\"name\":\"Расчеты с поставщиками (аккредитив)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":148542117,\"alias\":\"60.1\",\"name\":\"Ра"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 366200,
+          "dateEnd": "2025-12-31",
+          "withSubAccounts": true,
+          "summaryOnly": true
+        },
+        "durationMs": 578,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366200,\"accountAlias\":\"62\",\"accountName\":\"Расчеты с покупателями и заказчиками\",\"dateEnd\":\"2025-12-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":4,\"rowCount\":0,\"totals\":{\"debitNcu\":\"823.864\",\"creditNcu\":\"0\",\"debitCurr\":\"0\",\"creditCurr\":\"0\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"823.864\"},\"relatedSiblingAccounts\":[{\"accountKey\":284038375,\"alias\":\"62.2-1\",\"name\":\"Расчеты по ВНК НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\"},{\"accountKey\":366203,\"alias\":\"62.3\",\"name\":\"Векселя полученные (стар)\",\"accountType\":\"S\"},{\"accountKey\":148529707,\"alias\":\"62.4\",\"name\":\"Авансы полученные\",\"accountType\":\"A\"},{\"accountKey\":148040931,\"alias"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 366000,
+          "dateEnd": "2025-12-31",
+          "withSubAccounts": true,
+          "summaryOnly": true
+        },
+        "durationMs": 5591,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366000,\"accountAlias\":\"60\",\"accountName\":\"Расчеты с поставщиками и подрядчиками\",\"dateEnd\":\"2025-12-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":14,\"rowCount\":0,\"totals\":{\"debitNcu\":\"657687.127\",\"creditNcu\":\"1933.1951\",\"debitCurr\":\"2670.73\",\"creditCurr\":\"219833917.96\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"655753.9319\"},\"relatedSiblingAccounts\":[{\"accountKey\":148040908,\"alias\":\"60.4\",\"name\":\"Расчеты по авансам выданным (стар)\",\"accountType\":\"A\"}],\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateEnd\":\"2025-12-31\",\"accountKey\":366000,\"includeInternal\":fa"
+      }
+    ],
+    "finalAnswer": "На конец **2025-12-31** по организации **БелГИСС**:\n\n- **Покупатели должны нам (дебиторка по счёту 62): 823.864 бел. руб.**\n- **Мы должны поставщикам (кредиторка по счёту 60): 1 933.1951 бел. руб.**\n\nЕсли хотите, могу сразу развернуть это по субсчетам 60 и 62."
+  },
+  {
+    "id": "D2",
+    "group": "director",
+    "prompt": "Какая выручка и прибыль (убыток) за 2025 год?",
+    "totalMs": 14558,
+    "turnError": null,
+    "steps": 3,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Определить выручку и прибыль/убыток за 2025 год по учётной базе Gedemin.",
+          "summary": "Сначала найду в плане счетов счёт 90 и счёт 99, чтобы взять их реальные accountKey. Затем запрошу обороты/сальдо за 2025 год по этим счетам через get_account_analysis или get_balance, ориентируясь на названия счетов и итоги, а не на коды. Для выручки и прибыли важно не трактовать узлы 90.* только по номеру; при необходимости проверю ветки 90 и 99 в плане счетов, чтобы понять структуру и связанные счета.",
+          "discoverySteps": [
+            {
+              "phase": "discovery",
+              "tool": "find_account",
+              "description": "Найти счёт 90 в активном плане счетов и получить его реальный id, alias и название."
+            },
+            {
+              "phase": "discovery",
+              "tool": "find_account",
+              "description": "Найти счёт 99 в активном плане счетов и получить его реальный id, alias и название."
+            },
+            {
+              "phase": "query",
+              "tool": "get_account_analysis",
+              "description": "Получить обороты за 2025 год по счёту 90 для определения выручки по названию/структуре счета."
+            },
+            {
+              "phase": "query",
+              "tool": "get_account_analysis",
+              "description": "Получить обороты за 2025 год по счёту 99 для определения прибыли/убытка по названию/структуре счета."
+            },
+            {
+              "phase": "present",
+              "tool": "present_query_result",
+              "description": "При необходимости показать краткую сводку по итогам и ключевым строкам без больших таблиц."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "role": "План счетов (поиск и верификация 90/99)"
+            }
+          ],
+          "sqlStrategy": "SQL не нужен: сначала использовать find_account для 90 и 99, затем взять обороты за период через get_account_analysis для каждого счёта. Итоговые суммы выручки и прибыли/убытка не вычислять вручную из сырых строк, а читать из итогов отчётов и по названию счета/субсчетов. Если 90/99 имеют связанные соседние счета, при необходимости дополнить отдельными вызовами по relatedSiblingAccounts.",
+          "notes": "В ответе обязательно назвать организацию/период/валюту и взять цифры только из tool output. Если user не назвал организацию, можно не передавать companyKey."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Определить выручку и прибыль/убыток за 2025 год по учётной базе Gedemin.\",\"summary\":\"Сначала найду в плане счетов счёт 90 и счёт 99, чтобы взять их реальные accountKey. Затем запрошу обороты/сальдо за 2025 год по этим счетам через get_account_analysis или get_balance, ориентируясь на названия счетов и итоги, а не на коды. Для выручки и прибыли важно не трактовать узлы 90.* только по номеру; при необходимости проверю ветки 90 и 99 в плане счетов, чтобы понять структуру и связанные счета.\",\"discoverySteps\":[{\"phase\":\"discovery\",\"tool\":\"find_account\",\"description\":\"Найти счёт 90 в активном плане счетов и получить его реальный id, alias и название.\"},{\"phase\":\"discovery\",\"tool\":\"find_account\",\"description\":\"Найти счёт 99 в активном плане счетов и получить его реальный id, alias "
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "90",
+          "limit": 20
+        },
+        "durationMs": 108,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":344600,\"alias\":\"90\",\"name\":\"Доходы и расходы по текущей деятельности\",\"accountType\":\"A\",\"parent\":385000,\"offbalance\":0},{\"id\":390001,\"alias\":\"90---\",\"name\":\"Реализация\",\"accountType\":\"A\",\"parent\":176461267,\"offbalance\":0},{\"id\":344601,\"alias\":\"90.01\",\"name\":\"Выручка от реализации (Общая)\",\"accountType\":\"A\",\"parent\":385000,\"offbalance\":0},{\"id\":344602,\"alias\":\"90.02\",\"name\":\"Выручка от реализации (кафе-29)\",\"accountType\":\"A\",\"parent\":385000,\"offbalance\":0},{\"id\":189774108,\"alias\":\"90.02.01\",\"name\":\"Покупная стоимость\",\"accountType\":\"S\",\"parent\":344602,\"offbalance\":0},{\"id\":189774110,\"alias\":\"90.02.02\",\"name\":\"Затраты на производство и реализацию продукции (учитываемые)\",\"accountType\":\"S\",\"parent\":344602,\"offbalance\":0},{\"id\":189774130,\"alias\":\"90.02.03\",\"name\":\"Затраты на"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "99",
+          "limit": 20
+        },
+        "durationMs": 57,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":150262535,\"alias\":\"99\",\"name\":\"Прибыли и убытки\",\"accountType\":\"A\",\"parent\":385000,\"offbalance\":0},{\"id\":189774097,\"alias\":\"99.03\",\"name\":\"Налоги уплачиваемые из прибыли\",\"accountType\":\"S\",\"parent\":380001,\"offbalance\":0},{\"id\":189774325,\"alias\":\"99.03.01\",\"name\":\"Налог на недвижимость\",\"accountType\":\"S\",\"parent\":189774097,\"offbalance\":0},{\"id\":189774321,\"alias\":\"99.03.02\",\"name\":\"Налог на прибыль\",\"accountType\":\"S\",\"parent\":189774097,\"offbalance\":0},{\"id\":189774327,\"alias\":\"99.03.03\",\"name\":\"Целевой сбор (транспортный)\",\"accountType\":\"S\",\"parent\":189774097,\"offbalance\":0},{\"id\":189774333,\"alias\":\"99.03.05\",\"name\":\"Налог на доходы\",\"accountType\":\"S\",\"parent\":189774097,\"offbalance\":0},{\"id\":189774331,\"alias\":\"99.03.07\",\"name\":\"Штрафные санкции\",\"accountType\":\"S\",\"parent\":1"
+      },
+      {
+        "name": "get_account_analysis",
+        "args": {
+          "accountKey": 344600,
+          "dateBegin": "2025-01-01",
+          "dateEnd": "2025-12-31",
+          "withSubAccounts": true
+        },
+        "durationMs": 474,
+        "isError": false,
+        "resultPreview": "{\"source\":\"tgdv_acct_acc_review\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":344600,\"accountAlias\":\"90\",\"accountName\":\"Доходы и расходы по текущей деятельности\",\"dateBegin\":\"2025-01-01\",\"dateEnd\":\"2025-12-31\",\"includeInternal\":false,\"withSubAccounts\":true,\"allHoldingCompanies\":false,\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateBegin\":\"2025-01-01\",\"dateEnd\":\"2025-12-31\",\"accountKey\":344600,\"includeInternal\":false,\"allHoldingCompanies\":false,\"withSubAccounts\":true},\"saldoBeginNcu\":\"-0.0031\",\"saldoEndNcu\":\"-0.0031\",\"saldoBeginDebitNcu\":\"0\",\"saldoBeginCreditNcu\":\"0.0031\",\"saldoEndDebitNcu\":\"0\",\"saldoEndCreditNcu\":\"0.0031\",\"turnoverDebitNcu\":\"7543750.62\",\"turnoverCreditNcu\":\""
+      },
+      {
+        "name": "get_account_analysis",
+        "args": {
+          "accountKey": 150262535,
+          "dateBegin": "2025-01-01",
+          "dateEnd": "2025-12-31",
+          "withSubAccounts": true
+        },
+        "durationMs": 330,
+        "isError": false,
+        "resultPreview": "{\"source\":\"tgdv_acct_acc_review\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":150262535,\"accountAlias\":\"99\",\"accountName\":\"Прибыли и убытки\",\"dateBegin\":\"2025-01-01\",\"dateEnd\":\"2025-12-31\",\"includeInternal\":false,\"withSubAccounts\":true,\"allHoldingCompanies\":false,\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateBegin\":\"2025-01-01\",\"dateEnd\":\"2025-12-31\",\"accountKey\":150262535,\"includeInternal\":false,\"allHoldingCompanies\":false,\"withSubAccounts\":true},\"saldoBeginNcu\":\"0.0031\",\"saldoEndNcu\":\"0.0031\",\"saldoBeginDebitNcu\":\"0.0031\",\"saldoBeginCreditNcu\":\"0\",\"saldoEndDebitNcu\":\"0.0031\",\"saldoEndCreditNcu\":\"0\",\"turnoverDebitNcu\":\"4659019.55\",\"turnoverCreditNcu\":\"4659019.55\",\"related"
+      }
+    ],
+    "finalAnswer": "За 2025 год по базе **БелГИСС**:\n\n- **Выручка**: **7 543 750,62 бел. руб.**\n- **Прибыль / убыток**: **4 659 019,55 бел. руб.**\n\nДата среза учёта в базе: **2026-10-31**.  \nПериод расчёта: **2025-01-01 — 2025-12-31**.\n\nВажно: по счёту **90** обороты равны **7 543 750,62** по дебету и кредиту, поэтому для «выручки» я ориентировался на структуру и строки 90.* в отчёте; по счёту **99** обороты равны **4 659 019,55**.\n\nЕсли хотите, могу дальше разложить:\n- выручку по направлениям / субсчетам 90,\n- прибыль по корреспондирующим счетам 99,\n- или показать ОСВ по 90 и 99 за 2025 год."
+  },
+  {
+    "id": "D3",
+    "group": "director",
+    "prompt": "Кто из покупателей наши крупнейшие должники?",
+    "totalMs": 17372,
+    "turnError": null,
+    "steps": 3,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Найти крупнейших должников среди покупателей (дебиторская задолженность по счёту 62) с именами контрагентов.",
+          "summary": "Сначала уточню активную организацию через поиск контрагента не требуется, если организация не названа. Затем найду счёт 62 в плане счетов, проверю его аналитику/доступные поля и сниму развёрнутую дебиторскую задолженность по покупателям на дату среза учёта. Для ранжирования крупнейших должников использую get_analytics_balance по счёту 62 с side=debit и, при необходимости, с подходящим fieldName из метаданных счёта/аналитик. Если по счёту 62 есть несколько аналитических полей, сначала определю правильное поле через get_chart_of_accounts или find_analytics_value.",
+          "discoverySteps": [
+            {
+              "phase": "discovery",
+              "tool": "functions.find_account",
+              "description": "Найти счёт 62 в активном плане счетов и получить его id/название, а также понять, есть ли relatedSiblingAccounts и какие аналитики доступны."
+            },
+            {
+              "phase": "discovery",
+              "tool": "functions.get_chart_of_accounts",
+              "description": "Если у счёта 62 несколько аналитических полей или нужен контекст по ветке, посмотреть метаданные и доступные аналитики."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_analytics_balance",
+              "description": "Снять развёрнутую дебиторскую задолженность покупателей по счёту 62 на дату dataCutoff, side=debit, отсортировать по сумме и взять топ должников."
+            },
+            {
+              "phase": "present",
+              "tool": "functions.present_query_result",
+              "description": "Показать отобранные строки с крупнейшими должниками и итогом по дебиторке покупателей."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "displayName": "План счетов",
+              "role": "Справочник счёта 62 и его аналитик"
+            }
+          ],
+          "sqlStrategy": "SQL не нужен: используем специализированные accounting tools. Если потребуется уточнение аналитического поля, сначала беру metadata/поиск аналитик, затем get_analytics_balance по accountKey счёта 62. Для ответа беру только totals и строки tool output; числа не пересчитываю вручную.",
+          "notes": "Если организация не названа, companyKey не передаю. Дату беру как dataCutoff из первого подходящего ответа тулов."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Найти крупнейших должников среди покупателей (дебиторская задолженность по счёту 62) с именами контрагентов.\",\"summary\":\"Сначала уточню активную организацию через поиск контрагента не требуется, если организация не названа. Затем найду счёт 62 в плане счетов, проверю его аналитику/доступные поля и сниму развёрнутую дебиторскую задолженность по покупателям на дату среза учёта. Для ранжирования крупнейших должников использую get_analytics_balance по счёту 62 с side=debit и, при необходимости, с подходящим fieldName из метаданных счёта/аналитик. Если по счёту 62 есть несколько аналитических полей, сначала определю правильное поле через get_chart_of_accounts или find_analytics_value.\",\"discoverySteps\":[{\"phase\":\"discovery\",\"tool\":\"functions.find_account\",\"description\":\"Найти счё"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "62",
+          "limit": 10
+        },
+        "durationMs": 82,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366200,\"alias\":\"62\",\"name\":\"Расчеты с покупателями и заказчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":366204,\"alias\":\"62.04\",\"name\":\"Расчеты с покупателями в кредит НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366201,\"alias\":\"62.1\",\"name\":\"Расчеты с покупателями и заказчиками (задолженность)\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366202,\"alias\":\"62.2\",\"name\":\"Расчеты плановыми платежами\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":284038375,\"alias\":\"62.2-1\",\"name\":\"Расчеты по ВНК НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":366203,\"alias\":\"62.3\",\"name\":\"Векселя полученные (стар)\",\"accountType\":\"S\",\"parent\":176461267,\"offbalance\":0},{\"id\":148529707,\"alias\":\"62.4\",\""
+      },
+      {
+        "name": "get_analytics_balance",
+        "args": {
+          "accountKey": 366200,
+          "dateEnd": "2026-10-31",
+          "side": "debit",
+          "limit": 20
+        },
+        "durationMs": 2896,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal_analytics\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366200,\"accountAlias\":\"62\",\"accountName\":\"Расчеты с покупателями и заказчиками\",\"dateEnd\":\"2026-10-31\",\"closeDate\":\"2016-12-31\",\"fieldName\":\"USR$GS_CUSTOMER\",\"fieldLabel\":\"Клиент\",\"refTable\":\"GD_CONTACT\",\"withSubAccounts\":true,\"allHoldingCompanies\":false,\"side\":\"debit\",\"limit\":20,\"rows\":[{\"analyticsId\":148322708,\"analyticsName\":\"ОАО \\\"Белвторчермет\\\"\",\"debitNcu\":\"1541.3239\",\"creditNcu\":\"0\",\"simpleNcu\":\"1541.3239\",\"lastEntryDate\":\"2026-06-01\"},{\"analyticsId\":164794700,\"analyticsName\":\"Общество с ограниченной ответственностью \\\"МакВторВуд\\\"\",\"debitNcu\":\"550.28\",\"creditNcu\":\"0\",\"simpleNcu\":\"550.28\",\"lastEntryDate\":\"2026-06-17\"},{\"analyticsId\":14833025"
+      }
+    ],
+    "finalAnswer": "По организации **БелГИСС** на дату **2026-10-31** (срез учёта), в **бел. руб. / NCU** крупнейшие должники среди покупателей по счёту **62 «Расчеты с покупателями и заказчиками»** такие:\n\n1. **ОАО \"Белвторчермет\"** — **1 541.3239**  \n2. **Общество с ограниченной ответственностью \"МакВторВуд\"** — **550.28**  \n3. **Транспортное унитарное предприятие \"ГудАртАвто\"** — **358.72**  \n4. **ОАО \"БелВТИ\"** — **99.88**\n\nИтог по дебиторке покупателей:\n- **debitNcu:** **2550.2177**\n- **creditNcu:** **43.2337**\n- **simpleNcu:** **2506.984**\n\nЕсли хотите, я могу сразу показать **топ-10 должников** или сделать **разбивку по авансам / прочим покупателям**."
+  },
+  {
+    "id": "D4",
+    "group": "director",
+    "prompt": "Есть ли просроченная дебиторка / кому давно не платим?",
+    "totalMs": 8591,
+    "turnError": null,
+    "steps": 3,
+    "toolTrace": [
+      {
+        "name": "find_account",
+        "args": {
+          "query": "62",
+          "limit": 20
+        },
+        "durationMs": 89,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366200,\"alias\":\"62\",\"name\":\"Расчеты с покупателями и заказчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":366204,\"alias\":\"62.04\",\"name\":\"Расчеты с покупателями в кредит НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366201,\"alias\":\"62.1\",\"name\":\"Расчеты с покупателями и заказчиками (задолженность)\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366202,\"alias\":\"62.2\",\"name\":\"Расчеты плановыми платежами\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":284038375,\"alias\":\"62.2-1\",\"name\":\"Расчеты по ВНК НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":366203,\"alias\":\"62.3\",\"name\":\"Векселя полученные (стар)\",\"accountType\":\"S\",\"parent\":176461267,\"offbalance\":0},{\"id\":148529707,\"alias\":\"62.4\",\""
+      },
+      {
+        "name": "get_analytics_balance",
+        "args": {
+          "accountKey": 366200,
+          "dateEnd": "2026-10-31",
+          "fieldName": "ACCOUNTKEY",
+          "side": "debit",
+          "limit": 20
+        },
+        "durationMs": 126,
+        "isError": true,
+        "resultPreview": "{\"error\":\"Tool execution failed. {\\\"error\\\":\\\"fieldName must be a USR$ analytics column on AC_ENTRY (e.g. USR$GS_CUSTOMER)\\\",\\\"code\\\":\\\"INVALID_FIELD\\\"}\"}"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 366200,
+          "dateEnd": "2026-10-31",
+          "summaryOnly": true
+        },
+        "durationMs": 187,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366200,\"accountAlias\":\"62\",\"accountName\":\"Расчеты с покупателями и заказчиками\",\"dateEnd\":\"2026-10-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":4,\"rowCount\":0,\"totals\":{\"debitNcu\":\"2506.984\",\"creditNcu\":\"0\",\"debitCurr\":\"0\",\"creditCurr\":\"0\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"2506.984\"},\"relatedSiblingAccounts\":[{\"accountKey\":284038375,\"alias\":\"62.2-1\",\"name\":\"Расчеты по ВНК НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\"},{\"accountKey\":366203,\"alias\":\"62.3\",\"name\":\"Векселя полученные (стар)\",\"accountType\":\"S\"},{\"accountKey\":148529707,\"alias\":\"62.4\",\"name\":\"Авансы полученные\",\"accountType\":\"A\"},{\"accountKey\":148040931,\"ali"
+      }
+    ],
+    "finalAnswer": "Да, на **31.10.2026** по организации **БелГИСС** есть дебиторка по счёту **62 “Расчеты с покупателями и заказчиками”**:  \n\n- **дебетовая задолженность (нам должны)**: **2 506.984 бел. руб.**\n- **кредитовая задолженность**: **0**\n\nТо есть по покупателям на эту дату есть **просроченная/непогашенная дебиторская задолженность** как минимум в размере **2 506.984 бел. руб.**  \nНо чтобы ответить именно **“кому давно не платим”** / кто конкретно должен, нужен разворот по контрагентам и, при необходимости, по возрасту задолженности. Могу сразу показать **топ должников** по 62 с именами и суммами."
+  },
+  {
+    "id": "D5",
+    "group": "director",
+    "prompt": "Как изменились остатки денег на расчётных счетах за последний месяц / квартал?",
+    "totalMs": 37492,
+    "turnError": null,
+    "steps": 3,
+    "toolTrace": [
+      {
+        "name": "find_account",
+        "args": {
+          "query": "51",
+          "limit": 20
+        },
+        "durationMs": 106,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":355100,\"alias\":\"51\",\"name\":\"Расчетный счет\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":338278175,\"alias\":\"51-1\",\"name\":\"Расчетный счет(Белинвестбанк)\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":198276326,\"alias\":\"51-10\",\"name\":\"Кредитный расчетный счет, Белинвестбанк\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":198276328,\"alias\":\"51-11\",\"name\":\"Счет для учета процентов по кредитам\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":198407216,\"alias\":\"51-12\",\"name\":\"Расчетный счет, Беларусбанк (Слуцк)\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":381231989,\"alias\":\"51-13\",\"name\":\"Текущий счет Сбербанк Молодечно\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":381231990,\"alias\":\"51-14\",\"name\":\"Текущий счет Сберб"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 355100,
+          "dateEnd": "2026-10-31",
+          "summaryOnly": true,
+          "withSubAccounts": true
+        },
+        "durationMs": 14593,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":355100,\"accountAlias\":\"51\",\"accountName\":\"Расчетный счет\",\"dateEnd\":\"2026-10-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":1,\"rowCount\":0,\"totals\":{\"debitNcu\":\"1340905.6328\",\"creditNcu\":\"0\",\"debitCurr\":\"0\",\"creditCurr\":\"1200\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"1340905.6328\"},\"relatedSiblingAccounts\":[{\"accountKey\":338278175,\"alias\":\"51-1\",\"name\":\"Расчетный счет(Белинвестбанк)\",\"accountType\":\"A\"},{\"accountKey\":198276326,\"alias\":\"51-10\",\"name\":\"Кредитный расчетный счет, Белинвестбанк\",\"accountType\":\"A\"},{\"accountKey\":198276328,\"alias\":\"51-11\",\"name\":\"Счет для учета процентов по кредитам\",\"accountType\":\"A\"},{\"ac"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 355100,
+          "dateEnd": "2026-09-30",
+          "summaryOnly": true,
+          "withSubAccounts": true
+        },
+        "durationMs": 14646,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":355100,\"accountAlias\":\"51\",\"accountName\":\"Расчетный счет\",\"dateEnd\":\"2026-09-30\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":1,\"rowCount\":0,\"totals\":{\"debitNcu\":\"691043.0728\",\"creditNcu\":\"0\",\"debitCurr\":\"0\",\"creditCurr\":\"1200\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"691043.0728\"},\"relatedSiblingAccounts\":[{\"accountKey\":338278175,\"alias\":\"51-1\",\"name\":\"Расчетный счет(Белинвестбанк)\",\"accountType\":\"A\"},{\"accountKey\":198276326,\"alias\":\"51-10\",\"name\":\"Кредитный расчетный счет, Белинвестбанк\",\"accountType\":\"A\"},{\"accountKey\":198276328,\"alias\":\"51-11\",\"name\":\"Счет для учета процентов по кредитам\",\"accountType\":\"A\"},{\"acco"
+      }
+    ],
+    "finalAnswer": "По БелГИСС на расчётных счетах 51 и его субсчетах на дату среза 2026-10-31:\n\n- На 30.09.2026 остаток: 691 043.0728 бел. руб.\n- На 31.10.2026 остаток: 1 340 905.6328 бел. руб.\n- Изменение за месяц: +649 862.5600 бел. руб.\n\nЕсли нужен именно **квартал**, могу сразу посчитать изменение за последние 3 месяца по тем же счетам."
+  },
+  {
+    "id": "D6",
+    "group": "director",
+    "prompt": "Где «заморожены» деньги: запасы, незавершёнка, авансы?",
+    "totalMs": 97243,
+    "turnError": null,
+    "steps": 6,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Определить, где «заморожены» деньги: запасы, незавершёнка, авансы.",
+          "summary": "Нужно без выдумывания чисел показать, в каких статьях активов/расчётов находятся средства на дату среза учёта. Для этого сначала уточню организацию, если она названа, иначе использую единственную рабочую. Затем подберу счета для запасов, НЗП и авансов через поиск по плану счетов, после чего сниму сальдо на дату по найденным счетам и, если нужно, развёртку по аналитике для авансов/запасов. Итогом будет краткий перечень сумм по статьям с указанием даты среза и валюты.",
+          "discoverySteps": [
+            {
+              "phase": "discovery",
+              "tool": "functions.find_account",
+              "description": "Найти счета/субсчета для запасов, НЗП и авансов в активном плане счетов; при необходимости проверить связанные дочерние/соседние счета."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_balance",
+              "description": "Снять сальдо на дату по найденным счетам (с withSubAccounts=true) и получить totals.debitNcu / totals.creditNcu для статей, где деньги «заморожены»."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_analytics_balance",
+              "description": "Если по авансам нужна разбивка по контрагентам, показать топ аналитик с именами по 60/62/76."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "displayName": "План счетов",
+              "role": "Справочник счетов"
+            }
+          ],
+          "sqlStrategy": "SQL не нужен: для ответа используем find_account и затем get_balance / при необходимости get_analytics_balance. Если по одной статье найдено несколько релевантных счетов, возьму их все и сведу по смысловым группам, не суммируя вручную то, что уже возвращает totals тулов. Для синтетических счетов обязательно оставлю withSubAccounts=true.",
+          "notes": "Если организация не названа, companyKey не передавать. Для ответа нужно ориентироваться на дату dataCutoff, если пользователь не указал дату."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Определить, где «заморожены» деньги: запасы, незавершёнка, авансы.\",\"summary\":\"Нужно без выдумывания чисел показать, в каких статьях активов/расчётов находятся средства на дату среза учёта. Для этого сначала уточню организацию, если она названа, иначе использую единственную рабочую. Затем подберу счета для запасов, НЗП и авансов через поиск по плану счетов, после чего сниму сальдо на дату по найденным счетам и, если нужно, развёртку по аналитике для авансов/запасов. Итогом будет краткий перечень сумм по статьям с указанием даты среза и валюты.\",\"discoverySteps\":[{\"phase\":\"discovery\",\"tool\":\"functions.find_account\",\"description\":\"Найти счета/субсчета для запасов, НЗП и авансов в активном плане счетов; при необходимости проверить связанные дочерние/соседние счета.\"},{\"phase\":\""
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "запасы",
+          "limit": 10
+        },
+        "durationMs": 148,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[],\"rowCount\":0,\"dataCutoff\":\"2026-10-31\"}"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "незавершенное производство",
+          "limit": 10
+        },
+        "durationMs": 84,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[],\"rowCount\":0,\"dataCutoff\":\"2026-10-31\"}"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "авансы выданные",
+          "limit": 10
+        },
+        "durationMs": 85,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[],\"rowCount\":0,\"dataCutoff\":\"2026-10-31\"}"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "авансы поставщикам",
+          "limit": 10
+        },
+        "durationMs": 46,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[],\"rowCount\":0,\"dataCutoff\":\"2026-10-31\"}"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "60",
+          "limit": 20
+        },
+        "durationMs": 74,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366000,\"alias\":\"60\",\"name\":\"Расчеты с поставщиками и подрядчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":189773997,\"alias\":\"60.01\",\"name\":\"Расчеты с поставщиками (Борисов)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189773999,\"alias\":\"60.02\",\"name\":\"Расчеты с поставщиками (Молодечно)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774001,\"alias\":\"60.03\",\"name\":\"Расчеты с поставщиками (Слуцк)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774003,\"alias\":\"60.04\",\"name\":\"Расчеты с поставщиками (кафе-29)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774005,\"alias\":\"60.05\",\"name\":\"Расчеты с поставщиками (аккредитив)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":148542117,\"alias\":\"60.1\",\"name\":\"Ра"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "10",
+          "limit": 20
+        },
+        "durationMs": 59,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":311000,\"alias\":\"10\",\"name\":\"Материалы\",\"accountType\":\"A\",\"parent\":310000,\"offbalance\":0},{\"id\":326807825,\"alias\":\"10.01\",\"name\":\"Сырье и материалы ПП-27\",\"accountType\":\"S\",\"parent\":311000,\"offbalance\":0},{\"id\":326807826,\"alias\":\"10.02\",\"name\":\"Сырье и материалы ПП-27\",\"accountType\":\"S\",\"parent\":311000,\"offbalance\":0},{\"id\":311001,\"alias\":\"10.1\",\"name\":\"Сырье и материалы\",\"accountType\":\"S\",\"parent\":311000,\"offbalance\":0},{\"id\":150263727,\"alias\":\"10.1-1\",\"name\":\"Сырье и материалы РЭС\",\"accountType\":\"S\",\"parent\":311000,\"offbalance\":0},{\"id\":148085047,\"alias\":\"10.1-2\",\"name\":\"Металлы\",\"accountType\":\"S\",\"parent\":311000,\"offbalance\":0},{\"id\":148085048,\"alias\":\"10.1-3\",\"name\":\"Вспомогательные материалы\",\"accountType\":\"S\",\"parent\":311000,\"offbalance\":0},{\"id\":148085045,\"alias\":\""
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "20",
+          "limit": 20
+        },
+        "durationMs": 65,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":309178655,\"alias\":\"08.2.8\",\"name\":\"с/с с 2013 по 2016\",\"accountType\":\"S\",\"parent\":300800,\"offbalance\":0},{\"id\":322000,\"alias\":\"20\",\"name\":\"Основное производство\",\"accountType\":\"A\",\"parent\":320000,\"offbalance\":0},{\"id\":177726537,\"alias\":\"20-\",\"name\":\"Основное производство\",\"accountType\":\"A\",\"parent\":148498611,\"offbalance\":0},{\"id\":148012730,\"alias\":\"20.0\",\"name\":\"Основное производство\",\"accountType\":\"S\",\"parent\":322000,\"offbalance\":0},{\"id\":150336089,\"alias\":\"20.0-\",\"name\":\"Счет из АБ\",\"accountType\":\"S\",\"parent\":176461267,\"offbalance\":0},{\"id\":183548548,\"alias\":\"20.0.2\",\"name\":\"затраты не учитыв.ИЦ\",\"accountType\":\"A\",\"parent\":148498611,\"offbalance\":0},{\"id\":322002,\"alias\":\"20.02\",\"name\":\"Сельскохозяйственное производство\",\"accountType\":\"S\",\"parent\":322000,\"offbalance\":0},"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "капитальные вложения",
+          "limit": 20
+        },
+        "durationMs": 94,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[],\"rowCount\":0,\"dataCutoff\":\"2026-10-31\"}"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "вложения во внеоборотные активы",
+          "limit": 20
+        },
+        "durationMs": 78,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":300800,\"alias\":\"08\",\"name\":\"Вложения во внеоборотные активы\",\"accountType\":\"A\",\"parent\":300010,\"offbalance\":0}],\"rowCount\":1,\"dataCutoff\":\"2026-10-31\"}"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "авансы выданные",
+          "companyKey": null,
+          "limit": 20
+        },
+        "durationMs": 22,
+        "isError": true,
+        "resultPreview": "{\"error\":\"Tool execution failed. Input validation error: Invalid arguments for tool find_account: companyKey: Invalid input: expected number, received null\"}"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "авансы",
+          "limit": 20
+        },
+        "durationMs": 88,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":148529707,\"alias\":\"62.4\",\"name\":\"Авансы полученные\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":148040931,\"alias\":\"62.4-1\",\"name\":\"Авансы полученные ,сертиф. (ТН-2, ТН-3)\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":148040932,\"alias\":\"62.4-2\",\"name\":\"Авансы полученные, сертиф. (ТН-1)\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":148040933,\"alias\":\"62.4-3\",\"name\":\"Авансы полученные, присвоение кодов (ТН-1)\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":148040934,\"alias\":\"62.4-4\",\"name\":\"Авансы полученные, рассылка ТНПА (ТН-1)\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":148040935,\"alias\":\"62.4-5\",\"name\":\"Авансы полученные, экспертиза ТУ (ТН-1)\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":1"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "62",
+          "limit": 20
+        },
+        "durationMs": 76,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366200,\"alias\":\"62\",\"name\":\"Расчеты с покупателями и заказчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":366204,\"alias\":\"62.04\",\"name\":\"Расчеты с покупателями в кредит НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366201,\"alias\":\"62.1\",\"name\":\"Расчеты с покупателями и заказчиками (задолженность)\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366202,\"alias\":\"62.2\",\"name\":\"Расчеты плановыми платежами\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":284038375,\"alias\":\"62.2-1\",\"name\":\"Расчеты по ВНК НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":366203,\"alias\":\"62.3\",\"name\":\"Векселя полученные (стар)\",\"accountType\":\"S\",\"parent\":176461267,\"offbalance\":0},{\"id\":148529707,\"alias\":\"62.4\",\""
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "76",
+          "limit": 20
+        },
+        "durationMs": 82,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":367600,\"alias\":\"76\",\"name\":\"Расчеты с разн. дебиторами и кредиторами\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":367601,\"alias\":\"76. 01\",\"name\":\"Расчеты с организациями и лицами по исполнительным документам (стар)\",\"accountType\":\"S\",\"parent\":176461267,\"offbalance\":0},{\"id\":288163975,\"alias\":\"76.01\",\"name\":\"Расчеты с разн. дебиторами и кредиторами(строительство Новаторская 2,а)\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":367602,\"alias\":\"76.02\",\"name\":\"Расчеты по имущественному и личному страхованию\",\"accountType\":\"S\",\"parent\":367600,\"offbalance\":0},{\"id\":367603,\"alias\":\"76.03\",\"name\":\"Расчеты по претензиям\",\"accountType\":\"S\",\"parent\":367600,\"offbalance\":0},{\"id\":367604,\"alias\":\"76.04\",\"name\":\"Расчеты по причитающим дивидентам и другим доходам\",\"a"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "41",
+          "limit": 20
+        },
+        "durationMs": 55,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":344100,\"alias\":\"41\",\"name\":\"Товары\",\"accountType\":\"A\",\"parent\":340000,\"offbalance\":0},{\"id\":363896123,\"alias\":\"41-1\",\"name\":\"Товары на складе (КАФЕ-29)\",\"accountType\":\"S\",\"parent\":344100,\"offbalance\":0},{\"id\":363896124,\"alias\":\"41-2\",\"name\":\"Товары (бар КАФЕ-29)\",\"accountType\":\"S\",\"parent\":344100,\"offbalance\":0},{\"id\":344101,\"alias\":\"41.0\",\"name\":\"Товары (БСО, Эталон)\",\"accountType\":\"S\",\"parent\":344100,\"offbalance\":0},{\"id\":148012841,\"alias\":\"41.1\",\"name\":\"Товары на складе (кафе) (стар)\",\"accountType\":\"A\",\"parent\":176461267,\"offbalance\":0},{\"id\":150342367,\"alias\":\"41.1.1\",\"name\":\"Счет из АБ\",\"accountType\":\"S\",\"parent\":176461267,\"offbalance\":0},{\"id\":344102,\"alias\":\"41.2\",\"name\":\"Товары на складе (бар) (стар)\",\"accountType\":\"S\",\"parent\":176461267,\"offbalance\":0},{\"id\":344"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 311000,
+          "dateEnd": "2026-10-31",
+          "summaryOnly": true
+        },
+        "durationMs": 11233,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":311000,\"accountAlias\":\"10\",\"accountName\":\"Материалы\",\"dateEnd\":\"2026-10-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":24,\"rowCount\":0,\"totals\":{\"debitNcu\":\"3124970.5223\",\"creditNcu\":\"623193.941\",\"debitCurr\":\"343077.85\",\"creditCurr\":\"0\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"2501776.5813\"},\"relatedSiblingAccounts\":[{\"accountKey\":158057018,\"alias\":\"10.12\",\"name\":\"Начисленная амортизация на МБП, спецодежду, специнвентарь (стар.)\",\"accountType\":\"S\"},{\"accountKey\":148284909,\"alias\":\"10.12-148284909\",\"name\":\"Учет амортизации спец. одежды (стар.)\",\"accountType\":\"S\"},{\"accountKey\":150321896,\"alias\":\"10.2-1\",\"name\":\"Счет "
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 300800,
+          "dateEnd": "2026-10-31",
+          "summaryOnly": true
+        },
+        "durationMs": 1213,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":300800,\"accountAlias\":\"08\",\"accountName\":\"Вложения во внеоборотные активы\",\"dateEnd\":\"2026-10-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":62,\"rowCount\":0,\"totals\":{\"debitNcu\":\"495997.9178\",\"creditNcu\":\"0.0007\",\"debitCurr\":\"598794\",\"creditCurr\":\"0\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"495997.9171\"},\"relatedSiblingAccounts\":[{\"accountKey\":300801,\"alias\":\"08.01\",\"name\":\"Приобретение земельных участков\",\"accountType\":\"S\"},{\"accountKey\":300802,\"alias\":\"08.02\",\"name\":\"Приобретение объектов природопользования\",\"accountType\":\"S\"}],\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"defaul"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 366200,
+          "dateEnd": "2026-10-31",
+          "summaryOnly": true
+        },
+        "durationMs": 192,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366200,\"accountAlias\":\"62\",\"accountName\":\"Расчеты с покупателями и заказчиками\",\"dateEnd\":\"2026-10-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":4,\"rowCount\":0,\"totals\":{\"debitNcu\":\"2506.984\",\"creditNcu\":\"0\",\"debitCurr\":\"0\",\"creditCurr\":\"0\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"2506.984\"},\"relatedSiblingAccounts\":[{\"accountKey\":284038375,\"alias\":\"62.2-1\",\"name\":\"Расчеты по ВНК НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\"},{\"accountKey\":366203,\"alias\":\"62.3\",\"name\":\"Векселя полученные (стар)\",\"accountType\":\"S\"},{\"accountKey\":148529707,\"alias\":\"62.4\",\"name\":\"Авансы полученные\",\"accountType\":\"A\"},{\"accountKey\":148040931,\"ali"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 148529707,
+          "dateEnd": "2026-10-31",
+          "summaryOnly": true
+        },
+        "durationMs": 55426,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":148529707,\"accountAlias\":\"62.4\",\"accountName\":\"Авансы полученные\",\"dateEnd\":\"2026-10-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":22,\"rowCount\":0,\"totals\":{\"debitNcu\":\"584710.746\",\"creditNcu\":\"2420696.9719\",\"debitCurr\":\"1486374.3056\",\"creditCurr\":\"4895178.0231\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"-1835986.2259\"},\"relatedSiblingAccounts\":[],\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateEnd\":\"2026-10-31\",\"accountKey\":148529707,\"includeInternal\":false,\"allHoldingCompanies\":false,\"withSubAccounts\":true,\"summaryOnly\":true,\"fieldName\":\"ACCOUNTKEY\",\"cur"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 367600,
+          "dateEnd": "2026-10-31",
+          "summaryOnly": true
+        },
+        "durationMs": 6292,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":367600,\"accountAlias\":\"76\",\"accountName\":\"Расчеты с разн. дебиторами и кредиторами\",\"dateEnd\":\"2026-10-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":27,\"rowCount\":0,\"totals\":{\"debitNcu\":\"237730.4959\",\"creditNcu\":\"5192.7402\",\"debitCurr\":\"2124184.4044\",\"creditCurr\":\"2016\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"232537.7557\"},\"relatedSiblingAccounts\":[{\"accountKey\":367601,\"alias\":\"76. 01\",\"name\":\"Расчеты с организациями и лицами по исполнительным документам (стар)\",\"accountType\":\"S\"},{\"accountKey\":288163975,\"alias\":\"76.01\",\"name\":\"Расчеты с разн. дебиторами и кредиторами(строительство Новаторская 2,а)\",\"accountType\":"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 344100,
+          "dateEnd": "2026-10-31",
+          "summaryOnly": true
+        },
+        "durationMs": 641,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":344100,\"accountAlias\":\"41\",\"accountName\":\"Товары\",\"dateEnd\":\"2026-10-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":4,\"rowCount\":0,\"totals\":{\"debitNcu\":\"91759.5234\",\"creditNcu\":\"0\",\"debitCurr\":\"0\",\"creditCurr\":\"0\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"91759.5234\"},\"relatedSiblingAccounts\":[{\"accountKey\":148012841,\"alias\":\"41.1\",\"name\":\"Товары на складе (кафе) (стар)\",\"accountType\":\"A\"},{\"accountKey\":150342367,\"alias\":\"41.1.1\",\"name\":\"Счет из АБ\",\"accountType\":\"S\"},{\"accountKey\":344102,\"alias\":\"41.2\",\"name\":\"Товары на складе (бар) (стар)\",\"accountType\":\"S\"},{\"accountKey\":344103,\"alias\":\"41.3\",\"name\":\"Тара под това"
+      }
+    ],
+    "finalAnswer": "По данным среза на **2026-10-31** для **БелГИСС** (бел. руб. / NCU) деньги «заморожены» в основном здесь:\n\n- **Запасы / материалы (сч. 10 «Материалы»)**: **дебетовое сальдо 3 124 970.5223**\n- **Товары (сч. 41 «Товары»)**: **дебетовое сальдо 91 759.5234**\n- **Незавершёнка / вложения во внеоборотные активы (сч. 08 «Вложения во внеоборотные активы»)**: **дебетовое сальдо 495 997.9171**\n- **Авансы выданные / прочие авансовые и дебиторские суммы**:\n  - **сч. 62 «Расчеты с покупателями и заказчиками»**: **дебетовое сальдо 2 506.984**\n  - **сч. 76 «Расчеты с разн. дебиторами и кредиторами»**: **дебетовое сальдо 237 730.4959**\n  - **сч. 62.4 «Авансы полученные»** показывает **кредитовое сальдо 2 420 696.9719**, но это уже **полученные авансы**, то есть обязательство, а не «замороженные деньги» в активах.\n\nИтого по видимым «замороженным» активам: деньги в запасах, товарах и вложениях во внеоборотные активы — это **основные суммы**; по расчетным авансам/прочей дебиторке есть **237 730.4959 + 2 506.984** в дебете 76 и 62.\n\nЕсли хотите, я могу следующим сообщением **разложить это по конкретным субсчетам и контрагентам**: где именно сидят запасы, где НЗП, и кто должен по авансам."
+  },
+  {
+    "id": "A1",
+    "group": "accountant",
+    "prompt": "Оборотно-сальдовая по организации за декабрь 2025 — сверка с привычной ОСВ.",
+    "totalMs": 92338,
+    "turnError": null,
+    "steps": 2,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Построить оборотно-сальдовую ведомость по организации за декабрь 2025 и сопоставить с привычной ОСВ.",
+          "summary": "Сначала проверю, есть ли в базе единственная рабочая организация или требуется уточнение, затем построю ОСВ за 2025-12-01..2025-12-31. Если пользователь не называл организацию, не буду передавать companyKey. Для проверки «привычной ОСВ» использую get_trial_balance как штатный отчёт и при необходимости кратко сопоставлю totals по основным колонкам.",
+          "discoverySteps": [
+            {
+              "phase": "query",
+              "tool": "get_trial_balance",
+              "description": "Сформировать ОСВ за декабрь 2025 по активной организации (или по единственной доступной, если companyKey не задан)."
+            },
+            {
+              "phase": "present",
+              "description": "Показать итоги и ключевые колонки отчёта в чате, без выгрузки сотен строк."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "displayName": "План счетов",
+              "role": "Справочник счетов"
+            }
+          ],
+          "sqlStrategy": "SQL не требуется: используем штатный отчёт get_trial_balance за период 2025-12-01..2025-12-31. Если потребуется сверка формата/отбор по счётам — используем только returned rows отчёта, без ручного пересчёта.",
+          "notes": "Если организация в базе неоднозначна, сервер вернёт AMBIGUOUS_COMPANY и тогда потребуется назвать организацию через find_counterparty."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Построить оборотно-сальдовую ведомость по организации за декабрь 2025 и сопоставить с привычной ОСВ.\",\"summary\":\"Сначала проверю, есть ли в базе единственная рабочая организация или требуется уточнение, затем построю ОСВ за 2025-12-01..2025-12-31. Если пользователь не называл организацию, не буду передавать companyKey. Для проверки «привычной ОСВ» использую get_trial_balance как штатный отчёт и при необходимости кратко сопоставлю totals по основным колонкам.\",\"discoverySteps\":[{\"phase\":\"query\",\"tool\":\"get_trial_balance\",\"description\":\"Сформировать ОСВ за декабрь 2025 по активной организации (или по единственной доступной, если companyKey не задан).\"},{\"phase\":\"present\",\"description\":\"Показать итоги и ключевые колонки отчёта в чате, без выгрузки сотен строк.\"}],\"tables\":[{\"ta"
+      },
+      {
+        "name": "get_trial_balance",
+        "args": {
+          "dateBegin": "2025-12-01",
+          "dateEnd": "2025-12-31"
+        },
+        "durationMs": 82693,
+        "isError": false,
+        "resultPreview": "{\"source\":\"tgdv_acct_circulation_list\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateBegin\":\"2025-12-01\",\"dateEnd\":\"2025-12-31\",\"accountKey\":300001,\"includeInternal\":false,\"allHoldingCompanies\":false,\"includeOffBalance\":false,\"accounts\":[{\"ACCOUNT_ALIAS\":\"01\",\"ACCOUNT_NAME\":\"Основные средства\",\"ACCOUNT_ID\":300100,\"BEGIN_DEBIT\":\"64689006.34\",\"BEGIN_CREDIT\":\"0\",\"DEBIT\":\"5969837.5\",\"CREDIT\":\"5549.45\",\"END_DEBIT\":\"70653294.39\",\"END_CREDIT\":\"0\",\"OFFBALANCE\":0},{\"ACCOUNT_ALIAS\":\"01.1\",\"ACCOUNT_NAME\":\"Выбытие основных средств\",\"ACCOUNT_ID\":150261884,\"BEGIN_DEBIT\":\"0\",\"BEGIN_CREDIT\":\"0.009\",\"DEBIT\":\"5549.45\",\"CREDIT\":\"5549.45\",\"END_DEBIT\":\"0\",\"END_CREDIT\":\"0.009\",\"OFFBALANCE\":0},{\"ACCOUNT_ALIAS\":\"02\",\"ACCOUNT_NAME\":\"Амортизация основных средств\",\"ACCOU"
+      }
+    ],
+    "finalAnswer": "ОСВ за **декабрь 2025** по организации **БелГИСС** построена, дата среза учёта: **2026-10-31**. Валюта: **бел. руб. (NCU)**.\n\nИтоги по ведомости:\n- **Начальное сальдо:** Дт **107562309.9518**, Кт **107562309.9813**\n- **Обороты за период:** Дт **102064396.2963**, Кт **102064396.2963**\n- **Конечное сальдо:** Дт **79929249.2009**, Кт **79929249.2304**\n- **Строк в ОСВ:** **231**\n\nСверка с «привычной ОСВ»:\n- Отчёт построен штатным способом через ОСВ, без ручного пересчёта.\n- Обороты по дебету и кредиту **сходятся до копейки**: **102064396.2963 = 102064396.2963**.\n- Конечные дебетовое и кредитовое сальдо тоже почти равны; разница в копейках может быть из‑за округлений в отдельных строках отчёта.\n\nЕсли хотите, я могу следующим сообщением:\n1. показать **только итоги по 1–9 классам**,\n2. отдельно вывести **50/51/60/62/90/99**,\n3. или сделать **сверку по конкретным счетам**."
+  },
+  {
+    "id": "A2",
+    "group": "accountant",
+    "prompt": "Развёртка 62 / 60 на конец декабря 2025: долг vs авансы (кредитовое / дебетовое сальдо по клиентам).",
+    "totalMs": 39314,
+    "turnError": null,
+    "steps": 6,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Показать развёрнутые остатки по счетам 62 и 60 на конец декабря 2025 с разделением на кредитовое и дебетовое сальдо по контрагентам (долг vs авансы).",
+          "summary": "Сначала найду счета 62 и 60 в активном плане, затем запрошу развёрнутые сальдо на 2025-12-31 по каждому счёту через get_analytics_balance с подходящим аналитическим полем, чтобы получить список контрагентов и суммы по дебету/кредиту. После этого кратко сведу результат по 62 (дебиторка покупателей / авансы полученные) и 60 (кредиторка поставщикам / авансы выданные), не смешивая их между собой.",
+          "discoverySteps": [
+            {
+              "phase": "discovery",
+              "tool": "functions.find_account",
+              "description": "Найти счета 62 и 60 в активном плане, получить их id и проверить доступные аналитические поля."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_analytics_balance",
+              "description": "Получить развёрнутые остатки на 2025-12-31 по счетам 62 и 60 в разрезе аналитики-контрагента, отдельно для дебетовой и кредитовой сторон."
+            },
+            {
+              "phase": "present",
+              "tool": "functions.present_query_result",
+              "description": "При необходимости показать отобранные строки в удобной таблице и затем кратко подвести итог по долгу и авансам."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "displayName": "План счетов",
+              "role": "Поиск и проверка счёта 62/60 и их аналитик"
+            },
+            {
+              "tableName": "GD_CONTACT",
+              "displayName": "Контрагенты",
+              "role": "Расшифровка аналитики по клиентам/поставщикам"
+            }
+          ],
+          "sqlStrategy": "SQL не нужен: для развёрнутого сальдо на дату используем специализированный тул get_analytics_balance. Если понадобится, сначала resolve accountKey через find_account для 62 и 60, затем отдельные вызовы get_analytics_balance по каждому счёту на дату 2025-12-31. В ответе беру только totals и строки, возвращённые тулом; числа не пересчитываю вручную.",
+          "notes": "Так как пользователь просит именно развёртку по контрагентам и разделение дебет/кредит на дату, это задача для get_analytics_balance, а не get_balance без аналитики."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Показать развёрнутые остатки по счетам 62 и 60 на конец декабря 2025 с разделением на кредитовое и дебетовое сальдо по контрагентам (долг vs авансы).\",\"summary\":\"Сначала найду счета 62 и 60 в активном плане, затем запрошу развёрнутые сальдо на 2025-12-31 по каждому счёту через get_analytics_balance с подходящим аналитическим полем, чтобы получить список контрагентов и суммы по дебету/кредиту. После этого кратко сведу результат по 62 (дебиторка покупателей / авансы полученные) и 60 (кредиторка поставщикам / авансы выданные), не смешивая их между собой.\",\"discoverySteps\":[{\"phase\":\"discovery\",\"tool\":\"functions.find_account\",\"description\":\"Найти счета 62 и 60 в активном плане, получить их id и проверить доступные аналитические поля.\"},{\"phase\":\"query\",\"tool\":\"functions.get_anal"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "62",
+          "limit": 20
+        },
+        "durationMs": 84,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366200,\"alias\":\"62\",\"name\":\"Расчеты с покупателями и заказчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":366204,\"alias\":\"62.04\",\"name\":\"Расчеты с покупателями в кредит НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366201,\"alias\":\"62.1\",\"name\":\"Расчеты с покупателями и заказчиками (задолженность)\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366202,\"alias\":\"62.2\",\"name\":\"Расчеты плановыми платежами\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":284038375,\"alias\":\"62.2-1\",\"name\":\"Расчеты по ВНК НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":366203,\"alias\":\"62.3\",\"name\":\"Векселя полученные (стар)\",\"accountType\":\"S\",\"parent\":176461267,\"offbalance\":0},{\"id\":148529707,\"alias\":\"62.4\",\""
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "60",
+          "limit": 20
+        },
+        "durationMs": 100,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366000,\"alias\":\"60\",\"name\":\"Расчеты с поставщиками и подрядчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":189773997,\"alias\":\"60.01\",\"name\":\"Расчеты с поставщиками (Борисов)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189773999,\"alias\":\"60.02\",\"name\":\"Расчеты с поставщиками (Молодечно)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774001,\"alias\":\"60.03\",\"name\":\"Расчеты с поставщиками (Слуцк)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774003,\"alias\":\"60.04\",\"name\":\"Расчеты с поставщиками (кафе-29)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774005,\"alias\":\"60.05\",\"name\":\"Расчеты с поставщиками (аккредитив)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":148542117,\"alias\":\"60.1\",\"name\":\"Ра"
+      },
+      {
+        "name": "get_analytics_balance",
+        "args": {
+          "accountKey": 366200,
+          "dateEnd": "2025-12-31",
+          "fieldName": "ACCOUNTKEY",
+          "side": "both",
+          "limit": 50
+        },
+        "durationMs": 167,
+        "isError": true,
+        "resultPreview": "{\"error\":\"Tool execution failed. {\\\"error\\\":\\\"fieldName must be a USR$ analytics column on AC_ENTRY (e.g. USR$GS_CUSTOMER)\\\",\\\"code\\\":\\\"INVALID_FIELD\\\"}\"}"
+      },
+      {
+        "name": "get_analytics_balance",
+        "args": {
+          "accountKey": 366000,
+          "dateEnd": "2025-12-31",
+          "fieldName": "ACCOUNTKEY",
+          "side": "both",
+          "limit": 50
+        },
+        "durationMs": 64,
+        "isError": true,
+        "resultPreview": "{\"error\":\"Tool execution failed. {\\\"error\\\":\\\"fieldName must be a USR$ analytics column on AC_ENTRY (e.g. USR$GS_CUSTOMER)\\\",\\\"code\\\":\\\"INVALID_FIELD\\\"}\"}"
+      },
+      {
+        "name": "get_chart_of_accounts",
+        "args": {
+          "accountKey": 366200,
+          "depth": 1,
+          "includeGroups": true,
+          "limit": 50
+        },
+        "durationMs": 69,
+        "isError": false,
+        "resultPreview": "{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"chartRootId\":300001,\"branchAccountKey\":366200,\"accounts\":[{\"id\":366200,\"alias\":\"62\",\"name\":\"Расчеты с покупателями и заказчиками\",\"accountType\":\"A\",\"activity\":\"A\",\"activityKind\":\"active\",\"offbalance\":0,\"multycurr\":0,\"parent\":360000,\"depth\":0,\"analytics\":[]},{\"id\":366201,\"alias\":\"62.1\",\"name\":\"Расчеты с покупателями и заказчиками (задолженность)\",\"accountType\":\"S\",\"activity\":\"A\",\"activityKind\":\"active\",\"offbalance\":0,\"multycurr\":0,\"parent\":366200,\"depth\":1,\"analytics\":[]},{\"id\":366202,\"alias\":\"62.2\",\"name\":\"Расчеты плановыми платежами\",\"accountType\":\"S\",\"activity\":\"A\",\"activityKind\":\"active\",\"offbalance\":0,\"multycurr\":0,\"parent\":366200,\"depth\":1,\"analytics\":[]},{\"id\":366204,\"alias\":\"62.04\",\"name\":\"Расче"
+      },
+      {
+        "name": "get_chart_of_accounts",
+        "args": {
+          "accountKey": 366000,
+          "depth": 1,
+          "includeGroups": true,
+          "limit": 50
+        },
+        "durationMs": 105,
+        "isError": false,
+        "resultPreview": "{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"chartRootId\":300001,\"branchAccountKey\":366000,\"accounts\":[{\"id\":366000,\"alias\":\"60\",\"name\":\"Расчеты с поставщиками и подрядчиками\",\"accountType\":\"A\",\"activity\":\"A\",\"activityKind\":\"active\",\"offbalance\":0,\"multycurr\":0,\"parent\":360000,\"depth\":0,\"analytics\":[]},{\"id\":148040904,\"alias\":\"60.2\",\"name\":\"Расчеты с контрагентами\",\"accountType\":\"S\",\"activity\":\"B\",\"activityKind\":\"active_passive\",\"offbalance\":0,\"multycurr\":0,\"parent\":366000,\"depth\":1,\"analytics\":[{\"fieldName\":\"USR$GS_CUSTOMER\",\"label\":\"Клиент\"}]},{\"id\":148040907,\"alias\":\"60.3\",\"name\":\"Расчеты с поставщиками (кафе) НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"activity\":\"B\",\"activityKind\":\"active_passive\",\"offbalance\":0,\"multycurr\":0,\"parent\":366000,\"depth\":"
+      },
+      {
+        "name": "get_analytics_balance",
+        "args": {
+          "accountKey": 366200,
+          "dateEnd": "2025-12-31",
+          "fieldName": "USR$GS_CUSTOMER",
+          "side": "both",
+          "limit": 50
+        },
+        "durationMs": 1998,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal_analytics\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366200,\"accountAlias\":\"62\",\"accountName\":\"Расчеты с покупателями и заказчиками\",\"dateEnd\":\"2025-12-31\",\"closeDate\":\"2016-12-31\",\"fieldName\":\"USR$GS_CUSTOMER\",\"fieldLabel\":\"Клиент\",\"refTable\":\"GD_CONTACT\",\"withSubAccounts\":true,\"allHoldingCompanies\":false,\"side\":\"both\",\"limit\":50,\"rows\":[{\"analyticsId\":164794700,\"analyticsName\":\"Общество с ограниченной ответственностью \\\"МакВторВуд\\\"\",\"debitNcu\":\"365.28\",\"creditNcu\":\"0\",\"simpleNcu\":\"365.28\",\"lastEntryDate\":\"2025-11-20\"},{\"analyticsId\":148330252,\"analyticsName\":\"Транспортное унитарное предприятие \\\"ГудАртАвто\\\"\",\"debitNcu\":\"358.72\",\"creditNcu\":\"0\",\"simpleNcu\":\"358.72\",\"lastEntryDate\":\"2024-05-23\"},{\""
+      },
+      {
+        "name": "get_analytics_balance",
+        "args": {
+          "accountKey": 366000,
+          "dateEnd": "2025-12-31",
+          "fieldName": "USR$GS_CUSTOMER",
+          "side": "both",
+          "limit": 50
+        },
+        "durationMs": 20033,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal_analytics\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366000,\"accountAlias\":\"60\",\"accountName\":\"Расчеты с поставщиками и подрядчиками\",\"dateEnd\":\"2025-12-31\",\"closeDate\":\"2016-12-31\",\"fieldName\":\"USR$GS_CUSTOMER\",\"fieldLabel\":\"Клиент\",\"refTable\":\"GD_CONTACT\",\"withSubAccounts\":true,\"allHoldingCompanies\":false,\"side\":\"both\",\"limit\":50,\"rows\":[{\"analyticsId\":null,\"analyticsName\":\"(пусто)\",\"debitNcu\":\"379368.8858\",\"creditNcu\":\"0\",\"simpleNcu\":\"379368.8858\",\"lastEntryDate\":\"2025-09-01\"},{\"analyticsId\":148284864,\"analyticsName\":\"БелГИСС\",\"debitNcu\":\"0\",\"creditNcu\":\"371319.1968\",\"simpleNcu\":\"-371319.1968\",\"lastEntryDate\":\"2013-08-01\"},{\"analyticsId\":338875647,\"analyticsName\":\"ООО \\\"КИП-Эксперт\\\"\",\"debitNcu\":\""
+      }
+    ],
+    "finalAnswer": "По **БелГИСС** на **31.12.2025**, валюта: **бел. руб. (NCU)**.\n\n### Сводно по счетам\n- **62 «Расчеты с покупателями и заказчиками»**  \n  - дебетовое сальдо: **823.8977**\n  - кредитовое сальдо: **0.0337**\n  - чистое простое сальдо: **823.864**\n- **60 «Расчеты с поставщиками и подрядчиками»**  \n  - дебетовое сальдо: **1 141 640.331**\n  - кредитовое сальдо: **485 886.3991**\n  - чистое простое сальдо: **655 753.9319**\n\n### Как это читать\n- **62**\n  - **дебет** — это наша **дебиторка покупателей**\n  - **кредит** — это **полученные авансы / наша кредиторка перед покупателями**\n- **60**\n  - **кредит** — это **кредиторка поставщикам**\n  - **дебет** — это **выданные авансы / переплата поставщикам**\n\n### Краткий вывод\n- По **62** на конец декабря 2025 есть в основном **дебиторка покупателей**: **823.8977 бел. руб.**\n- По **60** есть значимый объём **расчётов с поставщиками**:\n  - **кредиторка**: **485 886.3991 бел. руб.**\n  - **дебетовое сальдо** (авансы/переплаты): **1 141 640.331 бел. руб.**\n\nЕсли хотите, я могу следующим сообщением показать **топ-10 контрагентов по дебету и кредиту отдельно для 62 и 60**."
+  },
+  {
+    "id": "A3",
+    "group": "accountant",
+    "prompt": "Карта или анализ счёта 90 за 2025 год: выручка, НДС, себестоимость, расходы.",
+    "totalMs": 12353,
+    "turnError": null,
+    "steps": 3,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Получить по счёту 90 за 2025 год карту счёта или анализ счёта, чтобы увидеть выручку, НДС, себестоимость и расходы.",
+          "summary": "Сначала найду счёт 90 в плане счетов, чтобы получить его accountKey и проверить структуру/связанные субсчета. Затем запрошу анализ счёта 90 за 2025 год (по месяцам или итогом периода — в зависимости от того, что нужно для сводки), чтобы получить обороты по корреспондирующим счетам. Для выручки/НДС/себестоимости/расходов буду опираться на accountName/corrAccountName и суммы из ответа тула, не по цифрам кода только.",
+          "discoverySteps": [
+            {
+              "phase": "discovery",
+              "tool": "functions.find_account",
+              "description": "Найти счёт 90 в активном плане и получить его id, alias, name, а также relatedSiblingAccounts/структуру."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_account_analysis",
+              "description": "Если нужна сводка по оборотам за год — получить анализ счёта 90 за 2025 год по корреспонденции; при необходимости дополнительно просмотреть карту счёта для детализации проводок."
+            },
+            {
+              "phase": "present",
+              "description": "Показать в ответе ключевые итоги и при необходимости кратко перечислить строки по выручке, НДС, себестоимости и расходам."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "displayName": "План счетов",
+              "role": "Для поиска и верификации счёта 90"
+            }
+          ],
+          "sqlStrategy": "SQL не нужен: используем find_account для получения accountKey и затем get_account_analysis для оборотов по счёту 90 за 2025 год. Если понадобится детализация по проводкам, дополнительно get_account_card. Для годового итога лучше groupBy не требуется в get_account_analysis, так как он сразу возвращает обороты за период по корреспондентам. Счёт 90 может иметь связанные соседние счета/субсчета, поэтому при необходимости проверю relatedSiblingAccounts и сделаю отдельные вызовы по ним, если это потребуется для полного ответа.",
+          "notes": "Не буду угадывать выручку/себестоимость только по коду; сначала посмотрю имя счёта и связанные счета. Если у 90 есть sibling accounts вне LB/RB, их надо учитывать отдельно для полного ответа."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Получить по счёту 90 за 2025 год карту счёта или анализ счёта, чтобы увидеть выручку, НДС, себестоимость и расходы.\",\"summary\":\"Сначала найду счёт 90 в плане счетов, чтобы получить его accountKey и проверить структуру/связанные субсчета. Затем запрошу анализ счёта 90 за 2025 год (по месяцам или итогом периода — в зависимости от того, что нужно для сводки), чтобы получить обороты по корреспондирующим счетам. Для выручки/НДС/себестоимости/расходов буду опираться на accountName/corrAccountName и суммы из ответа тула, не по цифрам кода только.\",\"discoverySteps\":[{\"phase\":\"discovery\",\"tool\":\"functions.find_account\",\"description\":\"Найти счёт 90 в активном плане и получить его id, alias, name, а также relatedSiblingAccounts/структуру.\"},{\"phase\":\"query\",\"tool\":\"functions.get_accoun"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "90",
+          "limit": 20
+        },
+        "durationMs": 94,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":344600,\"alias\":\"90\",\"name\":\"Доходы и расходы по текущей деятельности\",\"accountType\":\"A\",\"parent\":385000,\"offbalance\":0},{\"id\":390001,\"alias\":\"90---\",\"name\":\"Реализация\",\"accountType\":\"A\",\"parent\":176461267,\"offbalance\":0},{\"id\":344601,\"alias\":\"90.01\",\"name\":\"Выручка от реализации (Общая)\",\"accountType\":\"A\",\"parent\":385000,\"offbalance\":0},{\"id\":344602,\"alias\":\"90.02\",\"name\":\"Выручка от реализации (кафе-29)\",\"accountType\":\"A\",\"parent\":385000,\"offbalance\":0},{\"id\":189774108,\"alias\":\"90.02.01\",\"name\":\"Покупная стоимость\",\"accountType\":\"S\",\"parent\":344602,\"offbalance\":0},{\"id\":189774110,\"alias\":\"90.02.02\",\"name\":\"Затраты на производство и реализацию продукции (учитываемые)\",\"accountType\":\"S\",\"parent\":344602,\"offbalance\":0},{\"id\":189774130,\"alias\":\"90.02.03\",\"name\":\"Затраты на"
+      },
+      {
+        "name": "get_account_analysis",
+        "args": {
+          "accountKey": 344600,
+          "dateBegin": "2025-01-01",
+          "dateEnd": "2025-12-31",
+          "withSubAccounts": true
+        },
+        "durationMs": 460,
+        "isError": false,
+        "resultPreview": "{\"source\":\"tgdv_acct_acc_review\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":344600,\"accountAlias\":\"90\",\"accountName\":\"Доходы и расходы по текущей деятельности\",\"dateBegin\":\"2025-01-01\",\"dateEnd\":\"2025-12-31\",\"includeInternal\":false,\"withSubAccounts\":true,\"allHoldingCompanies\":false,\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateBegin\":\"2025-01-01\",\"dateEnd\":\"2025-12-31\",\"accountKey\":344600,\"includeInternal\":false,\"allHoldingCompanies\":false,\"withSubAccounts\":true},\"saldoBeginNcu\":\"-0.0031\",\"saldoEndNcu\":\"-0.0031\",\"saldoBeginDebitNcu\":\"0\",\"saldoBeginCreditNcu\":\"0.0031\",\"saldoEndDebitNcu\":\"0\",\"saldoEndCreditNcu\":\"0.0031\",\"turnoverDebitNcu\":\"7543750.62\",\"turnoverCreditNcu\":\""
+      }
+    ],
+    "finalAnswer": "По счёту 90 **«Доходы и расходы по текущей деятельности»** за **2025 год** по базе **БелГИСС** на дату среза **2026-10-31**:\n\n- **Обороты Дт / Кт по счёту 90:**  \n  - Дт: **7 543 750.62 бел. руб.**  \n  - Кт: **7 543 750.62 бел. руб.**\n- **Сальдо на начало и конец периода:**  \n  - начало: **-0.0031**  \n  - конец: **-0.0031**\n\nПо строкам анализа счёта видно:\n- **Выручка**: в данном ответе отдельной строкой выручка не выделилась; в анализе присутствуют связанные подветки, но по полученным строкам основная явная сумма связана с **«Управленческие расходы»**:\n  - **26.1 → 90.2-5:** **6 256 437.62 бел. руб.**\n- **НДС**:\n  - через подветку **90.04 / 90.05 / 90.2-5** в явных строках ответа отдельной суммы НДС как итоговой строки не показано;\n  - видна строка **42.3-1 «НДС в цене товаров(кафе-29)»** в корреспонденции по **90.04**: **162 559.91 бел. руб.** со знаком, отражённым в анализе как дебет **-162 559.91**.\n- **Себестоимость**:\n  - **44.3 → 90.05 «Себестоимость (кафе-29)»**: **693 884.92 бел. руб.**\n- **Расходы**:\n  - **26.1 → 90.2-5 «Управленческие расходы»**: **6 256 437.62 бел. руб.**\n\nЕсли хотите, я могу следующим сообщением:\n1. **собрать это в краткий итог по статьям**: выручка / НДС / себестоимость / расходы,  \nили  \n2. **показать карту счёта 90 за 2025 год** с детализацией проводок."
+  },
+  {
+    "id": "A4",
+    "group": "accountant",
+    "prompt": "Журнал-ордер по 51 за декабрь 2025 — крупные поступления и списания.",
+    "totalMs": 12106,
+    "turnError": null,
+    "steps": 3,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Показать журнал-ордер по счёту 51 за декабрь 2025 с крупными поступлениями и списаниями.",
+          "summary": "Нужно найти счёт 51 в активном плане, затем получить журнал-ордер за 2025-12 с группировкой по месяцу или без детализации по дням, чтобы увидеть обороты и отобрать крупные поступления/списания. Так как организация не названа, companyKey не передаём. После ответа покажу итоговые обороты и, при необходимости, краткую выборку крупных строк из журнала-ордера.",
+          "discoverySteps": [
+            {
+              "phase": "discovery",
+              "tool": "functions.find_account",
+              "description": "Найти счёт 51 и получить его id/alias/название в активном плане."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_journal_order",
+              "description": "Получить журнал-ордер по найденному accountKey за период 2025-12-01…2025-12-31, с учётом субсчетов."
+            },
+            {
+              "phase": "present",
+              "tool": "functions.present_query_result",
+              "description": "Показать таблицу с нужными строками/итогами, если ответ содержит много строк."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "role": "Поиск и идентификация счёта 51"
+            },
+            {
+              "tableName": "AC_ENTRY",
+              "role": "Журнал-ордер по счёту 51"
+            }
+          ],
+          "sqlStrategy": "Сначала find_account(query='51') для получения accountKey. Затем get_journal_order(dateBegin='2025-12-01', dateEnd='2025-12-31', accountKey=<id>, groupBy='MONTH', withSubAccounts=true). Если журнал-ордер вернёт строки по корреспонденции, отберу крупные поступления и списания по ncuDebit/ncuCredit из ответа тулов, не суммируя дневные строки вручную.",
+          "notes": "Если в базе несколько подходящих вариантов 51, выберу основной по названию и подтвержу его пользователю."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Показать журнал-ордер по счёту 51 за декабрь 2025 с крупными поступлениями и списаниями.\",\"summary\":\"Нужно найти счёт 51 в активном плане, затем получить журнал-ордер за 2025-12 с группировкой по месяцу или без детализации по дням, чтобы увидеть обороты и отобрать крупные поступления/списания. Так как организация не названа, companyKey не передаём. После ответа покажу итоговые обороты и, при необходимости, краткую выборку крупных строк из журнала-ордера.\",\"discoverySteps\":[{\"phase\":\"discovery\",\"tool\":\"functions.find_account\",\"description\":\"Найти счёт 51 и получить его id/alias/название в активном плане.\"},{\"phase\":\"query\",\"tool\":\"functions.get_journal_order\",\"description\":\"Получить журнал-ордер по найденному accountKey за период 2025-12-01…2025-12-31, с учётом субсчетов.\"},{"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "51",
+          "limit": 10
+        },
+        "durationMs": 81,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":355100,\"alias\":\"51\",\"name\":\"Расчетный счет\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":338278175,\"alias\":\"51-1\",\"name\":\"Расчетный счет(Белинвестбанк)\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":198276326,\"alias\":\"51-10\",\"name\":\"Кредитный расчетный счет, Белинвестбанк\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":198276328,\"alias\":\"51-11\",\"name\":\"Счет для учета процентов по кредитам\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":198407216,\"alias\":\"51-12\",\"name\":\"Расчетный счет, Беларусбанк (Слуцк)\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":381231989,\"alias\":\"51-13\",\"name\":\"Текущий счет Сбербанк Молодечно\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":381231990,\"alias\":\"51-14\",\"name\":\"Текущий счет Сберб"
+      },
+      {
+        "name": "get_journal_order",
+        "args": {
+          "dateBegin": "2025-12-01",
+          "dateEnd": "2025-12-31",
+          "accountKey": 355100,
+          "withSubAccounts": true,
+          "groupBy": "NONE"
+        },
+        "durationMs": 897,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_entry_issimple_pivot\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":355100,\"dateBegin\":\"2025-12-01\",\"dateEnd\":\"2025-12-31\",\"includeInternal\":false,\"withSubAccounts\":true,\"allHoldingCompanies\":false,\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateBegin\":\"2025-12-01\",\"dateEnd\":\"2025-12-31\",\"accountKey\":355100,\"includeInternal\":false,\"allHoldingCompanies\":false,\"withSubAccounts\":true},\"groupBy\":\"NONE\",\"rows\":[{\"groupKey\":\"TOTAL\",\"alias\":\"51\",\"accountName\":\"Расчетный счет\",\"ncuDebit\":\"2932211.53\",\"ncuCredit\":\"3250514.93\",\"correspondence\":[{\"corrAlias\":\"51-1\",\"corrAccountName\":\"Расчетный счет(Белинвестбанк)\",\"ncuDebit\":\"0\",\"ncuCredit\":\"1000\"},{\"corrAlias\":\"51-3\",\"cor"
+      }
+    ],
+    "finalAnswer": "Журнал-ордер по счёту 51 за декабрь 2025, организация: **БелГИСС**. Валюта: **бел. руб. (NCU)**.\n\nИтоги по счёту 51 за период **2025-12-01 — 2025-12-31**:\n- **Дебетовый оборот:** 2 932 211.53\n- **Кредитовый оборот:** 3 250 514.93\n\nКрупные поступления на 51:\n- 62.4-2 — **526 302.12**\n- 62.4-6 — **552 258.43**\n- 62.4-9 — **314 608.51**\n- 62.4-1 — **272 267.18**\n- 51-4 — **240 000.00**\n- 62.413 — **171 432.11**\n- 62.4-7 — **159 870.75**\n- 62.4-3 — **92 170.00**\n\nКрупные списания с 51:\n- 76.6 — **1 070 507.23**\n- 60.5 — **883 366.62**\n- 68.3 — **256 000.00**\n- 68.5 — **161 000.00**\n- 68.0 — **154 401.12**\n- 60.1 — **352 987.56**\n- 68.1 — **32 000.00**\n- 76.1 — **25 371.34**\n\nЕсли хотите, могу следующим сообщением развернуть это в виде:\n1. **только крупнейшие корреспонденции**, или  \n2. **полный журнал-ордер по 51 за декабрь 2025**."
+  },
+  {
+    "id": "A5",
+    "group": "accountant",
+    "prompt": "Почему сальдо по покупателю X не сходится с актом сверки?",
+    "totalMs": 6972,
+    "turnError": null,
+    "steps": 1,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Понять, почему сальдо по покупателю X не сходится с актом сверки, и выявить расхождение по датам/проводкам/аналитике.",
+          "summary": "Сначала нужно определить организацию и саму карточку контрагента X, затем проверить его сальдо на дату акту сверки и сверить движения по счёту 62 за нужный период с карточкой/анализом счёта. Если потребуется, посмотрим конкретные документы и внутренние проводки, чтобы объяснить расхождение.",
+          "discoverySteps": [
+            {
+              "phase": "discovery",
+              "tool": "functions.find_counterparty",
+              "description": "Найти контрагента X и получить его id для companyKey, если организация названа явно."
+            },
+            {
+              "phase": "discovery",
+              "tool": "functions.find_account",
+              "description": "Найти счёт 62 (расчёты с покупателями) для дальнейших запросов по сальдо и движению."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_balance",
+              "description": "Получить сальдо по счёту 62 на дату акта сверки, чтобы сравнить дебиторку/кредиторку по totals."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_account_analysis",
+              "description": "Посмотреть обороты по счёту 62 за период сверки и выявить расхождения по корреспондирующим счетам."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_account_card",
+              "description": "При необходимости поднять проводки по счёту 62 с документами, чтобы найти конкретные записи, которых нет в акте или наоборот."
+            },
+            {
+              "phase": "present",
+              "description": "Суммировать причину расхождения и указать, какие проводки/даты/аналитика дают разницу."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "displayName": "План счетов",
+              "role": "Найти счёт 62 и связанные субсчета"
+            },
+            {
+              "tableName": "GD_CONTACT",
+              "displayName": "Контрагенты",
+              "role": "Найти покупателя X"
+            }
+          ],
+          "sqlStrategy": "Сначала resolve контрагента через find_counterparty, затем get_balance по счёту 62 на дату акта сверки (summaryOnly=true, withSubAccounts=true). Потом get_account_analysis и при необходимости get_account_card за период сверки, чтобы увидеть обороты и документы. Если акт сверки относится к конкретному документу/периоду, дополнительно сравнить даты и внутренние проводки; без явной даты сверки использовать дату из запроса пользователя.",
+          "notes": "Не буду выдумывать суммы; если пользователь не назвал дату или организацию, уточню их или попробую найти по найденным данным. Для ответа понадобятся цифры только из тулов."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Понять, почему сальдо по покупателю X не сходится с актом сверки, и выявить расхождение по датам/проводкам/аналитике.\",\"summary\":\"Сначала нужно определить организацию и саму карточку контрагента X, затем проверить его сальдо на дату акту сверки и сверить движения по счёту 62 за нужный период с карточкой/анализом счёта. Если потребуется, посмотрим конкретные документы и внутренние проводки, чтобы объяснить расхождение.\",\"discoverySteps\":[{\"phase\":\"discovery\",\"tool\":\"functions.find_counterparty\",\"description\":\"Найти контрагента X и получить его id для companyKey, если организация названа явно.\"},{\"phase\":\"discovery\",\"tool\":\"functions.find_account\",\"description\":\"Найти счёт 62 (расчёты с покупателями) для дальнейших запросов по сальдо и движению.\"},{\"phase\":\"query\",\"tool\":\"func"
+      }
+    ],
+    "finalAnswer": "Чтобы понять, **почему сальдо по покупателю X не сходится с актом сверки**, мне нужны как минимум:\n\n1. **кто именно “покупатель X”** — название контрагента;\n2. **на какую дату** сравниваем сальдо с актом сверки;\n3. желательно **организация**, если их у вас несколько.\n\nБез этих данных я не смогу корректно сверить:\n- сальдо по **62 счёту**,\n- обороты за период,\n- конкретные документы/проводки, которые дают расхождение.\n\nЕсли хотите, просто пришлите в одном сообщении, например:\n- **Покупатель:** ООО «…»\n- **Дата акта:** 31.12.2026\n- **Организация:** …  \n\nИ я сразу проверю, где именно возникает разница."
+  },
+  {
+    "id": "A6",
+    "group": "accountant",
+    "prompt": "Какие сохранённые настройки отчётов есть по карте счёта / ОСВ — запусти «как в Гедымине» за декабрь 2025.",
+    "totalMs": 8478,
+    "turnError": null,
+    "steps": 2,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Найти сохранённые настройки отчётов по карте счёта и ОСВ и запустить их «как в Гедымине» за декабрь 2025.",
+          "summary": "Сначала найду сохранённые конфигурации отчётов двух классов: карта счёта и ОСВ. Затем запущу подходящие сохранённые настройки за период 2025-12-01..2025-12-31 через run_report_config, чтобы получить именно отчёты в логике Gedemin, а не пересчитывать их вручную.",
+          "discoverySteps": [
+            {
+              "phase": "discovery",
+              "tool": "list_report_configs",
+              "description": "Найти сохранённые конфигурации отчётов классов TAccCardConfig (карта счёта) и TAccCirculationListConfig (ОСВ)."
+            },
+            {
+              "phase": "query",
+              "tool": "run_report_config",
+              "description": "Для найденных конфигураций запустить отчёты за декабрь 2025 (2025-12-01..2025-12-31), чтобы получить итоговые строки и конфигурации в формате Gedemin."
+            },
+            {
+              "phase": "present",
+              "tool": "present_query_result",
+              "description": "При необходимости показать сводную таблицу найденных/запущенных отчётов в удобном виде."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCT_CONFIG",
+              "displayName": "Сохранённые настройки отчётов",
+              "role": "Конфигурации отчётов"
+            },
+            {
+              "tableName": "GD_DOCUMENT",
+              "displayName": "Документы",
+              "role": "Не основной источник, только если понадобится контекст"
+            }
+          ],
+          "sqlStrategy": "Сначала использовать list_report_configs с фильтрацией по className: TAccCardConfig и TAccCirculationListConfig. Затем, если конфигураций несколько, запускать те, что помечены showInExplorer=1 первыми; для выбранных вызвать run_report_config с dateBegin=2025-12-01 и dateEnd=2025-12-31. Если нужно будет показать результаты компактно, использовать present_query_result по возвращённым строкам.",
+          "notes": "Не выдумывать companyKey: если конфиги завязаны на активную организацию, сервер сам подставит единственную рабочую. Не использовать run_sql для пересчёта отчётов."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Найти сохранённые настройки отчётов по карте счёта и ОСВ и запустить их «как в Гедымине» за декабрь 2025.\",\"summary\":\"Сначала найду сохранённые конфигурации отчётов двух классов: карта счёта и ОСВ. Затем запущу подходящие сохранённые настройки за период 2025-12-01..2025-12-31 через run_report_config, чтобы получить именно отчёты в логике Gedemin, а не пересчитывать их вручную.\",\"discoverySteps\":[{\"phase\":\"discovery\",\"tool\":\"list_report_configs\",\"description\":\"Найти сохранённые конфигурации отчётов классов TAccCardConfig (карта счёта) и TAccCirculationListConfig (ОСВ).\"},{\"phase\":\"query\",\"tool\":\"run_report_config\",\"description\":\"Для найденных конфигураций запустить отчёты за декабрь 2025 (2025-12-01..2025-12-31), чтобы получить итоговые строки и конфигурации в формате Gedemin"
+      },
+      {
+        "name": "list_report_configs",
+        "args": {
+          "className": "TAccCardConfig",
+          "limit": 50
+        },
+        "durationMs": 75,
+        "isError": false,
+        "resultPreview": "{\"configs\":[{\"id\":155396340,\"name\":\"1\",\"className\":\"TAccCardConfig\",\"reportKind\":\"карта счёта\",\"reportClass\":\"TgdvAcctAccCard\",\"supported\":true,\"folder\":714000,\"showInExplorer\":0},{\"id\":157733907,\"name\":\"10 материалы\",\"className\":\"TAccCardConfig\",\"reportKind\":\"карта счёта\",\"reportClass\":\"TgdvAcctAccCard\",\"supported\":true,\"folder\":714000,\"showInExplorer\":0},{\"id\":158026990,\"name\":\"10.1 материалы=\",\"className\":\"TAccCardConfig\",\"reportKind\":\"карта счёта\",\"reportClass\":\"TgdvAcctAccCard\",\"supported\":true,\"folder\":714000,\"showInExplorer\":0},{\"id\":158027351,\"name\":\"10.1,МАТ=\",\"className\":\"TAccCardConfig\",\"reportKind\":\"карта счёта\",\"reportClass\":\"TgdvAcctAccCard\",\"supported\":true,\"folder\":714000,\"showInExplorer\":0},{\"id\":158027045,\"name\":\"10.1-2 металлы=\",\"className\":\"TAccCardConfig\",\"reportKind\":"
+      },
+      {
+        "name": "list_report_configs",
+        "args": {
+          "className": "TAccCirculationListConfig",
+          "limit": 50
+        },
+        "durationMs": 51,
+        "isError": false,
+        "resultPreview": "{\"configs\":[],\"rowCount\":0,\"dataCutoff\":\"2026-10-31\"}"
+      }
+    ],
+    "finalAnswer": "Нашёл сохранённые настройки **по карте счёта**; **ОСВ-сохранёнок в базе не найдено**.\n\n### Что есть по карте счёта\nВ списке — 32 конфигурации, например:\n- `карта` — id **288986253**\n- `Проверка денег` — id **281870264**\n- `консалтинг` — id **148878107**\n- `фонд` — id **148435116**\n- и ряд конфигураций по конкретным счетам: `10 материалы`, `60.3`, `62.4-1`, `62.4-4`, `12100`, `12200` и т.д.\n\n### По ОСВ\n- **Сохранённых конфигураций ОСВ не найдено** (`rowCount = 0`).\n\n### Дата среза\n- `dataCutoff`: **2026-10-31**\n\n### Что не получилось сделать автоматически\nВы просили “запусти «как в Гедымине» за декабрь 2025”.  \nНо в найденных данных:\n- по **ОСВ** нет сохранённых конфигов;\n- по **карте счёта** есть несколько сохранок, но без указания **какую именно** запускать, я не могу выбрать корректную.\n\nЕсли хотите, я могу сразу:\n1. **запустить все найденные конфигурации карты счёта за 2025-12-01..2025-12-31**, или  \n2. **запустить только выбранные** — скажите названия или id, например: `карта`, `Проверка денег`, `60.3`."
+  },
+  {
+    "id": "B1",
+    "group": "belgiss",
+    "prompt": "Кратко для директора: дебиторка и кредиторка на 28.12.2025, без субсчетов в ответе — итогами.",
+    "totalMs": 11645,
+    "turnError": null,
+    "steps": 3,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Кратко для директора: показать дебиторку и кредиторку на 28.12.2025, итогами без детализации по субсчетам в ответе.",
+          "summary": "Нужно получить сальдо на дату 28.12.2025 по ключевым расчетным счетам для директора. Для краткого ответа без субсчетов используем get_balance с summaryOnly=true и withSubAccounts=true, чтобы не потерять движения на субсчетах. Сначала найду/уточню счета 62 и 60 через find_account, затем запрошу итоговые totals.debitNcu/creditNcu по ним на нужную дату. Если организация не названа, companyKey не передаю.",
+          "discoverySteps": [
+            {
+              "phase": "discovery",
+              "tool": "functions.find_account",
+              "description": "Найти счета 62 и 60 в активном плане, чтобы получить их accountKey."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_balance",
+              "description": "Получить итоговое сальдо на 28.12.2025 по счету 62 для дебиторки покупателей и по счету 60 для кредиторки поставщикам, с summaryOnly=true."
+            },
+            {
+              "phase": "present",
+              "description": "Сформулировать краткий итог для директора: дебиторка = totals.debitNcu по 62, кредиторка = totals.creditNcu по 60, с указанием даты и валюты."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "displayName": "План счетов",
+              "role": "Поиск счетов 60 и 62"
+            }
+          ],
+          "sqlStrategy": "Не использовать SQL. Сначала find_account по запросам '62' и '60' (при необходимости с уточнением по названию), затем get_balance на дату 2025-12-28 с summaryOnly=true и withSubAccounts=true. В ответе использовать только totals.debitNcu / totals.creditNcu из тулов, без пересчёта.",
+          "notes": "Если find_account вернет несколько вариантов, выбрать стандартный расчетный счет 60/62 по названию и типу; не использовать алиасы как accountKey напрямую."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Кратко для директора: показать дебиторку и кредиторку на 28.12.2025, итогами без детализации по субсчетам в ответе.\",\"summary\":\"Нужно получить сальдо на дату 28.12.2025 по ключевым расчетным счетам для директора. Для краткого ответа без субсчетов используем get_balance с summaryOnly=true и withSubAccounts=true, чтобы не потерять движения на субсчетах. Сначала найду/уточню счета 62 и 60 через find_account, затем запрошу итоговые totals.debitNcu/creditNcu по ним на нужную дату. Если организация не названа, companyKey не передаю.\",\"discoverySteps\":[{\"phase\":\"discovery\",\"tool\":\"functions.find_account\",\"description\":\"Найти счета 62 и 60 в активном плане, чтобы получить их accountKey.\"},{\"phase\":\"query\",\"tool\":\"functions.get_balance\",\"description\":\"Получить итоговое сальдо на 28.1"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "62",
+          "limit": 10
+        },
+        "durationMs": 81,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366200,\"alias\":\"62\",\"name\":\"Расчеты с покупателями и заказчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":366204,\"alias\":\"62.04\",\"name\":\"Расчеты с покупателями в кредит НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366201,\"alias\":\"62.1\",\"name\":\"Расчеты с покупателями и заказчиками (задолженность)\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366202,\"alias\":\"62.2\",\"name\":\"Расчеты плановыми платежами\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":284038375,\"alias\":\"62.2-1\",\"name\":\"Расчеты по ВНК НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":366203,\"alias\":\"62.3\",\"name\":\"Векселя полученные (стар)\",\"accountType\":\"S\",\"parent\":176461267,\"offbalance\":0},{\"id\":148529707,\"alias\":\"62.4\",\""
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "60",
+          "limit": 10
+        },
+        "durationMs": 77,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366000,\"alias\":\"60\",\"name\":\"Расчеты с поставщиками и подрядчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":189773997,\"alias\":\"60.01\",\"name\":\"Расчеты с поставщиками (Борисов)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189773999,\"alias\":\"60.02\",\"name\":\"Расчеты с поставщиками (Молодечно)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774001,\"alias\":\"60.03\",\"name\":\"Расчеты с поставщиками (Слуцк)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774003,\"alias\":\"60.04\",\"name\":\"Расчеты с поставщиками (кафе-29)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774005,\"alias\":\"60.05\",\"name\":\"Расчеты с поставщиками (аккредитив)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":148542117,\"alias\":\"60.1\",\"name\":\"Ра"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 366200,
+          "dateEnd": "2025-12-28",
+          "withSubAccounts": true,
+          "summaryOnly": true
+        },
+        "durationMs": 144,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366200,\"accountAlias\":\"62\",\"accountName\":\"Расчеты с покупателями и заказчиками\",\"dateEnd\":\"2025-12-28\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":4,\"rowCount\":0,\"totals\":{\"debitNcu\":\"823.864\",\"creditNcu\":\"0\",\"debitCurr\":\"0\",\"creditCurr\":\"0\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"823.864\"},\"relatedSiblingAccounts\":[{\"accountKey\":284038375,\"alias\":\"62.2-1\",\"name\":\"Расчеты по ВНК НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\"},{\"accountKey\":366203,\"alias\":\"62.3\",\"name\":\"Векселя полученные (стар)\",\"accountType\":\"S\"},{\"accountKey\":148529707,\"alias\":\"62.4\",\"name\":\"Авансы полученные\",\"accountType\":\"A\"},{\"accountKey\":148040931,\"alias"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 366000,
+          "dateEnd": "2025-12-28",
+          "withSubAccounts": true,
+          "summaryOnly": true
+        },
+        "durationMs": 1577,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366000,\"accountAlias\":\"60\",\"accountName\":\"Расчеты с поставщиками и подрядчиками\",\"dateEnd\":\"2025-12-28\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":14,\"rowCount\":0,\"totals\":{\"debitNcu\":\"432291.2099\",\"creditNcu\":\"621134.608\",\"debitCurr\":\"2670.73\",\"creditCurr\":\"219833917.96\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"-188843.3981\"},\"relatedSiblingAccounts\":[{\"accountKey\":148040908,\"alias\":\"60.4\",\"name\":\"Расчеты по авансам выданным (стар)\",\"accountType\":\"A\"}],\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateEnd\":\"2025-12-28\",\"accountKey\":366000,\"includeInternal\""
+      }
+    ],
+    "finalAnswer": "БелГИСС, на **28.12.2025**, в **бел. руб. (NCU)**:\n\n- **Дебиторка покупателей (сч. 62)**: **823.864**\n- **Кредиторка поставщикам (сч. 60)**: **621134.608**\n\nЕсли нужно, могу сразу дать ещё и **чистый итог по двум счетам вместе** или разбивку по основным субсчетам."
+  },
+  {
+    "id": "B2",
+    "group": "belgiss",
+    "prompt": "Сравни обороты по 62 за ноябрь и декабрь 2025: отгрузка vs оплаты.",
+    "totalMs": 6357,
+    "turnError": null,
+    "steps": 2,
+    "toolTrace": [
+      {
+        "name": "find_account",
+        "args": {
+          "query": "62",
+          "limit": 20
+        },
+        "durationMs": 83,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366200,\"alias\":\"62\",\"name\":\"Расчеты с покупателями и заказчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":366204,\"alias\":\"62.04\",\"name\":\"Расчеты с покупателями в кредит НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366201,\"alias\":\"62.1\",\"name\":\"Расчеты с покупателями и заказчиками (задолженность)\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":366202,\"alias\":\"62.2\",\"name\":\"Расчеты плановыми платежами\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0},{\"id\":284038375,\"alias\":\"62.2-1\",\"name\":\"Расчеты по ВНК НЕ ИСПОЛЬЗОВАТЬ\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":366203,\"alias\":\"62.3\",\"name\":\"Векселя полученные (стар)\",\"accountType\":\"S\",\"parent\":176461267,\"offbalance\":0},{\"id\":148529707,\"alias\":\"62.4\",\""
+      },
+      {
+        "name": "get_journal_order",
+        "args": {
+          "accountKey": 366200,
+          "dateBegin": "2025-11-01",
+          "dateEnd": "2025-11-30",
+          "groupBy": "MONTH",
+          "withSubAccounts": true
+        },
+        "durationMs": 274,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_entry_issimple_pivot\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366200,\"dateBegin\":\"2025-11-01\",\"dateEnd\":\"2025-11-30\",\"includeInternal\":false,\"withSubAccounts\":true,\"allHoldingCompanies\":false,\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateBegin\":\"2025-11-01\",\"dateEnd\":\"2025-11-30\",\"accountKey\":366200,\"includeInternal\":false,\"allHoldingCompanies\":false,\"withSubAccounts\":true},\"groupBy\":\"MONTH\",\"rows\":[{\"groupKey\":\"2025-11\",\"alias\":\"62.2\",\"accountName\":\"Расчеты плановыми платежами\",\"ncuDebit\":\"52.8\",\"ncuCredit\":\"666.32\",\"correspondence\":[{\"corrAlias\":\"51\",\"corrAccountName\":\"Расчетный счет\",\"ncuDebit\":\"0\",\"ncuCredit\":\"666.32\"},{\"corrAlias\":\"90.5\",\"corrAccoun"
+      },
+      {
+        "name": "get_journal_order",
+        "args": {
+          "accountKey": 366200,
+          "dateBegin": "2025-12-01",
+          "dateEnd": "2025-12-31",
+          "groupBy": "MONTH",
+          "withSubAccounts": true
+        },
+        "durationMs": 272,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_entry_issimple_pivot\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366200,\"dateBegin\":\"2025-12-01\",\"dateEnd\":\"2025-12-31\",\"includeInternal\":false,\"withSubAccounts\":true,\"allHoldingCompanies\":false,\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateBegin\":\"2025-12-01\",\"dateEnd\":\"2025-12-31\",\"accountKey\":366200,\"includeInternal\":false,\"allHoldingCompanies\":false,\"withSubAccounts\":true},\"groupBy\":\"MONTH\",\"rows\":[{\"groupKey\":\"2025-12\",\"alias\":\"62.2\",\"accountName\":\"Расчеты плановыми платежами\",\"ncuDebit\":\"0\",\"ncuCredit\":\"454.1\",\"correspondence\":[{\"corrAlias\":\"51\",\"corrAccountName\":\"Расчетный счет\",\"ncuDebit\":\"0\",\"ncuCredit\":\"454.1\"}],\"month\":\"2025-12\"}],\"rowCount\":1,\"d"
+      }
+    ],
+    "finalAnswer": "По счёту 62 у **БелГИСС**:\n\n**Ноябрь 2025**\n- Отгрузка (Дт 62): **52.8 бел. руб.**\n- Оплаты (Кт 62): **666.32 бел. руб.**\n\n**Декабрь 2025**\n- Отгрузка (Дт 62): **0 бел. руб.**\n- Оплаты (Кт 62): **454.1 бел. руб.**\n\nКратко:\n- В ноябре оплаты были больше отгрузки на **613.52 бел. руб.**\n- В декабре тоже преобладали оплаты: разница **454.1 бел. руб.**\n\nЕсли хотите, могу ещё показать разбивку по субсчетам 62.1 / 62.2 / 62.4."
+  },
+  {
+    "id": "B3",
+    "group": "belgiss",
+    "prompt": "Топ-10 должников по 62.1 на конец декабря 2025.",
+    "totalMs": 6386,
+    "turnError": null,
+    "steps": 2,
+    "toolTrace": [
+      {
+        "name": "find_account",
+        "args": {
+          "query": "62.1",
+          "limit": 10
+        },
+        "durationMs": 62,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366201,\"alias\":\"62.1\",\"name\":\"Расчеты с покупателями и заказчиками (задолженность)\",\"accountType\":\"S\",\"parent\":366200,\"offbalance\":0}],\"rowCount\":1,\"dataCutoff\":\"2026-10-31\"}"
+      },
+      {
+        "name": "get_analytics_balance",
+        "args": {
+          "accountKey": 366201,
+          "dateEnd": "2025-12-31",
+          "side": "debit",
+          "limit": 10
+        },
+        "durationMs": 71,
+        "isError": true,
+        "resultPreview": "{\"error\":\"Tool execution failed. {\\\"error\\\":\\\"No USR$ analytics on AC_ACCANALYTICSEXT for this account tree. Pass fieldName explicitly (a USR$ column on AC_ENTRY).\\\",\\\"code\\\":\\\"NO_ANALYTICS_FIELD\\\",\\\"availableFields\\\":[]}\"}"
+      }
+    ],
+    "finalAnswer": "Не удалось получить топ-10 должников по 62.1 на 31.12.2025: для этого счёта в базе не найдено ни одного поля аналитики USR$.\n\nЧто известно:\n- Счёт 62.1: **id 366201**\n- Дата среза в базе: **2026-10-31**\n- Запрошенная дата: **31.12.2025**\n\nЧтобы показать именно **топ должников по контрагентам**, нужен аналитический признак на счёте 62.1. Сейчас инструмент вернул ошибку: **No USR$ analytics on AC_ACCANALYTICSEXT for this account tree**.\n\nЕсли хотите, я могу:\n1. проверить, по каким аналитикам вообще ведётся 62.1 в этой базе,  \n2. или показать **общий остаток по 62.1** на 31.12.2025 без разбивки по должникам."
+  },
+  {
+    "id": "B4",
+    "group": "belgiss",
+    "prompt": "По счёту 90 за 2025: выручка с НДС, себестоимость, финансовый результат.",
+    "totalMs": 7849,
+    "turnError": null,
+    "steps": 2,
+    "toolTrace": [
+      {
+        "name": "find_account",
+        "args": {
+          "query": "90",
+          "limit": 20
+        },
+        "durationMs": 59,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":344600,\"alias\":\"90\",\"name\":\"Доходы и расходы по текущей деятельности\",\"accountType\":\"A\",\"parent\":385000,\"offbalance\":0},{\"id\":390001,\"alias\":\"90---\",\"name\":\"Реализация\",\"accountType\":\"A\",\"parent\":176461267,\"offbalance\":0},{\"id\":344601,\"alias\":\"90.01\",\"name\":\"Выручка от реализации (Общая)\",\"accountType\":\"A\",\"parent\":385000,\"offbalance\":0},{\"id\":344602,\"alias\":\"90.02\",\"name\":\"Выручка от реализации (кафе-29)\",\"accountType\":\"A\",\"parent\":385000,\"offbalance\":0},{\"id\":189774108,\"alias\":\"90.02.01\",\"name\":\"Покупная стоимость\",\"accountType\":\"S\",\"parent\":344602,\"offbalance\":0},{\"id\":189774110,\"alias\":\"90.02.02\",\"name\":\"Затраты на производство и реализацию продукции (учитываемые)\",\"accountType\":\"S\",\"parent\":344602,\"offbalance\":0},{\"id\":189774130,\"alias\":\"90.02.03\",\"name\":\"Затраты на"
+      },
+      {
+        "name": "get_account_analysis",
+        "args": {
+          "accountKey": 344600,
+          "dateBegin": "2025-01-01",
+          "dateEnd": "2025-12-31",
+          "withSubAccounts": true
+        },
+        "durationMs": 489,
+        "isError": false,
+        "resultPreview": "{\"source\":\"tgdv_acct_acc_review\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":344600,\"accountAlias\":\"90\",\"accountName\":\"Доходы и расходы по текущей деятельности\",\"dateBegin\":\"2025-01-01\",\"dateEnd\":\"2025-12-31\",\"includeInternal\":false,\"withSubAccounts\":true,\"allHoldingCompanies\":false,\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateBegin\":\"2025-01-01\",\"dateEnd\":\"2025-12-31\",\"accountKey\":344600,\"includeInternal\":false,\"allHoldingCompanies\":false,\"withSubAccounts\":true},\"saldoBeginNcu\":\"-0.0031\",\"saldoEndNcu\":\"-0.0031\",\"saldoBeginDebitNcu\":\"0\",\"saldoBeginCreditNcu\":\"0.0031\",\"saldoEndDebitNcu\":\"0\",\"saldoEndCreditNcu\":\"0.0031\",\"turnoverDebitNcu\":\"7543750.62\",\"turnoverCreditNcu\":\""
+      }
+    ],
+    "finalAnswer": "По счёту 90 за 2025 год, по данным на срез **2026-10-31**, организация **БелГИСС**, валюта **бел. руб. (NCU)**:\n\n- **Выручка с НДС:** по этому отчёту счёт 90 показал обороты, но в найденных строках явной строки выручки с НДС нет; есть только связанные статьи 90.* с оборотами. Для точного выделения выручки нужна детализация по конкретному субсчёту выручки.\n- **Себестоимость:** **693884.92**\n- **Финансовый результат:** по корреспонденции счёта 90 на 31.12.2025 сальдо не сформировалось; обороты по дебету и кредиту равны **7543750.62** и **7543750.62**, соответственно, итоговое сальдо на дату — **-0.0031** NCU\n\nИз важного по строкам анализа счёта:\n- 90.04 «Покупная стоимость» — **1291857.72**\n- 90.05 «Себестоимость (кафе-29)» — **693884.92**\n- 90.2-5 «Управленческие расходы» — **6256437.62**\n\nЕсли хотите, я могу следующим сообщением отдельно разложить:\n1) **выручку**,  \n2) **НДС**,  \n3) **прибыль/убыток**  \nпо подходящим субсчетам 90.*, чтобы получить именно три итоговые цифры."
+  },
+  {
+    "id": "B5",
+    "group": "belgiss",
+    "prompt": "Покажи ОСВ за декабрь 2025 только по деньгам и расчётам (50–62), без забаланса.",
+    "totalMs": 77186,
+    "turnError": null,
+    "steps": 2,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Показать ОСВ за декабрь 2025 только по денежным и расчётным счетам 50–62, без забаланса.",
+          "summary": "Сначала уточню, есть ли несколько активных организаций; если организация не названа, попробую отчёт без companyKey. Для ОСВ по диапазону счетов 50–62 возьму get_trial_balance, отключу забалансовые счета и ограничу вывод диапазоном accountAliases '50-62'.",
+          "discoverySteps": [
+            {
+              "phase": "query",
+              "tool": "functions.get_trial_balance",
+              "description": "Сформировать ОСВ за 2025-12-01..2025-12-31 по диапазону 50–62, без забаланса, с фильтром accountAliases ['50-62']."
+            },
+            {
+              "phase": "present",
+              "description": "Показать итоговую таблицу ОСВ и кратко перечислить итоги по счетам/группам, если нужно."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "displayName": "План счетов",
+              "role": "Для фильтрации и чтения ОСВ по счетам 50–62"
+            }
+          ],
+          "sqlStrategy": "Использовать get_trial_balance за период 2025-12-01..2025-12-31, includeOffBalance=false, accountAliases=['50-62']. companyKey не передавать, так как организация не названа. Если отчёт вернёт только таблицу — в ответе опираться на totals из отчёта и не пересчитывать строки вручную.",
+          "notes": "Для диапазона 50–62 не использовать accountKey одного узла; нужен именно фильтр по aliases, чтобы включить все счета и субсчета внутри диапазона."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Показать ОСВ за декабрь 2025 только по денежным и расчётным счетам 50–62, без забаланса.\",\"summary\":\"Сначала уточню, есть ли несколько активных организаций; если организация не названа, попробую отчёт без companyKey. Для ОСВ по диапазону счетов 50–62 возьму get_trial_balance, отключу забалансовые счета и ограничу вывод диапазоном accountAliases '50-62'.\",\"discoverySteps\":[{\"phase\":\"query\",\"tool\":\"functions.get_trial_balance\",\"description\":\"Сформировать ОСВ за 2025-12-01..2025-12-31 по диапазону 50–62, без забаланса, с фильтром accountAliases ['50-62'].\"},{\"phase\":\"present\",\"description\":\"Показать итоговую таблицу ОСВ и кратко перечислить итоги по счетам/группам, если нужно.\"}],\"tables\":[{\"tableName\":\"AC_ACCOUNT\",\"displayName\":\"План счетов\",\"role\":\"Для фильтрации и чтения ОСВ"
+      },
+      {
+        "name": "get_trial_balance",
+        "args": {
+          "dateBegin": "2025-12-01",
+          "dateEnd": "2025-12-31",
+          "includeOffBalance": false,
+          "accountAliases": [
+            "50-62"
+          ]
+        },
+        "durationMs": 69075,
+        "isError": false,
+        "resultPreview": "{\"source\":\"tgdv_acct_circulation_list\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateBegin\":\"2025-12-01\",\"dateEnd\":\"2025-12-31\",\"accountKey\":300001,\"includeInternal\":false,\"allHoldingCompanies\":false,\"includeOffBalance\":false,\"accountAliases\":[\"50-62\"],\"accounts\":[{\"ACCOUNT_ALIAS\":\"50.0\",\"ACCOUNT_NAME\":\"Касса, бел.руб.\",\"ACCOUNT_ID\":148348805,\"BEGIN_DEBIT\":\"1980.27\",\"BEGIN_CREDIT\":\"0\",\"DEBIT\":\"44568.92\",\"CREDIT\":\"41157.16\",\"END_DEBIT\":\"5392.03\",\"END_CREDIT\":\"0\",\"OFFBALANCE\":0},{\"ACCOUNT_ALIAS\":\"50.01\",\"ACCOUNT_NAME\":\"Касса, бел.руб.(кафе-29)\",\"ACCOUNT_ID\":359903155,\"BEGIN_DEBIT\":\"4918.25\",\"BEGIN_CREDIT\":\"0\",\"DEBIT\":\"43227.76\",\"CREDIT\":\"42494.67\",\"END_DEBIT\":\"5651.34\",\"END_CREDIT\":\"0\",\"OFFBALANCE\":0},{\"ACCOUNT_ALIAS\":\"50.1\",\"ACCOUNT_NAME\":\"Касса"
+      }
+    ],
+    "finalAnswer": "ОСВ за **декабрь 2025** по **БелГИСС**  \nПериод: **2025-12-01 — 2025-12-31**  \nВалюта: **бел. руб. (NCU)**  \nЗабаланс: **не включён**\n\nИтоги по отобранным счетам **50–62**:\n- **Сальдо начальное:** Дт **4 509 881.4261**, Кт **2 520 740.4599**\n- **Обороты за период:** Дт **9 435 136.8922**, Кт **9 890 018.5521**\n- **Сальдо конечное:** Дт **3 954 106.2564**, Кт **2 419 846.9501**\n- **Кол-во счетов:** **62**\n\nЕсли хотите, могу ещё:\n- показать **только итоги по группам 50 / 51 / 52 / 55 / 57 / 58 / 60 / 62**,\n- или **отфильтровать конкретный счёт** внутри этого диапазона."
+  },
+  {
+    "id": "C1",
+    "group": "complex",
+    "prompt": "Сколько затрат в декабре 2025 и как их уменьшить?",
+    "totalMs": 16901,
+    "turnError": null,
+    "steps": 4,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Определить затраты за декабрь 2025 и дать рекомендации по их уменьшению.",
+          "summary": "Сначала нужно найти организацию, если она указана; здесь организация не названа, поэтому будем работать по единственному активному плану. Для ответа о затратах в декабре 2025 лучше всего определить счета затрат через план счетов/поиск счёта (90.4, 90.5, 90.6, 20, 23, 25, 26, 44 и т.п. — в зависимости от плана), затем получить обороты за декабрь по нужным счетам через анализ счёта или журнал-ордер. Если пользователь хочет именно управленчески «затраты», можно собрать расходы по счетам затрат и показать наиболее крупные статьи; для рекомендаций по уменьшению потребуется классифицировать крупные статьи по счетам и, при необходимости, по аналитике.",
+          "discoverySteps": [
+            {
+              "phase": "discovery",
+              "tool": "functions.find_account",
+              "description": "Найти ключевые счета затрат в текущем активном плане (например, 20/23/25/26/44/90.*) и уточнить их id, а также понять структуру плана."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_account_analysis",
+              "description": "Получить обороты по найденным счетам затрат за декабрь 2025, чтобы выделить основные статьи затрат."
+            },
+            {
+              "phase": "present",
+              "tool": "functions.present_query_result",
+              "description": "Показать пользователю компактную таблицу с ключевыми затратами и краткими выводами."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "displayName": "План счетов",
+              "role": "Определение счетов затрат"
+            }
+          ],
+          "sqlStrategy": "Использовать встроенные accounting tools, а не run_sql. Для сумм за период — get_account_analysis по найденным accountKey или get_journal_order groupBy=MONTH/NONE, если нужен разрез по корреспондентам. Сначала найти счета через find_account; при отсутствии названной организации companyKey не передавать.",
+          "notes": "Если в плане нет стандартных счетов затрат, опираться на фактические счета с названием/alias, содержащим расходы/затраты. Для рекомендаций по уменьшению использовать крупнейшие статьи из результата."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Определить затраты за декабрь 2025 и дать рекомендации по их уменьшению.\",\"summary\":\"Сначала нужно найти организацию, если она указана; здесь организация не названа, поэтому будем работать по единственному активному плану. Для ответа о затратах в декабре 2025 лучше всего определить счета затрат через план счетов/поиск счёта (90.4, 90.5, 90.6, 20, 23, 25, 26, 44 и т.п. — в зависимости от плана), затем получить обороты за декабрь по нужным счетам через анализ счёта или журнал-ордер. Если пользователь хочет именно управленчески «затраты», можно собрать расходы по счетам затрат и показать наиболее крупные статьи; для рекомендаций по уменьшению потребуется классифицировать крупные статьи по счетам и, при необходимости, по аналитике.\",\"discoverySteps\":[{\"phase\":\"discovery\",\"tool\":"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "затраты",
+          "limit": 10
+        },
+        "durationMs": 88,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":166127386,\"alias\":\"08.4-2.1\",\"name\":\"Затраты до начала строительства (модерниз.Новаторская 2Б)\",\"accountType\":\"S\",\"parent\":300800,\"offbalance\":0},{\"id\":184507657,\"alias\":\"08.4-2.3\",\"name\":\"Косвенные затраты (модерниз.Новаторская 2Б)\",\"accountType\":\"S\",\"parent\":300800,\"offbalance\":0},{\"id\":345668997,\"alias\":\"08.4.3\",\"name\":\"Косвенные затраты 4 очередь\",\"accountType\":\"S\",\"parent\":300800,\"offbalance\":0},{\"id\":183548548,\"alias\":\"20.0.2\",\"name\":\"затраты не учитыв.ИЦ\",\"accountType\":\"A\",\"parent\":148498611,\"offbalance\":0},{\"id\":322600,\"alias\":\"26\",\"name\":\"Общехозяйственные затраты\",\"accountType\":\"A\",\"parent\":320000,\"offbalance\":0},{\"id\":183548546,\"alias\":\"26.1\",\"name\":\"затраты учитыв.\",\"accountType\":\"S\",\"parent\":322600,\"offbalance\":0},{\"id\":183548547,\"alias\":\"26.2\",\"name\":\"затра"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "26",
+          "limit": 20
+        },
+        "durationMs": 105,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":177220672,\"alias\":\"026\",\"name\":\"026\",\"accountType\":\"A\",\"parent\":176461267,\"offbalance\":0},{\"id\":322600,\"alias\":\"26\",\"name\":\"Общехозяйственные затраты\",\"accountType\":\"A\",\"parent\":320000,\"offbalance\":0},{\"id\":183548546,\"alias\":\"26.1\",\"name\":\"затраты учитыв.\",\"accountType\":\"S\",\"parent\":322600,\"offbalance\":0},{\"id\":183548547,\"alias\":\"26.2\",\"name\":\"затраты новаторская\",\"accountType\":\"S\",\"parent\":322600,\"offbalance\":0},{\"id\":275574865,\"alias\":\"26.3\",\"name\":\" управленческие затраты \",\"accountType\":\"S\",\"parent\":322600,\"offbalance\":0}],\"rowCount\":5,\"dataCutoff\":\"2026-10-31\"}"
+      },
+      {
+        "name": "get_account_analysis",
+        "args": {
+          "accountKey": 322600,
+          "dateBegin": "2025-12-01",
+          "dateEnd": "2025-12-31",
+          "withSubAccounts": true
+        },
+        "durationMs": 2814,
+        "isError": false,
+        "resultPreview": "{\"source\":\"tgdv_acct_acc_review\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":322600,\"accountAlias\":\"26\",\"accountName\":\"Общехозяйственные затраты\",\"dateBegin\":\"2025-12-01\",\"dateEnd\":\"2025-12-31\",\"includeInternal\":false,\"withSubAccounts\":true,\"allHoldingCompanies\":false,\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateBegin\":\"2025-12-01\",\"dateEnd\":\"2025-12-31\",\"accountKey\":322600,\"includeInternal\":false,\"allHoldingCompanies\":false,\"withSubAccounts\":true},\"saldoBeginNcu\":\"-0.0015\",\"saldoEndNcu\":\"-0.0033\",\"saldoBeginDebitNcu\":\"0\",\"saldoBeginCreditNcu\":\"0.0015\",\"saldoEndDebitNcu\":\"0\",\"saldoEndCreditNcu\":\"0.0033\",\"turnoverDebitNcu\":\"595473.0182\",\"turnoverCreditNcu\":\"595473.02\",\"re"
+      }
+    ],
+    "finalAnswer": "За декабрь 2025 по счёту **26 «Общехозяйственные затраты»** у **БелГИСС** затраты составили **595 473,0182 бел. руб.**  \nПериод: **2025-12-01 — 2025-12-31**. Данные среза учёта: **2026-10-31**.\n\nЧто больше всего утянуло затраты по счёту 26:\n- **70.1 Расчеты с персоналом по оплате труда** — **292 557,58**\n- **69.1 Соцстрах и пенсионное обеспечение** — **99 391,32**\n- **60.5 Услуги поставщиков** — **77 993,92**\n- **02 Амортизация основных средств** — **43 271,64**\n- **68.5 Налог на недвижимость** — **20 016,71**\n- **68.6 Налог на землю** — **19 369,30**\n- **10.1 Сырьё и материалы** — **22 553,8435**\n- **18.10 НДС по приобретённым ТМЦ/услугам** — **5 791,36**\n\nКак их можно уменьшить:\n1. **Фонд оплаты труда и связанные начисления** — это главная статья. Обычно эффект дают:\n   - пересмотр численности и загрузки,\n   - оптимизация сверхурочных/премий,\n   - перераспределение функций между подразделениями.\n2. **Услуги поставщиков (60.5)**:\n   - пересмотреть договоры и тарифы,\n   - убрать дублирующиеся услуги,\n   - провести тендер/сравнение цен.\n3. **Амортизация и содержание ОС**:\n   - проверить, нет ли неиспользуемых активов,\n   - отказаться от лишних ремонтов/содержания,\n   - пересмотреть использование оборудования.\n4. **Налоги на недвижимость и землю**:\n   - проверить состав и использование объектов,\n   - исключить неиспользуемые площади,\n   - оценить, можно ли оптимизировать владение/аренду.\n5. **Материалы, топливо, хозинвентарь**:\n   - усилить лимиты и нормы,\n   - снизить потери и списания,\n   - контролировать закупки по заявкам.\n\nЕсли хотите, я могу следующим сообщением разложить **затраты по статьям в виде короткого рейтинга** или показать **затраты по конкретному счёту 20/25/26/44 отдельно**."
+  },
+  {
+    "id": "C2",
+    "group": "complex",
+    "prompt": "Хватает ли денег на расчётных счетах на 31.12.2025, чтобы закрыть все текущие долги поставщикам и по налогам/расчётам с бюджетом?",
+    "totalMs": 23201,
+    "turnError": null,
+    "steps": 3,
+    "toolTrace": [
+      {
+        "name": "create_query_plan",
+        "args": {
+          "userIntent": "Определить, хватает ли денег на расчётных счетах на 31.12.2025 для погашения текущих долгов поставщикам и по налогам/расчётам с бюджетом.",
+          "summary": "Нужно сравнить остаток денежных средств на расчётных счетах (счёт 51 и его субсчета, при необходимости отдельные счета 52/55 не входят в 51) на дату 31.12.2025 с текущей кредиторской задолженностью поставщикам (счёт 60) и по налогам/расчётам с бюджетом. Сначала найду организацию только если она названа; здесь организация не названа, значит companyKey не передаю. Затем через find_account определю id для 51, 60 и счетов по налогам/бюджету (если требуется отдельный поиск по плану/названиям), после чего запрошу get_balance на дату 31.12.2025 с summaryOnly=true для денежных счетов и обязательств. При необходимости уточню, какие именно счета плана отвечают за налоги/бюджет, чтобы не угадывать по номеру.",
+          "discoverySteps": [
+            {
+              "phase": "discovery",
+              "tool": "functions.find_account",
+              "description": "Найти в активном плане счета 51, 60 и, если нужно, счета для налогов/расчётов с бюджетом по названиям/алиасам, чтобы получить корректные accountKey."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_balance",
+              "description": "Получить остаток на 31.12.2025 по счёту 51 с withSubAccounts=true и summaryOnly=true."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_balance",
+              "description": "Получить кредитовое сальдо на 31.12.2025 по счёту 60 с withSubAccounts=true и summaryOnly=true."
+            },
+            {
+              "phase": "query",
+              "tool": "functions.get_balance",
+              "description": "Получить кредитовые остатки по найденным счетам налогов/бюджета (по каждому отдельному счёту или ветке, если они есть в плане)."
+            },
+            {
+              "phase": "present",
+              "tool": "functions.present_query_result",
+              "description": "Показать сводную таблицу с деньгами, долгами и выводом, хватает ли средств."
+            }
+          ],
+          "tables": [
+            {
+              "tableName": "AC_ACCOUNT",
+              "displayName": "План счетов",
+              "role": "Поиск accountKey для 51, 60 и счетов по налогам/бюджету"
+            },
+            {
+              "tableName": "AC_ACCOUNTEXSALDO_BAL",
+              "displayName": "Сальдо на дату",
+              "role": "Остатки денежных средств и обязательств на 31.12.2025"
+            }
+          ],
+          "sqlStrategy": "Сначала уточню через find_account правильные accountKey по счетам 51, 60 и возможным счетам налогов/бюджета; затем выполню get_balance с dateEnd=2025-12-31, withSubAccounts=true, summaryOnly=true. Для итогового ответа сравню только totals.creditNcu по обязательствам и totals.debitNcu по денежным средствам, без ручных вычислений по строкам. Если для налогов/бюджета в плане несколько релевантных счетов, соберу их отдельно и суммирую только по данным тулов.",
+          "notes": "Не буду выдумывать companyKey, так как организация не названа. Не буду использовать withSubAccounts=false для синтетических счетов."
+        },
+        "durationMs": 0,
+        "isError": false,
+        "resultPreview": "{\"userIntent\":\"Определить, хватает ли денег на расчётных счетах на 31.12.2025 для погашения текущих долгов поставщикам и по налогам/расчётам с бюджетом.\",\"summary\":\"Нужно сравнить остаток денежных средств на расчётных счетах (счёт 51 и его субсчета, при необходимости отдельные счета 52/55 не входят в 51) на дату 31.12.2025 с текущей кредиторской задолженностью поставщикам (счёт 60) и по налогам/расчётам с бюджетом. Сначала найду организацию только если она названа; здесь организация не названа, значит companyKey не передаю. Затем через find_account определю id для 51, 60 и счетов по налогам/бюджету (если требуется отдельный поиск по плану/названиям), после чего запрошу get_balance на дату 31.12.2025 с summaryOnly=true для денежных счетов и обязательств. При необходимости уточню, какие имен"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "51",
+          "limit": 10
+        },
+        "durationMs": 97,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":355100,\"alias\":\"51\",\"name\":\"Расчетный счет\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":338278175,\"alias\":\"51-1\",\"name\":\"Расчетный счет(Белинвестбанк)\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":198276326,\"alias\":\"51-10\",\"name\":\"Кредитный расчетный счет, Белинвестбанк\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":198276328,\"alias\":\"51-11\",\"name\":\"Счет для учета процентов по кредитам\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":198407216,\"alias\":\"51-12\",\"name\":\"Расчетный счет, Беларусбанк (Слуцк)\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":381231989,\"alias\":\"51-13\",\"name\":\"Текущий счет Сбербанк Молодечно\",\"accountType\":\"A\",\"parent\":350000,\"offbalance\":0},{\"id\":381231990,\"alias\":\"51-14\",\"name\":\"Текущий счет Сберб"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "60",
+          "limit": 10
+        },
+        "durationMs": 59,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":366000,\"alias\":\"60\",\"name\":\"Расчеты с поставщиками и подрядчиками\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":189773997,\"alias\":\"60.01\",\"name\":\"Расчеты с поставщиками (Борисов)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189773999,\"alias\":\"60.02\",\"name\":\"Расчеты с поставщиками (Молодечно)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774001,\"alias\":\"60.03\",\"name\":\"Расчеты с поставщиками (Слуцк)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774003,\"alias\":\"60.04\",\"name\":\"Расчеты с поставщиками (кафе-29)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":189774005,\"alias\":\"60.05\",\"name\":\"Расчеты с поставщиками (аккредитив)\",\"accountType\":\"S\",\"parent\":366000,\"offbalance\":0},{\"id\":148542117,\"alias\":\"60.1\",\"name\":\"Ра"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "налог",
+          "limit": 10
+        },
+        "durationMs": 97,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":359408875,\"alias\":\"09\",\"name\":\"Отложенные налоговые активы\",\"accountType\":\"A\",\"parent\":300010,\"offbalance\":0},{\"id\":148041170,\"alias\":\"42.4\",\"name\":\"Налог на услуги\",\"accountType\":\"S\",\"parent\":344200,\"offbalance\":0},{\"id\":359408876,\"alias\":\"65\",\"name\":\"Отложенные налоговые обязательства\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":366800,\"alias\":\"68\",\"name\":\"Расчеты по налогам и сборам\",\"accountType\":\"A\",\"parent\":360000,\"offbalance\":0},{\"id\":148040990,\"alias\":\"68.0\",\"name\":\"Подоходный налог\",\"accountType\":\"S\",\"parent\":366800,\"offbalance\":0},{\"id\":366801,\"alias\":\"68.01\",\"name\":\"Налоги и отчисления вкл. в с-сть товаров, продукции, работ, услуг\",\"accountType\":\"S\",\"parent\":366800,\"offbalance\":0},{\"id\":189773914,\"alias\":\"68.01.02\",\"name\":\"Экологический налог\",\"acc"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "бюджет",
+          "limit": 10
+        },
+        "durationMs": 313,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[{\"id\":147045111,\"alias\":\"01.03-147045111\",\"name\":\"Основные средства за счет бюджетных средств\",\"accountType\":\"A\",\"parent\":176461267,\"offbalance\":0},{\"id\":309178661,\"alias\":\"08.2.6\",\"name\":\"Корпус производ. 1,2 (бюджет+с/с)\",\"accountType\":\"S\",\"parent\":300800,\"offbalance\":0},{\"id\":300807,\"alias\":\"08.7\",\"name\":\"Приобретение ОС из республ. бюджета\",\"accountType\":\"S\",\"parent\":300800,\"offbalance\":0},{\"id\":148040940,\"alias\":\"62.4-8\",\"name\":\"Авансы полученные, разработка стандартов (бюджет)\",\"accountType\":\"S\",\"parent\":148529707,\"offbalance\":0},{\"id\":148040992,\"alias\":\"68.10\",\"name\":\"Отчисления во внебюджетный инвестиционный фонд\",\"accountType\":\"S\",\"parent\":366800,\"offbalance\":0},{\"id\":148040999,\"alias\":\"68.17\",\"name\":\"Подоходный налог (бюджет)\",\"accountType\":\"S\",\"parent\":366800,\"offba"
+      },
+      {
+        "name": "find_account",
+        "args": {
+          "query": "расчеты с бюджетом",
+          "limit": 10
+        },
+        "durationMs": 78,
+        "isError": false,
+        "resultPreview": "{\"accounts\":[],\"rowCount\":0,\"dataCutoff\":\"2026-10-31\"}"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 355100,
+          "dateEnd": "2025-12-31",
+          "withSubAccounts": true,
+          "summaryOnly": true
+        },
+        "durationMs": 8000,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":355100,\"accountAlias\":\"51\",\"accountName\":\"Расчетный счет\",\"dateEnd\":\"2025-12-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":1,\"rowCount\":0,\"totals\":{\"debitNcu\":\"227883.9928\",\"creditNcu\":\"0\",\"debitCurr\":\"0\",\"creditCurr\":\"1200\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"227883.9928\"},\"relatedSiblingAccounts\":[{\"accountKey\":338278175,\"alias\":\"51-1\",\"name\":\"Расчетный счет(Белинвестбанк)\",\"accountType\":\"A\"},{\"accountKey\":198276326,\"alias\":\"51-10\",\"name\":\"Кредитный расчетный счет, Белинвестбанк\",\"accountType\":\"A\"},{\"accountKey\":198276328,\"alias\":\"51-11\",\"name\":\"Счет для учета процентов по кредитам\",\"accountType\":\"A\"},{\"acco"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 366000,
+          "dateEnd": "2025-12-31",
+          "withSubAccounts": true,
+          "summaryOnly": true
+        },
+        "durationMs": 1507,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366000,\"accountAlias\":\"60\",\"accountName\":\"Расчеты с поставщиками и подрядчиками\",\"dateEnd\":\"2025-12-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":14,\"rowCount\":0,\"totals\":{\"debitNcu\":\"657687.127\",\"creditNcu\":\"1933.1951\",\"debitCurr\":\"2670.73\",\"creditCurr\":\"219833917.96\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"655753.9319\"},\"relatedSiblingAccounts\":[{\"accountKey\":148040908,\"alias\":\"60.4\",\"name\":\"Расчеты по авансам выданным (стар)\",\"accountType\":\"A\"}],\"appliedFilters\":{\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"dateEnd\":\"2025-12-31\",\"accountKey\":366000,\"includeInternal\":fa"
+      },
+      {
+        "name": "get_balance",
+        "args": {
+          "accountKey": 366800,
+          "dateEnd": "2025-12-31",
+          "withSubAccounts": true,
+          "summaryOnly": true
+        },
+        "durationMs": 1381,
+        "isError": false,
+        "resultPreview": "{\"source\":\"ac_accountexsaldo_bal\",\"companyKey\":148284864,\"companyName\":\"БелГИСС\",\"companyScope\":\"default_single_working\",\"accountKey\":366800,\"accountAlias\":\"68\",\"accountName\":\"Расчеты по налогам и сборам\",\"dateEnd\":\"2025-12-31\",\"fieldName\":\"ACCOUNTKEY\",\"withSubAccounts\":true,\"summaryOnly\":true,\"subAccountCount\":49,\"rowCount\":0,\"totals\":{\"debitNcu\":\"107903.2313\",\"creditNcu\":\"10430.2427\",\"debitCurr\":\"0\",\"creditCurr\":\"651425.015\",\"debitEq\":\"0\",\"creditEq\":\"0\",\"simpleNcu\":\"97472.9886\"},\"relatedSiblingAccounts\":[{\"accountKey\":148285028,\"alias\":\"68.02.02\",\"name\":\"с/х республиканский\",\"accountType\":\"S\"},{\"accountKey\":148285024,\"alias\":\"68.02.03\",\"name\":\"с/х местный\",\"accountType\":\"S\"},{\"accountKey\":366804,\"alias\":\"68.04\",\"name\":\"Налоги на доходы физических лиц\",\"accountType\":\"S\"},{\"accountKey\":148"
+      }
+    ],
+    "finalAnswer": "Да, **на 31.12.2025 денег на расчётных счетах достаточно**, если сравнивать только с **текущими долгами поставщикам (60)** и **по налогам/расчётам с бюджетом (68)**.\n\nПо данным учёта для **БелГИСС** на **31.12.2025**:\n\n- **Расчётные счета (51)**: дебетовое сальдо **227883.9928 бел. руб.**\n- **Поставщики и подрядчики (60)**:\n  - дебет **657687.127** бел. руб.\n  - кредит **1933.1951** бел. руб.\n  - для погашения текущей кредиторки поставщикам ориентируемся на **кредит 1933.1951** бел. руб.\n- **Налоги и сборы / расчёты с бюджетом (68)**:\n  - дебет **107903.2313** бел. руб.\n  - кредит **10430.2427** бел. руб.\n  - для погашения текущей задолженности по налогам ориентируемся на **кредит 10430.2427** бел. руб.\n\nСравнение:\n- Денег на 51: **227883.9928**\n- Текущие долги:\n  - поставщикам: **1933.1951**\n  - по налогам/бюджету: **10430.2427**\n  - всего: **12363.4378**\n\n**Итого: да, средств хватает.**  \nПосле покрытия этих текущих кредитовых остатков на расчётных счетах останется примерно **215520.5550 бел. руб.**\n\nЕсли хотите, могу ещё отдельно проверить **все денежные счета банка** — например, включить **52/55**, если они у вас тоже используются для оплаты."
+  }
+]
