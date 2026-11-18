@@ -21,6 +21,31 @@ flowchart LR
 Репозиторий: ветка `feature/mcp-v2` (или актуальный релиз с `docker-compose.stack.yaml`).  
 Целевой каталог на сервере (пример): `C:\Git\MCP-Nexus-v2`.
 
+### Быстрый путь (один скрипт)
+
+Если репозиторий уже есть на машине (или можно клонировать с GitHub), на Windows-хосте:
+
+```powershell
+# Один раз скопируйте scripts\bootstrap-remote-stack.ps1 на сервер
+# либо сразу работайте из клонированного репо:
+cd C:\Git\MCP-Nexus-v2
+powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap-remote-stack.ps1
+```
+
+Скрипт сам проверит Git / Node / **Docker Desktop** (если нет — поставит через winget, запустит, дождётся engine, проверит Linux containers / WSL), подтянет ветку (если это git-клон), подготовит `.env`, по возможности создаст `STARTUSER`/`mcp_worker`, поднимет Gedemin `:9080` и Docker-стек, затем проверит `/ready`.
+
+Если репозиторий уже скачан и pull не нужен:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap-remote-stack.ps1 -SkipGitPull
+```
+
+Параметры: `-NonInteractive`, `-SkipWingetInstall`, `-SkipWorker`, `-OpenFirewall`, `-SkipGitPull` и др. — см. [scripts/bootstrap-remote-stack.ps1](../scripts/bootstrap-remote-stack.ps1).
+
+После первой установки Docker Desktop иногда нужен **перезаход в Windows** (PATH) или reboot для WSL2 — скрипт напишет об этом явно.
+
+Ниже — ручные шаги, если скрипт нельзя использовать.
+
 ---
 
 ## 0. Требования на Windows-хосте (где Docker + Gedemin)
